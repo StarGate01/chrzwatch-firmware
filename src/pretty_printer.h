@@ -70,7 +70,7 @@ inline void print_error(ble_error_t error, const char* msg)
 /** print device address to the terminal */
 inline void print_address(const uint8_t &addr)
 {
-    printf("%x\r\n", addr);
+    printf("%x\n", addr);
 }
 
 inline void print_mac_address()

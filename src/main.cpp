@@ -77,7 +77,7 @@ private:
             adv_parameters
         );
         if (error) {
-            printf("_ble.gap().setAdvertisingParameters() failed\r\n");
+            printf("_ble.gap().setAdvertisingParameters() failed\n");
             return;
         }
         error = _ble.gap().setAdvertisingPayload(
@@ -85,14 +85,14 @@ private:
             _adv_data_builder.getAdvertisingData()
         );
         if (error) {
-            printf("_ble.gap().setAdvertisingPayload() failed\r\n");
+            printf("_ble.gap().setAdvertisingPayload() failed\n");
             return;
         }
 
         /* Start advertising */
         error = _ble.gap().startAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
         if (error) {
-            printf("_ble.gap().startAdvertising() failed\r\n");
+            printf("_ble.gap().startAdvertising() failed\n");
             return;
         }
     }
@@ -146,6 +146,7 @@ void schedule_ble_events(BLE::OnEventsToProcessCallbackContext *context) {
 
 int main()
 {
+    printf("CHRZwatch says hello\n");
     BLE &ble = BLE::Instance();
     ble.onEventsToProcess(schedule_ble_events);
     HeartrateDemo demo(ble, event_queue);
