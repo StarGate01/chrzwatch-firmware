@@ -1,5 +1,5 @@
 /**
- * @file core.h
+ * @file display.h
  * @author Christoph Honal
  * @brief Defines a class to interact with the LCD display and other actors
  * @version 0.1

@@ -67,7 +67,7 @@ class CoreService : ble::Gap::EventHandler
 
         HeartRateService _ble_hr_service; //!< BLE heartrate service
         BatteryService _ble_bat_service; //!< BLE battery service
-        CurrentTimeService _ble_time_service; //! BLE current time service
+        CurrentTimeService _ble_time_service; //!< BLE current time service
 
         SensorService _sensor_service; //!< Sensor subsystem
         DisplayService _display_service; //!< Display subsystem

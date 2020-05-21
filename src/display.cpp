@@ -1,5 +1,5 @@
 /**
- * @file display.h
+ * @file display.cpp
  * @author Christoph Honal
  * @brief Implements the functions defined in display.h
  * @version 0.1
