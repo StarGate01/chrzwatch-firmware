@@ -1,0 +1,30 @@
+{
+    "name": "BLE_GATT_Services",
+    "version": "0.1",
+    "keywords": "bluetooth, ble, gatt, service, currenttime",
+    "description": "Various Bluetooth LE GATT services: CurrentTime.",
+    "authors":
+    [
+        {
+            "name": "Christoph Honal",
+            "email": "christoph.honal@web.de",
+            "url": "https://chrz.de",
+            "maintainer": true
+        },
+        {
+            "name": "Takehisa Oneta",
+            "url": "https://os.mbed.com/users/ohneta/"
+        }
+    ],
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/StarGate01/chrzwatch-firmware.git"
+    },
+    "export": {
+        "include": [
+            "lib/BLE_GATT_Services"
+        ]
+    },
+    "frameworks": "mbed"
+}

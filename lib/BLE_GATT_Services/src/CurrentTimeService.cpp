@@ -8,7 +8,7 @@
  */
 
 #include "CurrentTimeService.h"
-#include <hal/rtc_api.h>
+// #include <hal/rtc_api.h>
 
 
 CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue):
