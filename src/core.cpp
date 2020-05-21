@@ -17,7 +17,8 @@ CoreService::CoreService(BLE &ble, events::EventQueue &event_queue):
     _ble_hr_service(ble, 0, HeartRateService::LOCATION_WRIST),
     _ble_bat_service(ble, 0),
     _ble_time_service(ble, event_queue),
-    _display_service(LED1)
+    _display_service(LED1),
+    _watchdog(Watchdog::get_instance())
 { }
 
 void CoreService::start() 
@@ -26,9 +27,13 @@ void CoreService::start()
     _ble.gap().setEventHandler(this);
     _ble.init(this, &CoreService::onInitComplete);
 
+    // Start the deadlock reset watchdog
+    _watchdog.start(min(15000ul, _watchdog.get_max_timeout()));
+
     // Setup and start thread scheduler
     _event_queue.call_every(500, this, &CoreService::doBlink);
     _event_queue.call_every(1000, this, &CoreService::doUpdateSensors);
+    _event_queue.call_every(10000, this, &CoreService::kickWatchdog);
     _event_queue.dispatch_forever();
 }
 
@@ -48,4 +53,9 @@ void CoreService::startAdvertising()
     // Setup advertising payload and start
     _ble.gap().setAdvertisingPayload(ble::LEGACY_ADVERTISING_HANDLE, _adv_data_builder.getAdvertisingData());
     _ble.gap().startAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
+}
+
+void CoreService::kickWatchdog()
+{
+    _watchdog.kick();
 }

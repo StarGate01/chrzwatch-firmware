@@ -11,9 +11,11 @@
 
 #define BLE_FEATURE_GATT_SERVER 1
 #define BLE_ROLE_BROADCASTER 1
+#define DEVICE_WATCHDOG 1
 
 #include <mbed.h>
 #include <events/mbed_events.h>
+#include <Watchdog.h>
 #include "ble/BLE.h"
 #include "ble/gap/Gap.h"
 #include "ble/services/HeartRateService.h"
@@ -72,6 +74,8 @@ class CoreService : ble::Gap::EventHandler
         SensorService _sensor_service; //!< Sensor subsystem
         DisplayService _display_service; //!< Display subsystem
 
+        Watchdog &_watchdog; //!< Emergency deadlock watchdog
+
         /**
          * @brief Starts the BLE GAP advertising
          * 
@@ -111,6 +115,12 @@ class CoreService : ble::Gap::EventHandler
          * @param event Event information
          */
         virtual void onConnectionComplete(const ble::ConnectionCompleteEvent &event);
+
+        /**
+         * @brief Restarts the deadlock watchdog
+         * 
+         */
+        void kickWatchdog();
 
 };
 
