@@ -138,14 +138,6 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
         virtual void linkEncryptionResult(ble::connection_handle_t connectionHandle, ble::link_encryption_t result);
 
         /**
-         * @brief Handles the displaying of a BLE passkey
-         * 
-         * @param connectionHandle Handle to the BLE connection
-         * @param passkey The passkey
-         */
-        virtual void passkeyDisplay(ble::connection_handle_t connectionHandle, const SecurityManager::Passkey_t passkey);
-
-        /**
          * @brief Restarts the deadlock watchdog
          * 
          */

@@ -13,7 +13,7 @@ void CoreService::onInitComplete(BLE::InitializationCompleteCallbackContext *par
     if(params->error != BLE_ERROR_NONE) return;
     
     // Init security bonding module
-    ble_error_t error = _ble.securityManager().init(true, false, SecurityManager::IO_CAPS_DISPLAY_ONLY, NULL, false, NULL);
+    ble_error_t error = _ble.securityManager().init(true, false, SecurityManager::IO_CAPS_NONE, NULL, false, NULL);
     if(error != BLE_ERROR_NONE) return;
     _ble.securityManager().allowLegacyPairing(false);
     _ble.securityManager().setSecurityManagerEventHandler(this);
@@ -43,10 +43,4 @@ void CoreService::pairingRequest(ble::connection_handle_t connectionHandle)
 void CoreService::linkEncryptionResult(ble::connection_handle_t connectionHandle, ble::link_encryption_t result)
 {
     _encrypted = (result != ble::link_encryption_t::NOT_ENCRYPTED);
-}
-
-void CoreService::passkeyDisplay(ble::connection_handle_t connectionHandle, const SecurityManager::Passkey_t passkey)
-{
-    for(uint i=0; i<SecurityManager::PASSKEY_LEN; i++) printf("%c ", passkey[i]);
-    printf("\n");
 }
