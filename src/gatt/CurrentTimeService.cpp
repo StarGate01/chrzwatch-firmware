@@ -24,9 +24,9 @@ CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue
             | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE)                       
 {
     // Read RTC
-    rtc_init();
-    time_t now = rtc_read();
-    writeEpoch(now, false);
+    // rtc_init();
+    // time_t now = rtc_read();
+    // writeEpoch(now, false);
 
     // Setup BLE service definition
     GattCharacteristic *charsTable[] = { &_currentTimeCharacteristic };
@@ -107,9 +107,9 @@ void CurrentTimeService::writeBuffer(const bool writeRtc)
     if(writeRtc)
     {  
         // Update RTC
-        time_t tmpEpochTime;
-        readEpoch(tmpEpochTime);
-        rtc_write(tmpEpochTime);
+        // time_t tmpEpochTime;
+        // readEpoch(tmpEpochTime);
+        // rtc_write(tmpEpochTime);
     }
 
     // Update GATT server
