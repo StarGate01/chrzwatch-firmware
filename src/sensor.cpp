@@ -1,3 +1,11 @@
+/**
+ * @file sensor.cpp
+ * @author Christoph Honal
+ * @brief Implements the functions defined in sensor.h
+ * @version 0.1
+ * @date 2020-05-21
+ */
+
 #include "sensor.h"
 
 SensorService::SensorService():

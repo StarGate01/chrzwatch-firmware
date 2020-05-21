@@ -6,8 +6,6 @@
  * @version 0.1
  * @date 2020-05-21
  * 
- * @copyright Copyright (c) 2020
- * 
  * Thanks to https://os.mbed.com/users/ohneta/code/BLE_CurrentTimeService/
  */
 
@@ -110,6 +108,7 @@ class CurrentTimeService
          * @param params The new timestamp to store
          */
         virtual void onDataWritten(const GattWriteCallbackParams *params);
+        
 };
  
 #endif

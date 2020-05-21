@@ -5,9 +5,6 @@
  * @brief Implements the definitions from CurrentTimeService.h
  * @version 0.1
  * @date 2020-05-21
- * 
- * @copyright Copyright (c) 2020
- * 
  */
 
 #include "CurrentTimeService.h"

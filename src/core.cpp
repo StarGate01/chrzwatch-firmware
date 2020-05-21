@@ -1,3 +1,11 @@
+/**
+ * @file core.cpp
+ * @author Christoph Honal
+ * @brief Implements the core BLE logic defined in core.h
+ * @version 0.1
+ * @date 2020-05-21
+ */
+
 #include "core.h"
 #include "debug.h"
 

@@ -1,10 +1,24 @@
+/**
+ * @file debug.h
+ * @author Christoph Honal
+ * @author Arm Limited (Mbed team)
+ * @brief Provides printing functions for debugging errors
+ * @version 0.1
+ * @date 2020-05-21
+ */
+
 #ifndef DEBUG_H
 #define DEBUG_H
 
 #include <mbed.h>
 #include "ble/BLE.h"
 
-
+/**
+ * @brief Print a BLE error flag in human readable form
+ * 
+ * @param error The BLE error
+ * @param msg An additional message
+ */
 inline void printError(ble_error_t error, const char* msg)
 {
     printf("%s: ", msg);
@@ -56,11 +70,21 @@ inline void printError(ble_error_t error, const char* msg)
     printf("\n");
 }
 
+/**
+ * @brief Print a MAC address
+ * 
+ * @param addr The MAC Address
+ */
 inline void printAddress(const uint8_t &addr)
 {
     printf("%x\n", addr);
 }
 
+/**
+ * @brief Print the BLE MAC address in human readable form
+ * 
+ * @param addr The BLE MAC Address
+ */
 inline void printMacAddress()
 {
     BLEProtocol::AddressType_t addr_type;
@@ -70,6 +94,12 @@ inline void printMacAddress()
     printAddress(address);
 }
 
+/**
+ * @brief Convert a PHY type to a human readable string
+ * 
+ * @param phy The PHY type
+ * @return const char* The string representation
+ */
 inline const char* phyToString(ble::phy_t phy) 
 {
     switch(phy.value()) 
