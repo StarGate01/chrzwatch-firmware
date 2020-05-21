@@ -1,5 +1,5 @@
 /**
- * @file sensor.h
+ * @file SensorService.h
  * @author Christoph Honal
  * @brief Defines a class to access the various sensors
  * @version 0.1
@@ -21,7 +21,6 @@ class SensorService
     public:
         /**
          * @brief Construct a new Sensor Service object
-         * 
          */
         SensorService();
 

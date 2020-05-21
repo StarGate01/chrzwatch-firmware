@@ -1,20 +1,18 @@
 /**
- * @file sensor.cpp
+ * @file SensorService.cpp
  * @author Christoph Honal
- * @brief Implements the functions defined in sensor.h
+ * @brief Implements the functions defined in SensorService.h
  * @version 0.1
  * @date 2020-05-21
  */
 
-#include "sensor.h"
+#include "SensorService.h"
 
 SensorService::SensorService():
     _hr_value(100),
     _gyro_value{50, 50, 50},
     _battery_value(50)
-{
-
-}
+{ }
 
 void SensorService::update()
 {

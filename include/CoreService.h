@@ -1,5 +1,5 @@
 /**
- * @file core.h
+ * @file CoreService.h
  * @author Christoph Honal
  * @brief Defines the core BLE logic and glues all services together
  * @version 0.1
@@ -11,6 +11,7 @@
 
 #define BLE_FEATURE_GATT_SERVER 1
 #define BLE_ROLE_BROADCASTER 1
+#define BLE_FEATURE_SECURITY 1
 
 #include <mbed.h>
 #include <events/mbed_events.h>
@@ -19,10 +20,12 @@
 #include "ble/services/HeartRateService.h"
 #include "ble/services/BatteryService.h"
 #include "ble/services/DeviceInformationService.h"
+#include "SecurityManager.h"
+
 #include <CurrentTimeService.h>
 
-#include "sensor.h"
-#include "display.h"
+#include "SensorService.h"
+#include "DisplayService.h"
 
 
 const static char DEVICE_NAME[] = "CHRZwatch One";
@@ -39,7 +42,7 @@ const static char INFO_SOFTWARE_REVISION[] = "0.1";
  * @brief Handles BLE connections, GAP advertising and contains all sub-service objects
  * 
  */
-class CoreService : ble::Gap::EventHandler 
+class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
 {
 
     public:
@@ -52,6 +55,12 @@ class CoreService : ble::Gap::EventHandler
         CoreService(BLE &ble, events::EventQueue &event_queue);
 
         /**
+         * @brief Destroy the Core Service object
+         * 
+         */
+        virtual ~CoreService();
+
+        /**
          * @brief Starts the subsystem threads
          * 
          */
@@ -61,6 +70,7 @@ class CoreService : ble::Gap::EventHandler
         events::EventQueue &_event_queue; //!< Reference to the event queue for dispatching
 
         bool _connected; //!< Connection state of the BLE system
+        bool _encrypted; //!< BLE link encryption state
         BLE &_ble; //!< Reference to the BLE instance
         uint8_t _adv_buffer[ble::LEGACY_ADVERTISING_MAX_SIZE]; //!< BLE GAP advertising buffer
         ble::AdvertisingDataBuilder _adv_data_builder; //!< BLE GAP factory
@@ -111,6 +121,29 @@ class CoreService : ble::Gap::EventHandler
          * @param event Event information
          */
         virtual void onConnectionComplete(const ble::ConnectionCompleteEvent &event);
+
+        /**
+         * @brief Handles a BLE pairing request event
+         * 
+         * @param connectionHandle Handle to the BLE connection
+         */
+        virtual void pairingRequest(ble::connection_handle_t connectionHandle);
+
+        /**
+         * @brief Handles the resulting link encryption event
+         * 
+         * @param connectionHandle Handle to the BLE connection
+         * @param result The type of encryption
+         */
+        virtual void linkEncryptionResult(ble::connection_handle_t connectionHandle, ble::link_encryption_t result);
+
+        /**
+         * @brief Handles the displaying of a BLE passkey
+         * 
+         * @param connectionHandle Handle to the BLE connection
+         * @param passkey The passkey
+         */
+        virtual void passkeyDisplay(ble::connection_handle_t connectionHandle, const SecurityManager::Passkey_t passkey);
 
         /**
          * @brief Restarts the deadlock watchdog

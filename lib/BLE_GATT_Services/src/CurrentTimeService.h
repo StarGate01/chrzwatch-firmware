@@ -47,10 +47,10 @@ class CurrentTimeService
         /**
          * @brief Construct a new Current Time Service object
          * 
-         * @param _ble BLE instance
+         * @param ble BLE instance
          * @param event_queue Event queue for dispatching calls from interrupt
          */
-        CurrentTimeService(BLE &_ble, events::EventQueue &event_queue);
+        CurrentTimeService(BLE &ble, events::EventQueue &event_queue);
 
         /**
          * @brief Sets the internal time using a date-time-stamp

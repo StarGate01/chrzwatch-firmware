@@ -1,12 +1,12 @@
 /**
- * @file display.cpp
+ * @file DisplayService.cpp
  * @author Christoph Honal
- * @brief Implements the functions defined in display.h
+ * @brief Implements the functions defined in DisplayService.h
  * @version 0.1
  * @date 2020-05-21
  */
 
-#include "display.h"
+#include "DisplayService.h"
 
 DisplayService::DisplayService(DigitalOut led):
     _led(led)

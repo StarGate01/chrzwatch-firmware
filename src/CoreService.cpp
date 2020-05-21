@@ -1,17 +1,17 @@
 /**
- * @file core.cpp
+ * @file CoreService.cpp
  * @author Christoph Honal
- * @brief Implements the core BLE logic defined in core.h
+ * @brief Implements the core BLE logic defined in CoreService.h
  * @version 0.1
  * @date 2020-05-21
  */
 
-#include "core.h"
-#include "debug.h"
+#include "CoreService.h"
 
 CoreService::CoreService(BLE &ble, events::EventQueue &event_queue):
     _event_queue(event_queue),
-    _connected(false),  
+    _connected(false),
+    _encrypted(false),
     _ble(ble),
     _adv_data_builder(_adv_buffer),
     _ble_hr_service(ble, 0, HeartRateService::LOCATION_WRIST),
@@ -19,6 +19,11 @@ CoreService::CoreService(BLE &ble, events::EventQueue &event_queue):
     _ble_time_service(ble, event_queue),
     _display_service(LED1)
 { }
+
+CoreService::~CoreService()
+{
+    if (_ble.hasInitialized()) _ble.shutdown();
+}
 
 void CoreService::start() 
 {

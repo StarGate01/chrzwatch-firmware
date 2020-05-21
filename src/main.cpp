@@ -9,7 +9,8 @@
 #include <mbed.h>
 #include <events/mbed_events.h>
 #include "ble/BLE.h"
-#include "core.h"
+
+#include "CoreService.h"
 
 static events::EventQueue event_queue(16 * EVENTS_EVENT_SIZE); //!< The main event queue for dispatching events
 
