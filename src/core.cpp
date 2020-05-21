@@ -17,8 +17,7 @@ CoreService::CoreService(BLE &ble, events::EventQueue &event_queue):
     _ble_hr_service(ble, 0, HeartRateService::LOCATION_WRIST),
     _ble_bat_service(ble, 0),
     _ble_time_service(ble, event_queue),
-    _display_service(LED1),
-    _watchdog(Watchdog::get_instance())
+    _display_service(LED1)
 { }
 
 void CoreService::start() 
@@ -28,7 +27,10 @@ void CoreService::start()
     _ble.init(this, &CoreService::onInitComplete);
 
     // Start the deadlock reset watchdog
-    _watchdog.start(min(15000ul, _watchdog.get_max_timeout()));
+    NRF_WDT->CONFIG = (WDT_CONFIG_SLEEP_Run << WDT_CONFIG_SLEEP_Pos) | (WDT_CONFIG_HALT_Pause << WDT_CONFIG_HALT_Pos);
+    NRF_WDT->CRV = 15 * 32768; // 32k tick
+    NRF_WDT->RREN = WDT_RREN_RR0_Enabled << WDT_RREN_RR0_Pos;
+    NRF_WDT->TASKS_START = 1;
 
     // Setup and start thread scheduler
     _event_queue.call_every(500, this, &CoreService::doBlink);
@@ -57,5 +59,5 @@ void CoreService::startAdvertising()
 
 void CoreService::kickWatchdog()
 {
-    _watchdog.kick();
+    NRF_WDT->RR[0] = WDT_RR_RR_Reload;
 }
