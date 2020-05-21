@@ -6,8 +6,9 @@ CoreService::CoreService(BLE &ble, events::EventQueue &event_queue):
     _connected(false),  
     _ble(ble),
     _adv_data_builder(_adv_buffer),
-    _ble_hr_uuid(GattService::UUID_HEART_RATE_SERVICE),
     _ble_hr_service(ble, 0, HeartRateService::LOCATION_WRIST),
+    _ble_bat_service(ble, 0),
+    _ble_time_service(ble, event_queue),
     _display_service(LED1)
 {
 }
@@ -32,10 +33,11 @@ void CoreService::startAdvertising()
         ble::advertising_type_t::CONNECTABLE_UNDIRECTED,
         ble::adv_interval_t(ble::millisecond_t(1000))
     );
-    _adv_data_builder.setFlags();
-    _adv_data_builder.setAppearance(ble::adv_data_appearance_t::GENERIC_HEART_RATE_SENSOR);
-    _adv_data_builder.setLocalServiceList(mbed::make_Span(&_ble_hr_uuid, 1));
+    _adv_data_builder.setFlags(ble::adv_data_flags_t::BREDR_NOT_SUPPORTED | ble::adv_data_flags_t::LE_GENERAL_DISCOVERABLE);
+    _adv_data_builder.setAppearance(ble::adv_data_appearance_t::GENERIC_WATCH);
     _adv_data_builder.setName(DEVICE_NAME);
+    
+    // Services are added at runtime, client is notified via Service Changed indicator
 
     // Setup advertising parameters
     ble_error_t error = _ble.gap().setAdvertisingParameters(

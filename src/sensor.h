@@ -12,12 +12,10 @@ class SensorService
         uint8_t getHRValue();
         uint8_t getBatteryValue();
 
-    private:
+    protected:
         uint8_t _hr_value;
         uint8_t _gyro_value[3];
         uint8_t _battery_value;
-
-        uint8_t _hr_counter;
 
 };
 

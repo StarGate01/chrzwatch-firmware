@@ -10,3 +10,8 @@ void DisplayService::blinkLed()
 {
     _led = !_led;
 }
+
+void DisplayService::render()
+{
+    
+}

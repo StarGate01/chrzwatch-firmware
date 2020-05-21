@@ -9,8 +9,10 @@ class DisplayService
         DisplayService(DigitalOut led);
         void blinkLed();
 
-    private:
+    protected:
         DigitalOut _led;
+
+        void render();
 
 };
 

@@ -2,22 +2,25 @@
 
 SensorService::SensorService():
     _hr_value(100),
-    _gyro_value({50, 50, 50}),
-    _battery_value(50),
-    _hr_counter(100)
+    _gyro_value{50, 50, 50},
+    _battery_value(50)
 {
 
 }
 
 void SensorService::update()
 {
-    _hr_counter++;
-    if (_hr_counter == 175) 
+    _hr_value++;
+    if (_hr_value == 175) 
     {
-        _hr_counter = 100;
+        _hr_value = 100;
     }
 
-    _hr_value = _hr_counter;
+    _battery_value--;
+    if (_battery_value == 10) 
+    {
+        _battery_value = 75;
+    }
 }
 
 uint8_t SensorService::getHRValue()
