@@ -11,13 +11,7 @@
 
 void CoreService::onInitComplete(BLE::InitializationCompleteCallbackContext *params) 
 {
-    if(params->error != BLE_ERROR_NONE) 
-    {
-        printError(params->error, "CoreService::onInitComplete");
-        return;
-    }
-    printMacAddress();
-    startAdvertising();
+    if(params->error == BLE_ERROR_NONE) startAdvertising();
 }
 
 void CoreService::onDisconnectionComplete(const ble::DisconnectionCompleteEvent &event) 
@@ -28,8 +22,5 @@ void CoreService::onDisconnectionComplete(const ble::DisconnectionCompleteEvent 
 
 void CoreService::onConnectionComplete(const ble::ConnectionCompleteEvent &event) 
 {
-    if(event.getStatus() == BLE_ERROR_NONE) 
-    {
-        _connected = true;
-    }
+    if(event.getStatus() == BLE_ERROR_NONE) _connected = true;
 }

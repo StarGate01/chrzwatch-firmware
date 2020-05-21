@@ -18,8 +18,7 @@ CoreService::CoreService(BLE &ble, events::EventQueue &event_queue):
     _ble_bat_service(ble, 0),
     _ble_time_service(ble, event_queue),
     _display_service(LED1)
-{
-}
+{ }
 
 void CoreService::start() 
 {
@@ -27,7 +26,7 @@ void CoreService::start()
     _ble.gap().setEventHandler(this);
     _ble.init(this, &CoreService::onInitComplete);
 
-    // Setup and start event scheduler
+    // Setup and start thread scheduler
     _event_queue.call_every(500, this, &CoreService::doBlink);
     _event_queue.call_every(1000, this, &CoreService::doUpdateSensors);
     _event_queue.dispatch_forever();
@@ -37,43 +36,16 @@ void CoreService::start()
 void CoreService::startAdvertising() 
 {
     // Create advertising parameters and payload
-    ble::AdvertisingParameters adv_parameters(
-        ble::advertising_type_t::CONNECTABLE_UNDIRECTED,
-        ble::adv_interval_t(ble::millisecond_t(1000))
-    );
+    ble::AdvertisingParameters adv_parameters(ble::advertising_type_t::CONNECTABLE_UNDIRECTED, ble::adv_interval_t(ble::millisecond_t(1000)));
     _adv_data_builder.setFlags(ble::adv_data_flags_t::BREDR_NOT_SUPPORTED | ble::adv_data_flags_t::LE_GENERAL_DISCOVERABLE);
     _adv_data_builder.setAppearance(ble::adv_data_appearance_t::GENERIC_WATCH);
     _adv_data_builder.setName(DEVICE_NAME);
     
     // Services are added at runtime, client is notified via Service Changed indicator
-
     // Setup advertising parameters
-    ble_error_t error = _ble.gap().setAdvertisingParameters(
-        ble::LEGACY_ADVERTISING_HANDLE,
-        adv_parameters
-    );
-    if (error != BLE_ERROR_NONE) 
-    {
-        printError(error, "setAdvertisingParameters");
-        return;
-    }
+    _ble.gap().setAdvertisingParameters(ble::LEGACY_ADVERTISING_HANDLE, adv_parameters);
 
-    // Setup advertising payload
-    error = _ble.gap().setAdvertisingPayload(
-        ble::LEGACY_ADVERTISING_HANDLE,
-        _adv_data_builder.getAdvertisingData()
-    );
-    if (error != BLE_ERROR_NONE)
-    {
-        printError(error, "setAdvertisingPayload");
-        return;
-    }
-
-    // Start advertising
-    error = _ble.gap().startAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
-    if (error != BLE_ERROR_NONE) 
-    {
-        printError(error, "startAdvertising");
-        return;
-    }
+    // Setup advertising payload and start
+    _ble.gap().setAdvertisingPayload(ble::LEGACY_ADVERTISING_HANDLE, _adv_data_builder.getAdvertisingData());
+    _ble.gap().startAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
 }

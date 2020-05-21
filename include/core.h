@@ -19,20 +19,20 @@
 #include "ble/services/HeartRateService.h"
 #include "ble/services/BatteryService.h"
 #include "ble/services/DeviceInformationService.h"
-#include "gatt/CurrentTimeService.h"
+#include <CurrentTimeService.h>
 
 #include "sensor.h"
 #include "display.h"
 
 
-const static char DEVICE_NAME[] = "CHRZwatch One dev2";
+const static char DEVICE_NAME[] = "CHRZwatch One";
 
 const static char INFO_MANUFACTURERS_NAME[] = "CHRZ Engineering";
-const static char INFO_MODEL_NUMBER[] = "CHRZwatch One";
+const static char INFO_MODEL_NUMBER[] = "One";
 const static char INFO_SERIAL_NUMBER[] = "1337-420";
-const static char INFO_HARDWARE_REVISION[] = "I6HRC";
-const static char INFO_FIRMWARE_REVISION[] = "1.0";
-const static char INFO_SOFTWARE_REVISION[] = "1.0";
+const static char INFO_HARDWARE_REVISION[] = "I6HRC-2020";
+const static char INFO_FIRMWARE_REVISION[] = "0.1";
+const static char INFO_SOFTWARE_REVISION[] = "0.1";
 
 
 /**
