@@ -20,7 +20,6 @@
 #include "ble/services/HeartRateService.h"
 #include "ble/services/BatteryService.h"
 #include "ble/services/DeviceInformationService.h"
-#include "SecurityManager.h"
 
 #include <CurrentTimeService.h>
 
@@ -121,21 +120,6 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
          * @param event Event information
          */
         virtual void onConnectionComplete(const ble::ConnectionCompleteEvent &event);
-
-        /**
-         * @brief Handles a BLE pairing request event
-         * 
-         * @param connectionHandle Handle to the BLE connection
-         */
-        virtual void pairingRequest(ble::connection_handle_t connectionHandle);
-
-        /**
-         * @brief Handles the resulting link encryption event
-         * 
-         * @param connectionHandle Handle to the BLE connection
-         * @param result The type of encryption
-         */
-        virtual void linkEncryptionResult(ble::connection_handle_t connectionHandle, ble::link_encryption_t result);
 
         /**
          * @brief Restarts the deadlock watchdog
