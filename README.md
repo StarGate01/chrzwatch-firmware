@@ -14,7 +14,9 @@ Solder the SWD testpoints to the unused USB data lines like this: https://www.yo
 
 ### Flashing the watch
 
-Flashing should work with any SWD capable programmer, like for example the **ST-Link V2** (the cheap clones work too). If the watch refuses to flash, hangs or is stuck in a bootloop, try connecting to it using **OpenOCD** (http://openocd.org/) while spamming the reset button on your adapter (or short `SWDIO` to `VCC`). 
+Flashing should work with any SWD capable programmer, like for example the **ST-Link V2** (the cheap clones work too). 
+
+If the watch refuses to flash, hangs or is stuck in a bootloop, try connecting to it using **OpenOCD** (http://openocd.org/) while spamming the reset button on your adapter (or short `SWDIO` to `VCC`). This should not be needed during normal flashing and execution.
 
 ```
 openocd -d2 -f interface/stlink-v2.cfg -c "transport select hla_swd" -f target/nrf52.cfg
