@@ -8,7 +8,13 @@ Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i
 
 Use `doxygen` to generate documentation.
 
-## Thanks to
+### Modding a I6HRC watch
+
+Solder the SWD testpoints to the unused USB data lines like this: https://www.youtube.com/watch?v=0Fu-VSuKHEg .
+
+You might want to fabricate a custom USB to ISP adapter.
+
+## Thanks to and pinmap source
 
 http://atcnetz.blogspot.com/2019/02/arduino-auf-dem-fitness-tracker-dank.html
 
