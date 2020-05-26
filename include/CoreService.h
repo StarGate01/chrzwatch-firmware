@@ -29,14 +29,6 @@
 
 const static char DEVICE_NAME[] = "CHRZwatch One";
 
-const static char INFO_MANUFACTURERS_NAME[] = "CHRZ Engineering";
-const static char INFO_MODEL_NUMBER[] = "One";
-const static char INFO_SERIAL_NUMBER[] = "1337-420";
-const static char INFO_HARDWARE_REVISION[] = "I6HRC-2020";
-const static char INFO_FIRMWARE_REVISION[] = "0.1.1";
-const static char INFO_SOFTWARE_REVISION[] = "0.1.1";
-
-
 /**
  * @brief Handles BLE connections, GAP advertising and contains all sub-service objects
  * 
