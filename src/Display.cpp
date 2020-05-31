@@ -8,10 +8,10 @@
 
 #include "DisplayService.h"
 
-DisplayService::DisplayService() //:
-    // _vibration(PIN_VIBRATION),
-    // _vibrationTrigger(1),
-    // _vibrationDuration(200)
+DisplayService::DisplayService():
+    _vibration(PIN_VIBRATION),
+    _vibrationTrigger(1),
+    _vibrationDuration(200)
 {
     // _vibrationThread.start(callback(this, &DisplayService::threadVibration));
 }

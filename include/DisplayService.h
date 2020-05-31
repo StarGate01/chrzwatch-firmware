@@ -37,10 +37,10 @@ class DisplayService
         void vibrate(uint8_t duration);
 
     protected:
-        // DigitalOut _vibration;
-        // Thread _vibrationThread;
-        // Semaphore _vibrationTrigger;
-        // uint8_t _vibrationDuration;
+        DigitalOut _vibration;
+        Thread _vibrationThread;
+        Semaphore _vibrationTrigger;
+        uint8_t _vibrationDuration;
 
         /**
          * @brief Render the internal state to the LCD display
