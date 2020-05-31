@@ -50,7 +50,7 @@ class CurrentTimeService
          * @param ble BLE instance
          * @param event_queue Event queue for dispatching calls from interrupt
          */
-        CurrentTimeService(BLE &ble, events::EventQueue &event_queue);
+        CurrentTimeService(BLE& ble, events::EventQueue &event_queue);
 
         /**
          * @brief Sets the internal time using a date-time-stamp
@@ -58,7 +58,7 @@ class CurrentTimeService
          * @param dateTime The date-time-stamp
          * @param writeRtc Whether to update the RTC
          */
-        void writeDateTime(const BLE_DateTime &dateTime, const bool writeRtc = false);
+        void writeDateTime(const BLE_DateTime& dateTime, const bool writeRtc = false);
 
         /**
          * @brief Sets the internal time using a UNIX timestamp
@@ -66,24 +66,24 @@ class CurrentTimeService
          * @param epochTime The UNIX timestamp
          * @param writeRtc Whether to update the RTC
          */
-        void writeEpoch(const time_t &epochTime, const bool writeRtc = false);
+        void writeEpoch(const time_t& epochTime, const bool writeRtc = false);
 
         /**
          * @brief Return the internal time as a date-time-stamp
          * 
          * @param dateTime The date-time-stamp
          */
-        void readDateTime(BLE_DateTime &dateTime);
+        void readDateTime(BLE_DateTime& dateTime);
 
         /**
          * @brief Return the internal time as a UNIX time stamp
          * 
          * @param epochTime The UNIX timestamp
          */
-        void readEpoch(time_t &epochTime);
+        void readEpoch(time_t& epochTime);
     
     protected:
-        BLE &_ble; //!< Reference to the BLE instance
+        BLE& _ble; //!< Reference to the BLE instance
         events::EventQueue &_event_queue; //!< Reference to the event queue for dispatching
         uint8_t _valueBytes[BLE_CURRENT_TIME_CHAR_VALUE_SIZE]; //!< Buffer for the internal time
         GattCharacteristic _currentTimeCharacteristic; //!< BLE characteristic definition
@@ -107,7 +107,7 @@ class CurrentTimeService
          * 
          * @param params The new timestamp to store
          */
-        virtual void onDataWritten(const GattWriteCallbackParams *params);
+        virtual void onDataWritten(const GattWriteCallbackParams* params);
         
 };
  

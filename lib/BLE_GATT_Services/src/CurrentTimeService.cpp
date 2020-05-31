@@ -8,7 +8,6 @@
  */
 
 #include "CurrentTimeService.h"
-// #include <hal/rtc_api.h>
 
 
 CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue):
@@ -18,7 +17,7 @@ CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue
         _valueBytes, BLE_CURRENT_TIME_CHAR_VALUE_SIZE, BLE_CURRENT_TIME_CHAR_VALUE_SIZE,
         GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_READ
             | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_NOTIFY
-            | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE)                       
+            | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE)
 {
     // Read RTC
     // rtc_init();
@@ -36,7 +35,7 @@ CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue
     _ticker.attach(_event_queue.event(this, &CurrentTimeService::onTickerCallback), 1.0);
 }
 
-void CurrentTimeService::writeDateTime(const BLE_DateTime &dateTime, const bool writeRtc)
+void CurrentTimeService::writeDateTime(const BLE_DateTime& dateTime, const bool writeRtc)
 {
     // Populate buffer from date-time-stamp
     *(uint16_t*)&_valueBytes[0] = dateTime.year;
@@ -55,7 +54,7 @@ void CurrentTimeService::writeDateTime(const BLE_DateTime &dateTime, const bool 
     writeBuffer(writeRtc);
 }
 
-void CurrentTimeService::writeEpoch(const time_t &epochTime, const bool writeRtc)
+void CurrentTimeService::writeEpoch(const time_t& epochTime, const bool writeRtc)
 {
     // Populate buffer from UNIX timestamp
     struct tm *tmPtr = localtime(&epochTime);
@@ -73,7 +72,7 @@ void CurrentTimeService::writeEpoch(const time_t &epochTime, const bool writeRtc
     writeBuffer(writeRtc);
 }
 
-void CurrentTimeService::readDateTime(BLE_DateTime &dateTime)
+void CurrentTimeService::readDateTime(BLE_DateTime& dateTime)
 {
     // Convert buffer to date-time-stamp
     dateTime.year     = *(uint16_t*)&_valueBytes[0];
@@ -84,7 +83,7 @@ void CurrentTimeService::readDateTime(BLE_DateTime &dateTime)
     dateTime.seconds  = _valueBytes[6];
 }
 
-void CurrentTimeService::readEpoch(time_t &epochTime)
+void CurrentTimeService::readEpoch(time_t& epochTime)
 {
     // Convert buffer to UNIX timestamp
     struct tm timep;
@@ -123,7 +122,7 @@ void CurrentTimeService::onTickerCallback(void)
     writeEpoch(tmpEpochTime, false);
 }
 
-void CurrentTimeService::onDataWritten(const GattWriteCallbackParams *params)
+void CurrentTimeService::onDataWritten(const GattWriteCallbackParams* params)
 {
     if (params->handle == _currentTimeCharacteristic.getValueHandle()) 
     {

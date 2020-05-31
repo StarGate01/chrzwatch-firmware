@@ -9,7 +9,11 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#define MBED_CONF_RTOS_PRESENT 1
+
 #include <mbed.h>
+#include <rtos.h>
+#include "HardwareConfiguration.h"
 
 /**
  * @brief Provides methods to interact with the LCD display and other actors
@@ -21,25 +25,30 @@ class DisplayService
     public:
         /**
          * @brief Construct a new Display Service object
-         * 
-         * @param led The pin of the keepalive LED
          */
-        DisplayService(DigitalOut led);
+        DisplayService();
 
         /**
-         * @brief Blink the keepalive LED
+         * @brief Vibrate the motor
+         * 
+         * @param milliSeconds For how long to vibrate
          * 
          */
-        void blinkLed();
+        void vibrate(uint8_t duration);
 
     protected:
-        DigitalOut _led; //!< The stored pin of the keepalive LED
+        // DigitalOut _vibration;
+        // Thread _vibrationThread;
+        // Semaphore _vibrationTrigger;
+        // uint8_t _vibrationDuration;
 
         /**
          * @brief Render the internal state to the LCD display
          * 
          */
         void render();
+
+        void threadVibration();
 
 };
 

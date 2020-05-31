@@ -10,6 +10,9 @@
 #define SENSOR_H
 
 #include <mbed.h>
+#include <events/mbed_events.h>
+#include "HardwareConfiguration.h"
+#include "DisplayService.h"
 
 /**
  * @brief Provides methods to access the various sensors
@@ -22,7 +25,7 @@ class SensorService
         /**
          * @brief Construct a new Sensor Service object
          */
-        SensorService();
+        SensorService(DisplayService& displayService);
 
         /**
          * @brief Update all sensor values
@@ -45,9 +48,18 @@ class SensorService
         uint8_t getBatteryValue();
 
     protected:
+        // events::EventQueue _event_queue; //!< Reference to the event queue for dispatching
+        // Thread _event_thread;
+        DisplayService& _displayService;
+
         uint8_t _hr_value; //!< The internal heartrate state
         uint8_t _gyro_value[3]; //!< The internal accelerometer state
         uint8_t _battery_value; //!< The internal battery value state
+
+        // InterruptIn _button1, _button2;
+
+        void handleButton1();
+        void handleButton2();
 
 };
 

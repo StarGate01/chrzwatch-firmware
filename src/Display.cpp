@@ -8,18 +8,32 @@
 
 #include "DisplayService.h"
 
-DisplayService::DisplayService(DigitalOut led):
-    _led(led)
+DisplayService::DisplayService() //:
+    // _vibration(PIN_VIBRATION),
+    // _vibrationTrigger(1),
+    // _vibrationDuration(200)
 {
-
+    // _vibrationThread.start(callback(this, &DisplayService::threadVibration));
 }
 
-void DisplayService::blinkLed()
+void DisplayService::vibrate(uint8_t duration)
 {
-    _led = !_led;
+    // _vibrationDuration = duration;
+    // _vibrationTrigger.release();
 }
 
 void DisplayService::render()
 {
     
+}
+
+void DisplayService::threadVibration()
+{
+    // while(true)
+    // {
+    //     // _vibrationTrigger.acquire();
+    //     // _vibration = 1;
+    //     // ThisThread::sleep_for(_vibrationDuration);
+    //     // _vibration = 0;
+    // }
 }

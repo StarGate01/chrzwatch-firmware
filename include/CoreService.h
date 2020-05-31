@@ -27,7 +27,11 @@
 #include "DisplayService.h"
 
 
+#if defined(TARGET_VARIANT_I6HRC)
 const static char DEVICE_NAME[] = "CHRZwatch One";
+#else
+const static char DEVICE_NAME[] = "CHRZwatch DK";
+#endif
 
 /**
  * @brief Handles BLE connections, GAP advertising and contains all sub-service objects
@@ -43,7 +47,7 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
          * @param _ble BLE instance
          * @param event_queue Event queue for dispatching calls from interrupt
          */
-        CoreService(BLE &ble, events::EventQueue &event_queue);
+        CoreService(BLE& ble, events::EventQueue& event_queue);
 
         /**
          * @brief Destroy the Core Service object
@@ -58,11 +62,11 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
         void start();
 
     protected:
-        events::EventQueue &_event_queue; //!< Reference to the event queue for dispatching
+        events::EventQueue& _event_queue; //!< Reference to the event queue for dispatching
 
         bool _connected; //!< Connection state of the BLE system
         bool _encrypted; //!< BLE link encryption state
-        BLE &_ble; //!< Reference to the BLE instance
+        BLE& _ble; //!< Reference to the BLE instance
         uint8_t _adv_buffer[ble::LEGACY_ADVERTISING_MAX_SIZE]; //!< BLE GAP advertising buffer
         ble::AdvertisingDataBuilder _adv_data_builder; //!< BLE GAP factory
 
@@ -85,11 +89,6 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
          */
         void doUpdateSensors();
 
-        /**
-         * @brief Blink keepalive thread
-         * 
-         */
-        void doBlink();
 
         /**
          * @brief Handles the BLE init completion event
