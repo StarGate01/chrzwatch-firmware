@@ -39,5 +39,8 @@ int main()
     CoreService core(ble, event_queue);
     core.start();
 
+    // Dispatch events in main thread
+    event_queue.dispatch_forever();
+
     return 0;
 }

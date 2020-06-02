@@ -23,15 +23,12 @@
 
 #include <CurrentTimeService.h>
 
+#include "HardwareConfiguration.h"
 #include "SensorService.h"
 #include "DisplayService.h"
 
 
-#if defined(TARGET_VARIANT_I6HRC)
-const static char DEVICE_NAME[] = "CHRZwatch One";
-#else
-const static char DEVICE_NAME[] = "CHRZwatch DK";
-#endif
+const static char DEVICE_NAME[] = TARGET_VARIANT_NAME;
 
 /**
  * @brief Handles BLE connections, GAP advertising and contains all sub-service objects

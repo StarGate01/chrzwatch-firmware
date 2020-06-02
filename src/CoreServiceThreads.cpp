@@ -10,8 +10,9 @@
 
 void CoreService::doUpdateSensors() 
 {
-    _sensor_service.update();
+    // Update UI
+    _display_service.render();
     // Update GATT server
-    _ble_bat_service.updateBatteryLevel(_sensor_service.getBatteryValue());
+    _ble_bat_service.updateBatteryLevel(_sensor_service.getBatteryPercent());
     _ble_hr_service.updateHeartRate(_sensor_service.getHRValue());
 }

@@ -1,0 +1,30 @@
+{
+    "name": "Adafruit_ST7735_Mini",
+    "version": "0.1",
+    "keywords": "st7735, lcd, tft",
+    "description": "A first port of the excellent Adafruit ST7735 library, with support for the R_MINI160x80 display",
+    "authors":
+    [
+        {
+            "name": "Christoph Honal",
+            "email": "christoph.honal@web.de",
+            "url": "https://chrz.de",
+            "maintainer": true
+        },
+        {
+            "name": "Andrew Lindsay",
+            "url": "https://developer.mbed.org/users/SomeRandomBloke/"
+        }
+    ],
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/StarGate01/chrzwatch-firmware.git"
+    },
+    "export": {
+        "include": [
+            "lib/Adafruit_ST7735"
+        ]
+    },
+    "frameworks": "mbed"
+}

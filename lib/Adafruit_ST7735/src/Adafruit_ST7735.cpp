@@ -24,8 +24,9 @@ inline uint16_t swapcolor(uint16_t x) {
 }
 
 // Constructor 
-Adafruit_ST7735::Adafruit_ST7735(PinName mosi, PinName miso, PinName sck, PinName cs, PinName rs, PinName rst) 
-        : lcdPort(mosi, miso, sck), _cs(cs), _rs(rs), _rst(rst), Adafruit_GFX(ST7735_TFTWIDTH, ST7735_TFTHEIGHT) 
+Adafruit_ST7735::Adafruit_ST7735(PinName mosi, PinName miso, PinName sck, PinName cs, PinName rs, PinName rst, 
+  int16_t w = ST7735_TFTWIDTH_128, int16_t h = ST7735_TFTHEIGHT_128) 
+        : lcdPort(mosi, miso, sck), _cs(cs), _rs(rs), _rst(rst), Adafruit_GFX(w, h) 
 { }
 
 
@@ -177,6 +178,15 @@ static unsigned char
       0x00, 0x00,             //     XSTART = 0
       0x00, 0x7F },           //     XEND = 127
 
+  Rcmd2green160x80[] = {            // 7735R init, part 2 (mini 160x80)
+    2,                              //  2 commands in list:
+    ST7735_CASET,   4,              //  1: Column addr set, 4 args, no delay:
+      0x00, 0x00,                   //     XSTART = 0
+      0x00, 0x4F,                   //     XEND = 79
+    ST7735_RASET,   4,              //  2: Row addr set, 4 args, no delay:
+      0x00, 0x00,                   //     XSTART = 0
+      0x00, 0x9F },                 //     XEND = 159
+
   Rcmd3[] = {                 // Init for 7735R, part 3 (red or green tab)
     4,                        //  4 commands in list:
     ST7735_GMCTRP1, 16      , //  1: Magical unicorn dust, 16 args, no delay:
@@ -258,28 +268,43 @@ void Adafruit_ST7735::initB(void)
 // Initialization for ST7735R screens (green or red tabs)
 void Adafruit_ST7735::initR(uint8_t options) {
   commonInit(Rcmd1);
-  if(options == INITR_GREENTAB) {
+  if (options == INITR_GREENTAB) {
     commandList(Rcmd2green);
     colstart = 2;
     rowstart = 1;
-  } else if(options == INITR_144GREENTAB) {
-    _height = ST7735_TFTHEIGHT_144;
+  } else if ((options == INITR_144GREENTAB) || (options == INITR_HALLOWING)) {
+    _height = ST7735_TFTHEIGHT_128;
+    _width = ST7735_TFTWIDTH_128;
     commandList(Rcmd2green144);
     colstart = 2;
-    rowstart = 3;
+    rowstart = 3; // For default rotation 0
+  } else if (options == INITR_MINI160x80) {
+    _height = ST7735_TFTWIDTH_80;
+    _width = ST7735_TFTHEIGHT_160;
+    commandList(Rcmd2green160x80);
+    colstart = 24;
+    rowstart = 0;
   } else {
     // colstart, rowstart left at default '0' values
     commandList(Rcmd2red);
   }
   commandList(Rcmd3);
 
-  // if black, change MADCTL color filter
-  if (options == INITR_BLACKTAB) {
+  // Black tab, change MADCTL color filter
+  if ((options == INITR_BLACKTAB) || (options == INITR_MINI160x80)) {
+    uint8_t data = 0xC0;
     writecommand(ST7735_MADCTL);
-    writedata(0xC0);
+    writedata(data);
   }
 
-  tabcolor = options;
+  if (options == INITR_HALLOWING) {
+    // Hallowing is simply a 1.44" green tab upside-down:
+    tabcolor = INITR_144GREENTAB;
+    setRotation(2);
+  } else {
+    tabcolor = options;
+    setRotation(0);
+  }
 }
 
 void Adafruit_ST7735::setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1,
@@ -419,65 +444,93 @@ uint16_t Adafruit_ST7735::Color565(uint8_t r, uint8_t g, uint8_t b)
 #define MADCTL_MH  0x04
 
 void Adafruit_ST7735::setRotation(uint8_t m) {
+  uint8_t madctl = 0;
+
+  rotation = m & 3; // can't be higher than 3
+
+  // For ST7735 with GREEN TAB (including HalloWing)...
+  if ((tabcolor == INITR_144GREENTAB) || (tabcolor == INITR_HALLOWING)) {
+    // ..._rowstart is 3 for rotations 0&1, 1 for rotations 2&3
+    rowstart = (rotation < 2) ? 3 : 1;
+  }
+
+  switch (rotation) {
+  case 0:
+    if ((tabcolor == INITR_BLACKTAB) || (tabcolor == INITR_MINI160x80)) {
+      madctl = MADCTL_MX | MADCTL_MY | MADCTL_RGB;
+    } else {
+      madctl = MADCTL_MX | MADCTL_MY | MADCTL_BGR;
+    }
+
+    if (tabcolor == INITR_144GREENTAB) {
+      _height = ST7735_TFTHEIGHT_128;
+      _width = ST7735_TFTWIDTH_128;
+    } else if (tabcolor == INITR_MINI160x80) {
+      _height = ST7735_TFTHEIGHT_160;
+      _width = ST7735_TFTWIDTH_80;
+    } else {
+      _height = ST7735_TFTHEIGHT_160;
+      _width = ST7735_TFTWIDTH_128;
+    }
+    break;
+  case 1:
+    if ((tabcolor == INITR_BLACKTAB) || (tabcolor == INITR_MINI160x80)) {
+      madctl = MADCTL_MY | MADCTL_MV | MADCTL_RGB;
+    } else {
+      madctl = MADCTL_MY | MADCTL_MV | MADCTL_BGR;
+    }
+
+    if (tabcolor == INITR_144GREENTAB) {
+      _width = ST7735_TFTHEIGHT_128;
+      _height = ST7735_TFTWIDTH_128;
+    } else if (tabcolor == INITR_MINI160x80) {
+      _width = ST7735_TFTHEIGHT_160;
+      _height = ST7735_TFTWIDTH_80;
+    } else {
+      _width = ST7735_TFTHEIGHT_160;
+      _height = ST7735_TFTWIDTH_128;
+    }
+    break;
+  case 2:
+    if ((tabcolor == INITR_BLACKTAB) || (tabcolor == INITR_MINI160x80)) {
+      madctl = MADCTL_RGB;
+    } else {
+      madctl = MADCTL_BGR;
+    }
+
+    if (tabcolor == INITR_144GREENTAB) {
+      _height = ST7735_TFTHEIGHT_128;
+      _width = ST7735_TFTWIDTH_128;
+    } else if (tabcolor == INITR_MINI160x80) {
+      _height = ST7735_TFTHEIGHT_160;
+      _width = ST7735_TFTWIDTH_80;
+    } else {
+      _height = ST7735_TFTHEIGHT_160;
+      _width = ST7735_TFTWIDTH_128;
+    }
+    break;
+  case 3:
+    if ((tabcolor == INITR_BLACKTAB) || (tabcolor == INITR_MINI160x80)) {
+      madctl = MADCTL_MX | MADCTL_MV | MADCTL_RGB;
+    } else {
+      madctl = MADCTL_MX | MADCTL_MV | MADCTL_BGR;
+    }
+
+    if (tabcolor == INITR_144GREENTAB) {
+      _width = ST7735_TFTHEIGHT_128;
+      _height = ST7735_TFTWIDTH_128;
+    } else if (tabcolor == INITR_MINI160x80) {
+      _width = ST7735_TFTHEIGHT_160;
+      _height = ST7735_TFTWIDTH_80;
+    } else {
+      _width = ST7735_TFTHEIGHT_160;
+      _height = ST7735_TFTWIDTH_128;
+    }
+    break;
+  }
 
   writecommand(ST7735_MADCTL);
-  rotation = m % 4; // can't be higher than 3
-  switch (rotation) {
-   case 0:
-     if (tabcolor == INITR_BLACKTAB) {
-       writedata(MADCTL_MX | MADCTL_MY | MADCTL_RGB);
-     } else {
-       writedata(MADCTL_MX | MADCTL_MY | MADCTL_BGR);
-     }
-     _width  = ST7735_TFTWIDTH;
-
-     if (tabcolor == INITR_144GREENTAB) 
-       _height = ST7735_TFTHEIGHT_144;
-     else
-       _height = ST7735_TFTHEIGHT_18;
-
-     break;
-   case 1:
-     if (tabcolor == INITR_BLACKTAB) {
-       writedata(MADCTL_MY | MADCTL_MV | MADCTL_RGB);
-     } else {
-       writedata(MADCTL_MY | MADCTL_MV | MADCTL_BGR);
-     }
-
-     if (tabcolor == INITR_144GREENTAB) 
-       _width = ST7735_TFTHEIGHT_144;
-     else
-       _width = ST7735_TFTHEIGHT_18;
-
-     _height = ST7735_TFTWIDTH;
-     break;
-  case 2:
-     if (tabcolor == INITR_BLACKTAB) {
-       writedata(MADCTL_RGB);
-     } else {
-       writedata(MADCTL_BGR);
-     }
-     _width  = ST7735_TFTWIDTH;
-     if (tabcolor == INITR_144GREENTAB) 
-       _height = ST7735_TFTHEIGHT_144;
-     else
-       _height = ST7735_TFTHEIGHT_18;
-
-    break;
-   case 3:
-     if (tabcolor == INITR_BLACKTAB) {
-       writedata(MADCTL_MX | MADCTL_MV | MADCTL_RGB);
-     } else {
-       writedata(MADCTL_MX | MADCTL_MV | MADCTL_BGR);
-     }
-     if (tabcolor == INITR_144GREENTAB) 
-       _width = ST7735_TFTHEIGHT_144;
-     else
-       _width = ST7735_TFTHEIGHT_18;
-
-     _height = ST7735_TFTWIDTH;
-     break;
-  }
+  writedata(madctl);
 }
 
 

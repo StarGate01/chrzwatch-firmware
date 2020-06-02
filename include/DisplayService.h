@@ -13,6 +13,9 @@
 
 #include <mbed.h>
 #include <rtos.h>
+
+#include <Adafruit_ST7735.h>
+
 #include "HardwareConfiguration.h"
 
 /**
@@ -29,18 +32,12 @@ class DisplayService
         DisplayService();
 
         /**
-         * @brief Vibrate the motor
+         * @brief Vibrates the motor
          * 
          * @param milliSeconds For how long to vibrate
          * 
          */
-        void vibrate(uint8_t duration);
-
-    protected:
-        DigitalOut _vibration;
-        Thread _vibrationThread;
-        Semaphore _vibrationTrigger;
-        uint8_t _vibrationDuration;
+        void vibrate(uint16_t duration);
 
         /**
          * @brief Render the internal state to the LCD display
@@ -48,6 +45,19 @@ class DisplayService
          */
         void render();
 
+    protected:
+        DigitalOut _vibration; //!< Vibration output
+        Thread _vibration_thread; //!< Thread for vibration duration
+        Semaphore _vibration_trigger; //!< Interlock to trigger vibration
+        uint16_t _vibration_duration; //!< Duration of the vibration in ms
+
+        Adafruit_ST7735 _lcd; //!< LCD output
+        PwmOut _lcd_bl;
+
+        /**
+         * @brief Waits for the vibration interlock and then vibrates the motor
+         * 
+         */
         void threadVibration();
 
 };

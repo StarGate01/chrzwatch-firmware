@@ -25,22 +25,20 @@
 #define boolean bool
 
 // some flags for initR() :(
-// some flags for initR() :(
 #define INITR_GREENTAB 0x0
 #define INITR_REDTAB   0x1
 #define INITR_BLACKTAB   0x2
-
 #define INITR_18GREENTAB    INITR_GREENTAB
 #define INITR_18REDTAB      INITR_REDTAB
 #define INITR_18BLACKTAB    INITR_BLACKTAB
 #define INITR_144GREENTAB   0x1
+#define INITR_MINI160x80 0x04
+#define INITR_HALLOWING 0x05
 
-#define ST7735_TFTWIDTH  128
-// for 1.44" display
-#define ST7735_TFTHEIGHT_144 128
-// for 1.8" display
-#define ST7735_TFTHEIGHT_18  160
-#define ST7735_TFTHEIGHT  160
+#define ST7735_TFTWIDTH_128 128  // for 1.44 and mini
+#define ST7735_TFTWIDTH_80 80    // for mini
+#define ST7735_TFTHEIGHT_128 128 // for 1.44" display
+#define ST7735_TFTHEIGHT_160 160 // for 1.8" and mini display
 
 #define ST7735_NOP     0x00
 #define ST7735_SWRESET 0x01
@@ -103,7 +101,7 @@ class Adafruit_ST7735 : public Adafruit_GFX {
 
  public:
 
-  Adafruit_ST7735(PinName mosi, PinName miso, PinName sck, PinName CS, PinName RS, PinName RST);
+  Adafruit_ST7735(PinName mosi, PinName miso, PinName sck, PinName CS, PinName RS, PinName RST, int16_t w, int16_t h);
 
   void     initB(void);                             // for ST7735B displays
   void     initR(uint8_t options = INITR_GREENTAB); // for ST7735R

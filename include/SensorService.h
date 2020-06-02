@@ -14,6 +14,9 @@
 #include "HardwareConfiguration.h"
 #include "DisplayService.h"
 
+#define POLL_FREQUENCY 100
+#define BUTTON_VIBRATION_LENGTH 75
+
 /**
  * @brief Provides methods to access the various sensors
  * 
@@ -24,42 +27,53 @@ class SensorService
     public:
         /**
          * @brief Construct a new Sensor Service object
-         */
-        SensorService(DisplayService& displayService);
-
-        /**
-         * @brief Update all sensor values
          * 
+         * @param display_service Reference to the display service for button vibration
          */
-        void update();
+        SensorService(DisplayService& display_service);
 
         /**
          * @brief Get the heartrate (BPM) value
          * 
-         * @return uint8_t The heartrate
+         * @return uint16_t The heartrate
          */
-        uint8_t getHRValue();
+        uint16_t getHRValue();
 
         /**
-         * @brief Get the Battery value
+         * @brief Get the Battery value in percent
          * 
          * @return uint8_t The battery value
          */
-        uint8_t getBatteryValue();
+        uint8_t getBatteryPercent();
+
+        /**
+         * @brief Get whether the device is being charged
+         * 
+         * @return true Device is connected to 5V
+         * @return false Device is not connected to power source
+         */
+        bool getCharging();
 
     protected:
-        // events::EventQueue _event_queue; //!< Reference to the event queue for dispatching
-        // Thread _event_thread;
-        DisplayService& _displayService;
+        events::EventQueue _event_queue; //!< Eventqueue for dispatich timer for polling
+        Thread _event_thread; //!< Thread for polling
+        DisplayService& _display_service; //!< Reference to the display service for button vibration
 
-        uint8_t _hr_value; //!< The internal heartrate state
-        uint8_t _gyro_value[3]; //!< The internal accelerometer state
-        uint8_t _battery_value; //!< The internal battery value state
+        AnalogIn _battery; //!< Battery voltage input
+        DigitalIn _charging; //!< Is charging input
+        uint16_t _hr_value; //!< The internal heartrate state
+        float _battery_value; //!< The internal battery value state
+        int _charging_value; //!< The internal charging state
 
-        // InterruptIn _button1, _button2;
+        DigitalIn _button1; //!< Button 1 input
+        DigitalIn _button2; //!< Button 2 input
+        int _last_button1; //!< Last state of button 1 for edge detection
+        int _last_button2; //!< Last state of button 2 for edge detection
 
-        void handleButton1();
-        void handleButton2();
+        void _poll(); //!< Read all sensors
+
+        void _handleButton1(); //!< Handle press of button 1
+        void _handleButton2(); //!< Handle press of button 2
 
 };
 
