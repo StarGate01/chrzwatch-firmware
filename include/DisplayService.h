@@ -14,7 +14,7 @@
 #include <mbed.h>
 #include <rtos.h>
 
-#include <Adafruit_ST7735.h>
+#include <Adafruit_ST7735_Mini.h>
 
 #include "HardwareConfiguration.h"
 
@@ -51,8 +51,9 @@ class DisplayService
         Semaphore _vibration_trigger; //!< Interlock to trigger vibration
         uint16_t _vibration_duration; //!< Duration of the vibration in ms
 
-        Adafruit_ST7735 _lcd; //!< LCD output
+        Adafruit_ST7735_Mini _lcd; //!< LCD output
         PwmOut _lcd_bl;
+        DigitalOut _lcd_pwr;
 
         /**
          * @brief Waits for the vibration interlock and then vibrates the motor

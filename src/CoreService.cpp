@@ -32,9 +32,9 @@ void CoreService::start()
     _ble.init(this, &CoreService::onInitComplete);
 
     // Start the deadlock reset watchdog
-    NRF_WDT->CONFIG = (WDT_CONFIG_SLEEP_Run << WDT_CONFIG_SLEEP_Pos) | (WDT_CONFIG_HALT_Pause << WDT_CONFIG_HALT_Pos);
-    NRF_WDT->CRV = 15 * 32768; // 32k tick
-    NRF_WDT->RREN = WDT_RREN_RR0_Enabled << WDT_RREN_RR0_Pos;
+    NRF_WDT->CONFIG = (WDT_CONFIG_SLEEP_Pause << WDT_CONFIG_SLEEP_Pos) | (WDT_CONFIG_HALT_Pause << WDT_CONFIG_HALT_Pos);
+    NRF_WDT->CRV = 15 * 32768; // 32k tick, 15 sec timeout
+    NRF_WDT->RREN |= WDT_RREN_RR0_Msk; 
     NRF_WDT->TASKS_START = 1;
 
     // Setup and start ble and watchdog queue

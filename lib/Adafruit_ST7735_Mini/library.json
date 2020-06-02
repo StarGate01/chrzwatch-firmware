@@ -2,7 +2,7 @@
     "name": "Adafruit_ST7735_Mini",
     "version": "0.1",
     "keywords": "st7735, lcd, tft",
-    "description": "A first port of the excellent Adafruit ST7735 library, with support for the R_MINI160x80 display",
+    "description": "A first port of the excellent Adafruit ST7735 library, with added support for the R_MINI160x80 display",
     "authors":
     [
         {
@@ -16,6 +16,16 @@
             "url": "https://developer.mbed.org/users/SomeRandomBloke/"
         }
     ],
+    "dependencies":
+    [
+        {
+            "name": "Adafruit_GFX",
+            "authors":
+            [
+                "Andrew Lindsay"
+            ]
+        }
+    ],
     "repository":
     {
         "type": "git",
@@ -23,7 +33,7 @@
     },
     "export": {
         "include": [
-            "lib/Adafruit_ST7735"
+            "lib/Adafruit_ST7735_Mini"
         ]
     },
     "frameworks": "mbed"

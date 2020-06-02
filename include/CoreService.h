@@ -34,7 +34,7 @@ const static char DEVICE_NAME[] = TARGET_VARIANT_NAME;
  * @brief Handles BLE connections, GAP advertising and contains all sub-service objects
  * 
  */
-class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
+class CoreService : ble::Gap::EventHandler
 {
 
     public:
