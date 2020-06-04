@@ -265,30 +265,30 @@ void Adafruit_ST7735_Mini::initB(void)
 }
 
 // Initialization for ST7735R screens (green or red tabs)
-void Adafruit_ST7735_Mini::initR(uint8_t options)
+void Adafruit_ST7735_Mini::initR(uint8_t options, int8_t colshift, int8_t rowshift)
 {
     commonInit(Rcmd1);
     if (options == INITR_GREENTAB)
     {
         commandList(Rcmd2green);
-        colstart = 2;
-        rowstart = 1;
+        colstart = 2 + colshift;
+        rowstart = 1 + rowshift;
     }
     else if ((options == INITR_144GREENTAB) || (options == INITR_HALLOWING))
     {
         _height = ST7735_TFTHEIGHT_128;
         _width = ST7735_TFTWIDTH_128;
         commandList(Rcmd2green144);
-        colstart = 2;
-        rowstart = 3; // For default rotation 0
+        colstart = 2 + colshift;
+        rowstart = 3 + rowshift; // For default rotation 0
     }
     else if (options == INITR_MINI160x80)
     {
         _height = ST7735_TFTWIDTH_80;
         _width = ST7735_TFTHEIGHT_160;
         commandList(Rcmd2green160x80);
-        colstart = 24;
-        rowstart = 0;
+        colstart = 24 + colshift;
+        rowstart = 0 + rowshift;
     }
     else
     {

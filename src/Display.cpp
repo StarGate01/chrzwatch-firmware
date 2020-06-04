@@ -22,7 +22,10 @@ DisplayService::DisplayService():
     _lcd_pwr.write(1);
     _lcd_bl.write(1.0f);
 
-    _lcd.initR(INITR_MINI160x80);
+    _lcd.initR(INITR_MINI160x80, LCD_COLSHIFT, LCD_ROWSHIFT);
+#   if defined(LCD_INVERT)
+        _lcd.invertDisplay(true);
+#   endif
     _lcd.fillScreen(ST7735_BLACK);
     _lcd.setRotation(2);
     _lcd.setCursor(0, 0);

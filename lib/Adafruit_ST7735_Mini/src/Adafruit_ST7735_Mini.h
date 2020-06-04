@@ -139,8 +139,10 @@ public:
      * @brief Initializes a ST7735R type display
      * 
      * @param options Which R variant display to initialize
+     * @param colshift How many pixels to shift the first column
+     * @param rowshift How many pixels to shift the first row
      */
-    void initR(uint8_t options = INITR_GREENTAB);
+    void initR(uint8_t options = INITR_GREENTAB, int8_t colshift = 0, int8_t rowshift = 0);
 
     /**
      * @brief Set the test address window
