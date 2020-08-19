@@ -18,6 +18,33 @@
 
 #include "HardwareConfiguration.h"
 
+
+/**
+ * @brief Holds the state of the display screen
+ * 
+ */
+class ScreenModel
+{
+
+    public: 
+        /**
+         * @brief Construct a new Screen Model object
+         * 
+         */
+        ScreenModel();
+
+        /**
+         * @brief Renders the model to a LCD
+         */
+        void render(Adafruit_ST7735_Mini &lcd);
+
+        time_t epochTime; //!< Current time
+        uint8_t batteryValue; //!< Battery remaining in percent
+        bool batteryCharging; //!< Battery charging state
+
+};
+
+
 /**
  * @brief Provides methods to interact with the LCD display and other actors
  * 
@@ -45,6 +72,23 @@ class DisplayService
          */
         void render();
 
+        /**
+         * @brief Turns the display on or off to save energy
+         * 
+         * @param on True to turn on, false to turn off
+         */
+        void setPower(bool on);
+
+        /**
+         * @brief Return the power state
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool getPower();
+
+        ScreenModel screenModel; //!< Contents of the screen
+
     protected:
         DigitalOut _vibration; //!< Vibration output
         Thread _vibration_thread; //!< Thread for vibration duration
@@ -54,6 +98,8 @@ class DisplayService
         Adafruit_ST7735_Mini _lcd; //!< LCD output
         PwmOut _lcd_bl;
         DigitalOut _lcd_pwr;
+
+        bool _is_on; //!< Power state
 
         /**
          * @brief Waits for the vibration interlock and then vibrates the motor

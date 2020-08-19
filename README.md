@@ -2,6 +2,24 @@
 
 Custom firmware for the NRF52 based smartwatch I6HRC using the Mbed framework.
 
+- [x] Complete BLE Stack
+- [x] Battery GATT profile
+- [ ] Heartrate GATT profile
+- [x] Current time GATT profile
+- [ ] Steps GATT profile
+- [x] Display driver
+- [x] Vibration
+- [x] Charging detection
+- [x] Touch buttons
+- [x] Battery voltage sensor
+- [x] Timekeeping
+- [ ] Step sensor driver
+- [ ] Heartrate sensor driver
+- [ ] Low power mode verification
+- [x] Energy saving display
+- [x] Basic UI
+- [ ] Fancy UI
+
 ## Development setup
 
 Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i6hrc` env for deployment, or the `nrf52_dk` env for debugging on a NRF52-DK board.
@@ -16,7 +34,7 @@ Solder the SWDCLK and SWDIO testpoints to the unused USB data lines. You might w
 
 Flashing should work with any SWD capable programmer, like for example the **ST-Link V2** (the cheap clones work too). 
 
-If the watch refuses to flash, hangs in low poer mode or is stuck in a bootloop, try connecting to it using **OpenOCD** (http://openocd.org/) while spamming the reset button on your adapter (or short `SWDIO` to `VCC`). This should not be needed during normal flashing and execution.
+If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using **OpenOCD** (http://openocd.org/) while spamming the reset button on your adapter (or short `SWDIO` to `VCC`). This should not be needed during normal flashing and execution.
 
 ```
 openocd -d2 -f interface/stlink-v2.cfg -c "transport select hla_swd" -f target/nrf52.cfg
@@ -48,10 +66,10 @@ Thanks to *Aaron Christophel* for providing instructions on how to modify the ha
 ### Library credits:
 
  - ARM Mbed RTOS and API: https://os.mbed.com/
- - The `CurrentTimeService` module of the `BLE_GATT_Services` library is based on `BLE_CurrentTimeService` by *Takehisa Oneta*: https://os.mbed.com/users/ohneta/code/BLE_CurrentTimeService/
+ - The `CurrentTimeService` module of the `BLE_GATT_Services` library (https://platformio.org/lib/show/7372/BLE_GATT_Services) is based on `BLE_CurrentTimeService` by *Takehisa Oneta*: https://os.mbed.com/users/ohneta/code/BLE_CurrentTimeService/
    - Deferred calls in ISR context to EventQueue
    - Added documentation
- - The `Adafruit_ST7735_Mini` library is based on the `Adafruit_ST7735` library by *Andrew Lindsay*: https://platformio.org/lib/show/2150/Adafruit_ST7735, which in turn is a port of a library by Adafruit: https://github.com/adafruit/Adafruit-ST7735-Library
+ - The `Adafruit_ST7735_Mini` library (https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini) is based on the `Adafruit_ST7735` library by *Andrew Lindsay*: https://platformio.org/lib/show/2150/Adafruit_ST7735, which in turn is a port of a library by Adafruit: https://github.com/adafruit/Adafruit-ST7735-Library
    - Added support for the `R_MINI160x80` display type
    - Added documentation
    - Added an explicit dependency to `Adafruit_GFX` port by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which is a port of https://github.com/adafruit/Adafruit-GFX-Library

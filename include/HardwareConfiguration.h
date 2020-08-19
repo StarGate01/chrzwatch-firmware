@@ -19,6 +19,8 @@
 #define PIN_LCD_SDA          P0_15
 #define PIN_LCD_BL           P0_4
 #define PIN_LCD_PWR          P0_30
+#define LCD_COLSHIFT         0
+#define LCD_ROWSHIFT         0
 
 #if defined(TARGET_VARIANT_I6HRC)
 #   define TARGET_VARIANT_NAME  "CHRZwatch I6HRC"
@@ -26,8 +28,11 @@
 #   define PIN_BUTTON1          P0_26
 #   define PIN_BUTTON2          P0_27
 #   define PIN_BATTERY          P0_28
-#   define PIN_CHARGE           P0_24
+#   define PIN_CHARGE           P0_23
 #elif defined(TARGET_VARIANT_NRF52_DK)
 #   define TARGET_VARIANT_NAME  "CHRZwatch NRF52_DK"
 #   define PIN_VIBRATION_INVERT 1
+#   define LCD_COLSHIFT         2
+#   define LCD_ROWSHIFT         2
+#   define LCD_INVERT           1
 #endif
