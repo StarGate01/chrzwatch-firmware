@@ -2,6 +2,24 @@
 
 Custom firmware for the NRF52 based smartwatch I6HRC using the Mbed framework.
 
+- [x] Complete BLE Stack
+- [x] Battery GATT profile
+- [ ] Heartrate GATT profile
+- [x] Current time GATT profile
+- [ ] Steps GATT profile
+- [x] Display driver
+- [x] Vibration
+- [x] Charging detection
+- [x] Touch buttons
+- [x] Battery voltage sensor
+- [x] Timekeeping
+- [ ] Step sensor driver
+- [ ] Heartrate sensor driver
+- [ ] Low power mode verification
+- [x] Energy saving display
+- [x] Basic UI
+- [ ] Fancy UI
+
 ## Development setup
 
 Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i6hrc` env for deployment, or the `nrf52_dk` env for debugging on a NRF52-DK board.
