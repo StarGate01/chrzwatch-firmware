@@ -54,6 +54,14 @@ class SensorService
          */
         bool getBatteryCharging();
 
+        /**
+         * @brief Get whether the device is being charged
+         * 
+         * @return true Device is connected to 5V
+         * @return false Device is not connected to power source
+         */
+        bool getBatteryCharging2();
+
     protected:
         events::EventQueue _event_queue; //!< Eventqueue for dispatich timer for polling
         Thread _event_thread; //!< Thread for polling
@@ -61,12 +69,14 @@ class SensorService
 
         AnalogIn _battery; //!< Battery voltage input
         DigitalIn _charging; //!< Is charging input
+        DigitalIn _charging2; //!< Is charging input
         uint16_t _hr_value; //!< The internal heartrate state
         float _battery_value; //!< The internal battery value state
         bool _charging_value; //!< The internal charging state
+        bool _charging_value2; //!< The internal charging state
 
-        DigitalIn _button1; //!< Button 1 input
-        DigitalIn _button2; //!< Button 2 input
+        InterruptIn _button1; //!< Button 1 input
+        InterruptIn _button2; //!< Button 2 input
         int _last_button1; //!< Last state of button 1 for edge detection
         int _last_button2; //!< Last state of button 2 for edge detection
         bool _cancel_timeout; //!< Whether a button timeout is already running

@@ -12,7 +12,8 @@
 ScreenModel::ScreenModel():
     epochTime(0),
     batteryValue(0),
-    batteryCharging(true)
+    batteryCharging(true),
+    batteryCharging2(true)
 {
 }
 
@@ -26,4 +27,6 @@ void ScreenModel::render(Adafruit_ST7735_Mini &lcd)
     lcd.printf("%u%%", batteryValue);
     lcd.setCursor(0, 100);
     lcd.printf(batteryCharging? "Yes" : "No ");
+    lcd.setCursor(0, 110);
+    lcd.printf(batteryCharging2? "Yes" : "No ");
 }
