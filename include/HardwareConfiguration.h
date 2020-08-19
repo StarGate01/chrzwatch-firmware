@@ -28,7 +28,7 @@
 #   define PIN_BUTTON1          P0_26
 #   define PIN_BUTTON2          P0_27
 #   define PIN_BATTERY          P0_28
-#   define PIN_CHARGE           P0_24
+#   define PIN_CHARGE           P0_23
 #elif defined(TARGET_VARIANT_NRF52_DK)
 #   define TARGET_VARIANT_NAME  "CHRZwatch NRF52_DK"
 #   define PIN_VIBRATION_INVERT 1
