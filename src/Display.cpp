@@ -65,10 +65,7 @@ void DisplayService::vibrate(uint16_t duration)
 
 void DisplayService::render()
 {
-    if(_is_on)
-    {
-        screenModel.render(_lcd);
-    }
+    screenModel.render(_lcd);
 }
 
 void DisplayService::threadVibration()

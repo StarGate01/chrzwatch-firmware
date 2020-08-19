@@ -41,6 +41,7 @@ class ScreenModel
         time_t epochTime; //!< Current time
         uint8_t batteryValue; //!< Battery remaining in percent
         bool batteryCharging; //!< Battery charging state
+        bool batteryCharging2; //!< Battery charging state
 
 };
 
