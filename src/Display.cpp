@@ -10,6 +10,7 @@
 
 
 DisplayService::DisplayService():
+    screenModel(ScreenModel()),
     _vibration(PIN_VIBRATION),
     _vibration_trigger(1),
     _vibration_duration(200),
@@ -19,20 +20,41 @@ DisplayService::DisplayService():
 {
     _vibration_thread.start(callback(this, &DisplayService::threadVibration));
 
-    _lcd_pwr.write(1);
-    _lcd_bl.write(1.0f);
+    setPower(true);
 
+     // Init display controller
     _lcd.initR(INITR_MINI160x80, LCD_COLSHIFT, LCD_ROWSHIFT);
 #   if defined(LCD_INVERT)
         _lcd.invertDisplay(true);
 #   endif
-    _lcd.fillScreen(ST7735_BLACK);
     _lcd.setRotation(2);
     _lcd.setCursor(0, 0);
-    _lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
     _lcd.setTextSize(1);
     _lcd.setTextWrap(false);
-    _lcd.printf("Init ok\n");
+    _lcd.fillScreen(ST7735_BLACK);
+    _lcd.setTextColor(ST7735_CYAN, ST7735_BLACK);
+    _lcd.printf("CHRZ Watch\n\nTime:\n\n\n\n\nBattery:\n\n\n\nCharging:\n");
+    _lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
+}
+
+void DisplayService::setPower(bool on)
+{
+    if(on)
+    {
+        _lcd_pwr.write(1);
+        _lcd_bl.write(1.0f);
+    }
+    else
+    {
+        _lcd_pwr.write(0);
+        _lcd_bl.write(0.0f);
+    }
+    _is_on = on;
+}
+
+bool DisplayService::getPower()
+{
+    return _is_on;
 }
 
 void DisplayService::vibrate(uint16_t duration)
@@ -43,7 +65,10 @@ void DisplayService::vibrate(uint16_t duration)
 
 void DisplayService::render()
 {
-    _lcd.printf("Hello World!\n");
+    if(_is_on)
+    {
+        screenModel.render(_lcd);
+    }
 }
 
 void DisplayService::threadVibration()

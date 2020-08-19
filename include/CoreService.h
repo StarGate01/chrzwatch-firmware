@@ -86,6 +86,12 @@ class CoreService : ble::Gap::EventHandler
          */
         void doUpdateSensors();
 
+        /**
+         * @brief Update display thread
+         * 
+         */
+        void doUpdateDisplay();
+
 
         /**
          * @brief Handles the BLE init completion event
