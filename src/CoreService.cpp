@@ -18,7 +18,9 @@ CoreService::CoreService(BLE &ble, events::EventQueue &event_queue):
     _ble_bat_service(ble, 0),
     _ble_time_service(ble, event_queue),
     _sensor_service(_display_service)
-{ }
+{ 
+    _display_service.setBLEStatusPtr(&_connected);
+}
 
 CoreService::~CoreService()
 {
