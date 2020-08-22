@@ -93,6 +93,8 @@ You can then exit the OpenOCD instance if you want to use a other tool for flash
 
 ## Connecting to a phone
 
+A fork of the Android app **Gadgetbridge** (https://gadgetbridge.org/) with support for this firmware is available at *Codeberg*: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch .
+
 You can use the Android app "**nRF Connect**" (https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp&hl=en) to test the Bluetooth functions. Sometimes, connecting takes multiple tries.
 
 ## Stock firmware
