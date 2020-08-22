@@ -32,7 +32,7 @@ void schedule_ble_events(BLE::OnEventsToProcessCallbackContext *context)
 int main()
 {
     // Setup low power modes
-    Thread::attach_idle_hook(&sleep);
+    Thread::attach_idle_hook(&deepsleep);
 
     // Get BLE Instance and setup BLE events to event queue handler
     BLE &ble = BLE::Instance();
