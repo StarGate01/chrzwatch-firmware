@@ -47,7 +47,7 @@ void CoreService::start()
 void CoreService::startAdvertising() 
 {
     // Create advertising parameters and payload
-    ble::AdvertisingParameters adv_parameters(ble::advertising_type_t::CONNECTABLE_UNDIRECTED, ble::adv_interval_t(ble::millisecond_t(1000)));
+    ble::AdvertisingParameters adv_parameters(ble::advertising_type_t::CONNECTABLE_UNDIRECTED, ble::adv_interval_t(ble::millisecond_t(2000)));
     _adv_data_builder.setFlags(ble::adv_data_flags_t::BREDR_NOT_SUPPORTED | ble::adv_data_flags_t::LE_GENERAL_DISCOVERABLE);
     _adv_data_builder.setAppearance(ble::adv_data_appearance_t::GENERIC_WATCH);
     _adv_data_builder.setName(DEVICE_NAME);
