@@ -14,6 +14,7 @@ Screen::Screen():
     batteryValue(0),
     batteryCharging(true),
     batteryCharging2(true),
+    bleStatus(false),
     _lcd(PIN_LCD_SDA, NC, PIN_LCD_SCL, PIN_LCD_CS, PIN_LCD_DC, PIN_LCD_RESET),
     _display_guard(1)
 {
@@ -52,7 +53,7 @@ void Screen::render()
     _lcd.setCursor(0, 110);
     _lcd.printf(batteryCharging2? "Yes" : "No ");
     _lcd.setCursor(0, 130);
-    _lcd.printf("CYCCNT: %lu", DWT->CYCCNT);
+    _lcd.printf(bleStatus? "BLE connected    " : "BLE not connected");
 
     _display_guard.release();
 }

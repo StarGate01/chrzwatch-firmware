@@ -10,7 +10,11 @@
 
 void CoreService::onInitComplete(BLE::InitializationCompleteCallbackContext *params) 
 {
-    if(params->error != BLE_ERROR_NONE) return;
+    if(params->error != BLE_ERROR_NONE) 
+    {
+        system_reset();
+        return;
+    }
     startAdvertising();
 }
 

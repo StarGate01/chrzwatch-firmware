@@ -42,6 +42,7 @@ class Screen
         uint8_t batteryValue; //!< Battery remaining in percent
         bool batteryCharging; //!< Battery charging state
         bool batteryCharging2; //!< Battery charging state
+        bool bleStatus; //!< Bluetooth status
 
     protected:
         Adafruit_ST7735_Mini _lcd; //!< LCD output
@@ -92,9 +93,17 @@ class DisplayService
          */
         bool getPower();
 
+        /**
+         * @brief Set the BLE status pointer
+         * 
+         * @param ble_status The pointer
+         */
+        void setBLEStatusPtr(bool* ble_status);
+
         Screen screen; //!< The LCD screen
 
     protected:
+        bool* _ble_connected; //!< BLE status
         DigitalOut _vibration; //!< Vibration output
         Thread _vibration_thread; //!< Thread for vibration duration
         Semaphore _vibration_trigger; //!< Interlock to trigger vibration

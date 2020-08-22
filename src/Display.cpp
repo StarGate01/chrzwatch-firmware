@@ -11,6 +11,7 @@
 
 DisplayService::DisplayService():
     screen(Screen()),
+    _ble_connected(nullptr),
     _vibration(PIN_VIBRATION),
     _vibration_trigger(1),
     _vibration_duration(200),
@@ -19,6 +20,11 @@ DisplayService::DisplayService():
 {
     _vibration_thread.start(callback(this, &DisplayService::threadVibration));
     setPower(true);
+}
+
+void DisplayService::setBLEStatusPtr(bool* bleStatus)
+{
+    _ble_connected = bleStatus;
 }
 
 void DisplayService::setPower(bool on)
@@ -49,6 +55,7 @@ void DisplayService::vibrate(uint16_t duration)
 
 void DisplayService::render()
 {
+    if(_ble_connected != nullptr) screen.bleStatus = *_ble_connected;
     screen.render();
 }
 
