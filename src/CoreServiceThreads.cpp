@@ -18,10 +18,10 @@ void CoreService::doUpdateDisplay()
 {
     if(_display_service.getPower())
     {
-        _ble_time_service.readEpoch(_display_service.screenModel.epochTime);
-        _display_service.screenModel.batteryValue = _sensor_service.getBatteryPercent();
-        _display_service.screenModel.batteryCharging = _sensor_service.getBatteryCharging();
-        _display_service.screenModel.batteryCharging2 = _sensor_service.getBatteryCharging2();
+        _ble_time_service.readEpoch(_display_service.screen.epochTime);
+        _display_service.screen.batteryValue = _sensor_service.getBatteryPercent();
+        _display_service.screen.batteryCharging = _sensor_service.getBatteryCharging();
+        _display_service.screen.batteryCharging2 = _sensor_service.getBatteryCharging2();
         _display_service.render();
     }
 }

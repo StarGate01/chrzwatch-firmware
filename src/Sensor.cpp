@@ -62,10 +62,12 @@ void SensorService::_poll()
 
 void SensorService::_handleButton()
 {
+    _event_queue.call(callback(&_display_service, &DisplayService::render));
     _display_service.vibrate(BUTTON_VIBRATION_LENGTH);
-    _display_service.setPower(true);
     _cancel_timeout = true;
+    _display_service.setPower(true);
 }
+
 
 void SensorService::_handleDisplayTimeout()
 {

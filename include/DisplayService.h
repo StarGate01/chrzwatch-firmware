@@ -23,7 +23,7 @@
  * @brief Holds the state of the display screen
  * 
  */
-class ScreenModel
+class Screen
 {
 
     public: 
@@ -31,17 +31,21 @@ class ScreenModel
          * @brief Construct a new Screen Model object
          * 
          */
-        ScreenModel();
+        Screen();
 
         /**
          * @brief Renders the model to a LCD
          */
-        void render(Adafruit_ST7735_Mini &lcd);
+        void render();
 
         time_t epochTime; //!< Current time
         uint8_t batteryValue; //!< Battery remaining in percent
         bool batteryCharging; //!< Battery charging state
         bool batteryCharging2; //!< Battery charging state
+
+    protected:
+        Adafruit_ST7735_Mini _lcd; //!< LCD output
+        Semaphore _display_guard; //!< Protect display integrity
 
 };
 
@@ -88,7 +92,7 @@ class DisplayService
          */
         bool getPower();
 
-        ScreenModel screenModel; //!< Contents of the screen
+        Screen screen; //!< The LCD screen
 
     protected:
         DigitalOut _vibration; //!< Vibration output
@@ -96,9 +100,8 @@ class DisplayService
         Semaphore _vibration_trigger; //!< Interlock to trigger vibration
         uint16_t _vibration_duration; //!< Duration of the vibration in ms
 
-        Adafruit_ST7735_Mini _lcd; //!< LCD output
-        PwmOut _lcd_bl;
-        DigitalOut _lcd_pwr;
+        PwmOut _lcd_bl; //!< LCD backlight
+        DigitalOut _lcd_pwr; //!< LCD power
 
         bool _is_on; //!< Power state
 
