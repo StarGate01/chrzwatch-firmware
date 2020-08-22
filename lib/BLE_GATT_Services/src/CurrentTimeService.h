@@ -22,6 +22,10 @@
 
 #define BLE_CURRENT_TIME_CHAR_VALUE_SIZE 10
 
+#ifndef LOW_POWER
+#define LOW_POWER 1
+#endif
+
 /**
  * @brief Provides symbols for the weekdays
  * 
@@ -87,7 +91,11 @@ class CurrentTimeService
         events::EventQueue &_event_queue; //!< Reference to the event queue for dispatching
         uint8_t _valueBytes[BLE_CURRENT_TIME_CHAR_VALUE_SIZE]; //!< Buffer for the internal time
         GattCharacteristic _currentTimeCharacteristic; //!< BLE characteristic definition
-        Ticker _ticker; //!< Monotonic timer for ticking
+#       if LOW_POWER == 1
+            LowPowerTicker _ticker; //!< Low power monotonic timer for ticking
+#       else
+            Ticker _ticker; //!< Precision monotonic timer for ticking
+#       endif
 
         /**
          * @brief Writes the contents of the internal buffer to the BLE GATT server
