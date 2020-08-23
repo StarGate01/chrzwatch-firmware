@@ -1,6 +1,6 @@
 # CHRZ Watch Firmware
 
-Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed 5.14 RTOS.
+Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed 5.14 RTOS. Supported by a custom version of the Gadgetbridge Android app.
 
 ## State of the project
 
@@ -36,6 +36,8 @@ Other
 - [ ] Step detection algorithm
 - [x] Basic UI
 - [ ] Fancy UI
+- [x] Basic Android support
+- [ ] Complete Android support
 
 ## Hardware overview
 

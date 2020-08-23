@@ -8,16 +8,16 @@
 
 #include "CoreService.h"
 
-CoreService::CoreService(BLE &ble, events::EventQueue &event_queue):
+CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _event_queue(event_queue),
     _connected(false),
-    _encrypted(false),
     _ble(ble),
     _adv_data_builder(_adv_buffer),
     _ble_hr_service(ble, 0, HeartRateService::LOCATION_WRIST),
     _ble_bat_service(ble, 0),
     _ble_time_service(ble, event_queue),
-    _sensor_service(_display_service)
+    _display_service(_sensor_service, _ble_time_service, event_queue),
+    _sensor_service(_display_service, event_queue)
 { 
     _display_service.setBLEStatusPtr(&_connected);
 }
@@ -40,8 +40,7 @@ void CoreService::start()
     NRF_WDT->TASKS_START = 1;
 
     // Setup and start ble and watchdog queue
-    _event_queue.call_every(2000, this, &CoreService::doUpdateSensors);
-    _event_queue.call_every(1000, this, &CoreService::doUpdateDisplay);
+    _event_queue.call_every(1000 * 30, this, &CoreService::doUpdateGATT);
     _event_queue.call_every(15000, this, &CoreService::kickWatchdog);
 }
 

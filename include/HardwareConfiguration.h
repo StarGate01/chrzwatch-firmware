@@ -22,6 +22,8 @@
 #define PIN_LCD_PWR          P0_30
 #define LCD_COLSHIFT         0
 #define LCD_ROWSHIFT         0
+#define LCD_TIMEOUT          10000
+#define SENSOR_FREQUENCY     10000
 
 #if defined(TARGET_VARIANT_I6HRC)
 #   define TARGET_VARIANT_NAME  "CHRZwatch I6HRC"

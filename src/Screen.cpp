@@ -11,9 +11,9 @@
 
 Screen::Screen():
     epochTime(0),
-    batteryValue(0),
+    batteryPercent(0),
+    batteryRaw(0),
     batteryCharging(true),
-    batteryCharging2(true),
     bleStatus(false),
     _lcd(PIN_LCD_SDA, NC, PIN_LCD_SCL, PIN_LCD_CS, PIN_LCD_DC, PIN_LCD_RESET),
     _display_guard(1)
@@ -32,7 +32,6 @@ Screen::Screen():
     _lcd.fillScreen(ST7735_BLACK);
     _lcd.setTextColor(ST7735_CYAN, ST7735_BLACK);
     _lcd.printf("CHRZ Watch\n\nTime:\n\n\n\n\nBattery:\n\n\n\nCharging:\n");
-    _lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
 
     _display_guard.release();
 }
@@ -42,18 +41,28 @@ void Screen::render()
     bool sem = _display_guard.try_acquire();
     if(!sem) return; // Cancel if a rendering is already in progress
 
+    // Decode timestamp to string
     char time_buff[20];
     strftime(time_buff, 20, "%H:%M:%S\n%d.%m.%Y", localtime(&epochTime));
+
+    _lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
     _lcd.setCursor(0, 30);
     _lcd.printf(time_buff);
     _lcd.setCursor(0, 70);
-    _lcd.printf("%u%%", batteryValue);
+    _lcd.printf("%u%% (%ul)", batteryPercent, batteryRaw);
     _lcd.setCursor(0, 100);
     _lcd.printf(batteryCharging? "Yes" : "No ");
-    _lcd.setCursor(0, 110);
-    _lcd.printf(batteryCharging2? "Yes" : "No ");
     _lcd.setCursor(0, 130);
-    _lcd.printf(bleStatus? "BLE connected    " : "BLE not connected");
+    if(bleStatus)
+    {
+        _lcd.setTextColor(ST7735_GREEN, ST7735_BLACK);
+        _lcd.printf("BLE: [x]");
+    }
+    else
+    {
+        _lcd.setTextColor(ST7735_RED, ST7735_BLACK);
+        _lcd.printf("BLE: [ ]");
+    }
 
     _display_guard.release();
 }
