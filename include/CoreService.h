@@ -62,7 +62,6 @@ class CoreService : ble::Gap::EventHandler
         events::EventQueue& _event_queue; //!< Reference to the event queue for dispatching
 
         bool _connected; //!< Connection state of the BLE system
-        bool _encrypted; //!< BLE link encryption state
         BLE& _ble; //!< Reference to the BLE instance
         uint8_t _adv_buffer[ble::LEGACY_ADVERTISING_MAX_SIZE]; //!< BLE GAP advertising buffer
         ble::AdvertisingDataBuilder _adv_data_builder; //!< BLE GAP factory
@@ -71,8 +70,8 @@ class CoreService : ble::Gap::EventHandler
         BatteryService _ble_bat_service; //!< BLE battery service
         CurrentTimeService _ble_time_service; //!< BLE current time service
 
-        SensorService _sensor_service; //!< Sensor subsystem
         DisplayService _display_service; //!< Display subsystem
+        SensorService _sensor_service; //!< Sensor subsystem
 
         /**
          * @brief Starts the BLE GAP advertising
@@ -81,16 +80,10 @@ class CoreService : ble::Gap::EventHandler
         void startAdvertising();
 
         /**
-         * @brief Update sensors thread
+         * @brief Update GATT thread
          * 
          */
-        void doUpdateSensors();
-
-        /**
-         * @brief Update display thread
-         * 
-         */
-        void doUpdateDisplay();
+        void doUpdateGATT();
 
 
         /**

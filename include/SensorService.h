@@ -12,10 +12,14 @@
 #include <mbed.h>
 #include <events/mbed_events.h>
 #include "HardwareConfiguration.h"
-#include "DisplayService.h"
 
 #define POLL_FREQUENCY 100
 #define BUTTON_VIBRATION_LENGTH 75
+
+
+// Forward decalarations
+class DisplayService;
+
 
 /**
  * @brief Provides methods to access the various sensors
@@ -30,7 +34,7 @@ class SensorService
          * 
          * @param display_service Reference to the display service for button vibration
          */
-        SensorService(DisplayService& display_service);
+        SensorService(DisplayService& display_service, events::EventQueue& event_queue);
 
         /**
          * @brief Get the heartrate (BPM) value
@@ -47,12 +51,11 @@ class SensorService
         uint8_t getBatteryPercent();
 
         /**
-         * @brief Get whether the device is being charged
+         * @brief Get the Battery value raw
          * 
-         * @return true Device is connected to 5V
-         * @return false Device is not connected to power source
+         * @return uint8_t The battery value
          */
-        bool getBatteryCharging();
+        uint16_t getBatteryRaw();
 
         /**
          * @brief Get whether the device is being charged
@@ -60,20 +63,18 @@ class SensorService
          * @return true Device is connected to 5V
          * @return false Device is not connected to power source
          */
-        bool getBatteryCharging2();
+        bool getBatteryCharging();
 
     protected:
-        events::EventQueue _event_queue; //!< Eventqueue for dispatich timer for polling
+        events::EventQueue& _event_queue; //!< Eventqueue for dispatch timer for polling
         Thread _event_thread; //!< Thread for polling
         DisplayService& _display_service; //!< Reference to the display service for button vibration
 
         AnalogIn _battery; //!< Battery voltage input
         DigitalIn _charging; //!< Is charging input
-        DigitalIn _charging2; //!< Is charging input
         uint16_t _hr_value; //!< The internal heartrate state
-        float _battery_value; //!< The internal battery value state
+        uint16_t _battery_value; //!< The internal battery value state (volts)
         bool _charging_value; //!< The internal charging state
-        bool _charging_value2; //!< The internal charging state
 
         InterruptIn _button1; //!< Button 1 input
         InterruptIn _button2; //!< Button 2 input

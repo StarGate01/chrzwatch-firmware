@@ -12,15 +12,21 @@
 #define MBED_CONF_RTOS_PRESENT 1
 
 #include <mbed.h>
+#include <events/mbed_events.h>
 #include <rtos.h>
 
 #include <Adafruit_ST7735_Mini.h>
 
 #include "HardwareConfiguration.h"
+#include "CurrentTimeService.h"
+
+
+// Forward decalarations
+class SensorService;
 
 
 /**
- * @brief Holds the state of the display screen
+ * @brief Holds the state of the display screen and talks to the LCD controller
  * 
  */
 class Screen
@@ -38,18 +44,47 @@ class Screen
          */
         void render();
 
+        Adafruit_ST7735_Mini lcd; //!< LCD output
         time_t epochTime; //!< Current time
-        uint8_t batteryValue; //!< Battery remaining in percent
+        uint8_t batteryPercent; //!< Battery remaining in percent
+        uint16_t batteryRaw; //!< Battery remaining raw (volts)
         bool batteryCharging; //!< Battery charging state
-        bool batteryCharging2; //!< Battery charging state
         bool bleStatus; //!< Bluetooth status
 
     protected:
-        Adafruit_ST7735_Mini _lcd; //!< LCD output
-        Semaphore _display_guard; //!< Protect display integrity
+        Semaphore _display_guard; //!< Serialize display bus access
 
 };
 
+/**
+ * @brief Provides a PWM interface with power saving option
+ * 
+ */
+class PwmOutLP: public PwmOut
+{
+
+    public:
+
+        /**
+         * @brief Construct a new Pwm Out L P object
+         * 
+         * @param pin Which pin to use
+         */
+        PwmOutLP(PinName pin) : PwmOut(pin) { }
+
+        /**
+         * @brief Powers the interface up
+         * 
+         */
+        void enable();
+
+        /**
+         * @brief Powers the interface down
+         * 
+         */
+        void disable();
+
+};
 
 /**
  * @brief Provides methods to interact with the LCD display and other actors
@@ -62,7 +97,8 @@ class DisplayService
         /**
          * @brief Construct a new Display Service object
          */
-        DisplayService();
+        DisplayService(SensorService& sensor_service, CurrentTimeService& current_time_service, 
+            events::EventQueue& event_queue);
 
         /**
          * @brief Vibrates the motor
@@ -100,19 +136,23 @@ class DisplayService
          */
         void setBLEStatusPtr(bool* ble_status);
 
-        Screen screen; //!< The LCD screen
+        Screen screen; //!< The LCD screen model and controller
 
     protected:
+        SensorService& _sensor_service; //!< Sensor service reference
+        CurrentTimeService& _current_time_service; //! Current time service
+        events::EventQueue& _event_queue; //!< Event queue
         bool* _ble_connected; //!< BLE status
         DigitalOut _vibration; //!< Vibration output
         Thread _vibration_thread; //!< Thread for vibration duration
         Semaphore _vibration_trigger; //!< Interlock to trigger vibration
         uint16_t _vibration_duration; //!< Duration of the vibration in ms
 
-        PwmOut _lcd_bl; //!< LCD backlight
+        PwmOutLP _lcd_bl; //!< LCD backlight
         DigitalOut _lcd_pwr; //!< LCD power
 
         bool _is_on; //!< Power state
+        int _event_id; //!< Render loop event id
 
         /**
          * @brief Waits for the vibration interlock and then vibrates the motor
