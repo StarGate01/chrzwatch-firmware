@@ -1,13 +1,10 @@
 {
     "target_overrides": {
         "*": {
+            "rtos.idle-thread-stack-size": 1024,
+            "platform.cpu-stats-enabled": true,
             "target.lse_available": true,
-            "events.use-lowpower-timer-ticker": true,
-            "target.device_has_remove": [
-                "SERIAL",
-                "SERIAL_ASYNCH",
-                "SERIAL_FC"
-            ]
+            "events.use-lowpower-timer-ticker": true
         }
     }
 }

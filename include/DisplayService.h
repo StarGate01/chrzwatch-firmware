@@ -44,6 +44,7 @@ class Screen
          */
         void render();
 
+        Adafruit_ST7735_Mini lcd; //!< LCD output
         time_t epochTime; //!< Current time
         uint8_t batteryPercent; //!< Battery remaining in percent
         uint16_t batteryRaw; //!< Battery remaining raw (volts)
@@ -51,11 +52,39 @@ class Screen
         bool bleStatus; //!< Bluetooth status
 
     protected:
-        Adafruit_ST7735_Mini _lcd; //!< LCD output
         Semaphore _display_guard; //!< Serialize display bus access
 
 };
 
+/**
+ * @brief Provides a PWM interface with power saving option
+ * 
+ */
+class PwmOutLP: public PwmOut
+{
+
+    public:
+
+        /**
+         * @brief Construct a new Pwm Out L P object
+         * 
+         * @param pin Which pin to use
+         */
+        PwmOutLP(PinName pin) : PwmOut(pin) { }
+
+        /**
+         * @brief Powers the interface up
+         * 
+         */
+        void enable();
+
+        /**
+         * @brief Powers the interface down
+         * 
+         */
+        void disable();
+
+};
 
 /**
  * @brief Provides methods to interact with the LCD display and other actors
@@ -119,7 +148,7 @@ class DisplayService
         Semaphore _vibration_trigger; //!< Interlock to trigger vibration
         uint16_t _vibration_duration; //!< Duration of the vibration in ms
 
-        PwmOut _lcd_bl; //!< LCD backlight
+        PwmOutLP _lcd_bl; //!< LCD backlight
         DigitalOut _lcd_pwr; //!< LCD power
 
         bool _is_on; //!< Power state

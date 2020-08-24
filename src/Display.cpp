@@ -12,7 +12,6 @@
 
 DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService& current_time_service,
         events::EventQueue &event_queue):
-    screen(Screen()),
     _sensor_service(sensor_service),
     _current_time_service(current_time_service),
     _event_queue(event_queue),
@@ -39,6 +38,7 @@ void DisplayService::setPower(bool on)
     {
         // Enable LCD power
         _lcd_pwr.write(1);
+        _lcd_bl.enable();
         _lcd_bl.write(1.0f);
         // Start render thread
         if(_event_id == 0)
@@ -50,7 +50,7 @@ void DisplayService::setPower(bool on)
     {
         // Disable LCD power
         _lcd_pwr.write(0);
-        _lcd_bl.write(0.0f);
+        _lcd_bl.disable();
         // Stop render thread
         if(_event_id != 0) 
         {

@@ -227,7 +227,7 @@ void Adafruit_ST7735_Mini::commandList(uint8_t *addr)
             ms = *addr++; // Read post-command delay time (ms)
             if (ms == 255)
                 ms = 500; // If 255, delay for 500 ms
-            wait_ms(ms);
+            ThisThread::sleep_for(ms);
         }
     }
 }
@@ -248,11 +248,11 @@ void Adafruit_ST7735_Mini::commonInit(uint8_t *cmdList)
     // toggle RST low to reset; CS low so it'll listen to us
     _cs = 0;
     _rst = 1;
-    wait_ms(500);
+    ThisThread::sleep_for(500);
     _rst = 0;
-    wait_ms(500);
+    ThisThread::sleep_for(500);
     _rst = 1;
-    wait_ms(500);
+    ThisThread::sleep_for(500);
 
     if (cmdList)
         commandList(cmdList);
