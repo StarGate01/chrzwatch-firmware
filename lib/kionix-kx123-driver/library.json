@@ -6,14 +6,14 @@
     "authors":
     [
         {
-            "name": "Rohm",
-            "url": "https://os.mbed.com/teams/Rohm/"
-        },
-        {
             "name": "Christoph Honal",
             "email": "christoph.honal@web.de",
             "url": "https://chrz.de",
             "maintainer": true
+        },
+        {
+            "name": "Rohm",
+            "url": "https://os.mbed.com/teams/Rohm/"
         }
     ],
     "dependencies":
@@ -22,8 +22,8 @@
             "name": "RegisterWriter",
             "authors":
             [
-                "Mikko Koivunen",
-                "Christoph Honal"
+                "Christoph Honal",
+                "Mikko Koivunen"
             ]
         }
     ],
