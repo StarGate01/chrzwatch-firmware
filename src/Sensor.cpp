@@ -38,10 +38,10 @@ uint16_t SensorService::getHRValue()
 
 uint8_t SensorService::getBatteryPercent()
 {
-    return (uint8_t)((float)_battery_value / 655.35f);
+    return (uint8_t)round(((_battery_value * 1.024f) - 0.330f) / 0.0009f);
 }
 
-uint16_t SensorService::getBatteryRaw()
+float SensorService::getBatteryRaw()
 {
     return _battery_value;
 }
@@ -54,7 +54,7 @@ bool SensorService::getBatteryCharging()
 void SensorService::_poll()
 {
     // Update sensors
-    _battery_value = _battery.read_u16();
+    _battery_value = _battery.read();
     _charging_value = (_charging.read() == 0);
     _hr_value = rand() % 200; // TODO HR driver
 }

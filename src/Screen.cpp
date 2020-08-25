@@ -50,7 +50,7 @@ void Screen::render()
     lcd.setCursor(0, 30);
     lcd.printf(time_buff);
     lcd.setCursor(0, 70);
-    lcd.printf("%u%% (%ul)", batteryPercent, batteryRaw);
+    lcd.printf("%u%% (%f)", batteryPercent, batteryRaw);
     lcd.setCursor(0, 100);
     lcd.printf(batteryCharging? "Yes" : "No ");
     lcd.setCursor(0, 115);

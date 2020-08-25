@@ -1,10 +1,12 @@
 {
     "target_overrides": {
         "*": {
-            "rtos.idle-thread-stack-size": 1024,
             "platform.cpu-stats-enabled": true,
             "target.lse_available": true,
-            "events.use-lowpower-timer-ticker": true
+            "events.use-lowpower-timer-ticker": true,
+            "platform.fatal-error-auto-reboot-enabled": true,
+            "platform.crash-capture-enabled": true,
+            "platform.error-reboot-max": 3
         }
     }
 }
