@@ -33,6 +33,8 @@ Power saving
 Other
 
 - [x] Timekeeping
+- [x] Graceful reboot on error
+- [ ] Wakeup on wrist turn
 - [ ] Step detection algorithm
 - [x] Basic UI
 - [ ] Fancy UI
@@ -103,7 +105,7 @@ You can use the Android app "**nRF Connect**" (https://play.google.com/store/app
 
 A dump of the stock ROM can be found at `doc/stock_rom_dump.bin` (armv7le) for decompiling (e.g. using **Ghidra**: https://ghidra-sre.org/) or restoring the watch (untested).
 
-## Thanks to and credits
+## Thanks to
 
 Thanks to *Aaron Christophel* for providing instructions on how to modify the hardware, mapping out the pins and providing some demo Arduino code.
 
@@ -112,9 +114,11 @@ Thanks to *Aaron Christophel* for providing instructions on how to modify the ha
  - https://www.mikrocontroller.net/topic/467136
  - https://www.youtube.com/watch?v=0Fu-VSuKHEg 
 
-### Library credits:
+### Library credits and modifications
 
  - ARM Mbed RTOS and API: https://os.mbed.com/
+   - Hot-patch Nordic BLE driver to support deep sleep
+   - Hot-patch NRF52 linker memory map to support crash dump retention
  - The `CurrentTimeService` module of the `BLE_GATT_Services` library (https://platformio.org/lib/show/7372/BLE_GATT_Services) is based on `BLE_CurrentTimeService` by *Takehisa Oneta*: https://os.mbed.com/users/ohneta/code/BLE_CurrentTimeService/
    - Deferred calls in ISR context to EventQueue
    - Added documentation
