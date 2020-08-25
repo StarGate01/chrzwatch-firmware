@@ -19,7 +19,8 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     _charging_value(false),
     _button1(PIN_BUTTON1),
     _button2(PIN_BUTTON2),
-    _cancel_timeout(true)
+    _cancel_timeout(true),
+    _acc_i2c(ACC_SDA, ACC_SCL)
 { 
     // Button interrupts
     _button1.fall(callback(this, &SensorService::_handleButton));
@@ -57,6 +58,7 @@ void SensorService::_poll()
     _battery_value = _battery.read();
     _charging_value = (_charging.read() == 0);
     _hr_value = rand() % 200; // TODO HR driver
+
 }
 
 void SensorService::_handleButton()

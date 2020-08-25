@@ -1,0 +1,30 @@
+{
+    "name": "RegisterWriter",
+    "version": "0.1",
+    "keywords": "rohm, hal",
+    "description": "Rohm HAL cpp for sensor driver development. Modified to remove explicit Mbed driver dependency and fix file includes.",
+    "authors":
+    [
+        {
+            "name": "Christoph Honal",
+            "email": "christoph.honal@web.de",
+            "url": "https://chrz.de",
+            "maintainer": true
+        },
+        {
+            "name": "Mikko Koivunen",
+            "url": "https://os.mbed.com/teams/Rohm/"
+        }
+    ],
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/StarGate01/chrzwatch-firmware.git"
+    },
+    "export": {
+        "include": [
+            "lib/RegisterWriter"
+        ]
+    },
+    "frameworks": "mbed"
+}

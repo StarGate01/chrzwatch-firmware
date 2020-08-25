@@ -13,6 +13,12 @@
 #include <events/mbed_events.h>
 #include "HardwareConfiguration.h"
 
+
+#include "rohm_hal2.h"
+
+#include <kx123_registers.h>
+#include <kx123.h>
+
 #define POLL_FREQUENCY 100
 #define BUTTON_VIBRATION_LENGTH 75
 
@@ -81,6 +87,9 @@ class SensorService
         int _last_button1; //!< Last state of button 1 for edge detection
         int _last_button2; //!< Last state of button 2 for edge detection
         bool _cancel_timeout; //!< Whether a button timeout is already running
+
+        I2C _acc_i2c; //!< I2C interface for the acceleration sensor
+
 
         void _poll(); //!< Read all sensors
 

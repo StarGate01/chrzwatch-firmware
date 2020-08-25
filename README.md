@@ -33,6 +33,8 @@ Power saving
 Other
 
 - [x] Timekeeping
+- [x] Graceful reboot on error
+- [ ] Wakeup on wrist turn
 - [ ] Step detection algorithm
 - [x] Basic UI
 - [ ] Fancy UI
@@ -51,7 +53,7 @@ Other
  - Acceleration sensor: **KX023**
    - General: https://www.kionix.com/product/KX023-1025
    - Datasheet: http://kionixfs.kionix.com/en/datasheet/KX023-1025%20Specifications%20Rev%2012.0.pdf
-   - Driver: TBD
+   - Driver: https://platformio.org/lib/show/3975/kionix-kx123-driver
  - Heart rate sensor: **AFE4404**
    - General: https://www.ti.com/product/AFE4404
    - Datasheet: https://www.ti.com/lit/ds/symlink/afe4404.pdf?ts=1597861981560&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FAFE4404
@@ -103,7 +105,7 @@ You can use the Android app "**nRF Connect**" (https://play.google.com/store/app
 
 A dump of the stock ROM can be found at `doc/stock_rom_dump.bin` (armv7le) for decompiling (e.g. using **Ghidra**: https://ghidra-sre.org/) or restoring the watch (untested).
 
-## Thanks to and credits
+## Thanks to
 
 Thanks to *Aaron Christophel* for providing instructions on how to modify the hardware, mapping out the pins and providing some demo Arduino code.
 
@@ -112,9 +114,11 @@ Thanks to *Aaron Christophel* for providing instructions on how to modify the ha
  - https://www.mikrocontroller.net/topic/467136
  - https://www.youtube.com/watch?v=0Fu-VSuKHEg 
 
-### Library credits:
+### Library credits and modifications
 
  - ARM Mbed RTOS and API: https://os.mbed.com/
+   - Hot-patch Nordic BLE driver to support deep sleep
+   - Hot-patch NRF52 linker memory map to support crash dump retention
  - The `CurrentTimeService` module of the `BLE_GATT_Services` library (https://platformio.org/lib/show/7372/BLE_GATT_Services) is based on `BLE_CurrentTimeService` by *Takehisa Oneta*: https://os.mbed.com/users/ohneta/code/BLE_CurrentTimeService/
    - Deferred calls in ISR context to EventQueue
    - Added documentation
@@ -123,3 +127,6 @@ Thanks to *Aaron Christophel* for providing instructions on how to modify the ha
    - Added support for the `R_MINI160x80` display type
    - Added documentation
    - Added an explicit dependency to `Adafruit_GFX` port by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which is a port of https://github.com/adafruit/Adafruit-GFX-Library
+ - The `kionix-kx123-driver` library (https://platformio.org/lib/show/3975/kionix-kx123-driver) by *Rohm*
+ - The `RegisterWriter` library (https://platformio.org/lib/show/10695/RegisterWriter) by *Rohm* / *Mikko Koivunen*
+ - The `mbed-drivers` library (https://platformio.org/lib/show/962/mbed-drivers) by *Mbed* / *Bogdan Marinescu*
