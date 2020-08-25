@@ -47,7 +47,7 @@ class Screen
         Adafruit_ST7735_Mini lcd; //!< LCD output
         time_t epochTime; //!< Current time
         uint8_t batteryPercent; //!< Battery remaining in percent
-        uint16_t batteryRaw; //!< Battery remaining raw (volts)
+        float batteryRaw; //!< Battery remaining raw (volts)
         bool batteryCharging; //!< Battery charging state
         bool bleStatus; //!< Bluetooth status
 

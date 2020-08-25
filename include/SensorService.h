@@ -55,7 +55,7 @@ class SensorService
          * 
          * @return uint8_t The battery value
          */
-        uint16_t getBatteryRaw();
+        float getBatteryRaw();
 
         /**
          * @brief Get whether the device is being charged
@@ -73,7 +73,7 @@ class SensorService
         AnalogIn _battery; //!< Battery voltage input
         DigitalIn _charging; //!< Is charging input
         uint16_t _hr_value; //!< The internal heartrate state
-        uint16_t _battery_value; //!< The internal battery value state (volts)
+        float _battery_value; //!< The internal battery value state (volts)
         bool _charging_value; //!< The internal charging state
 
         InterruptIn _button1; //!< Button 1 input
