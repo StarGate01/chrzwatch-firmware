@@ -53,7 +53,7 @@ Other
  - Acceleration sensor: **KX023**
    - General: https://www.kionix.com/product/KX023-1025
    - Datasheet: http://kionixfs.kionix.com/en/datasheet/KX023-1025%20Specifications%20Rev%2012.0.pdf
-   - Driver: TBD
+   - Driver: https://platformio.org/lib/show/3975/kionix-kx123-driver
  - Heart rate sensor: **AFE4404**
    - General: https://www.ti.com/product/AFE4404
    - Datasheet: https://www.ti.com/lit/ds/symlink/afe4404.pdf?ts=1597861981560&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FAFE4404
@@ -127,3 +127,6 @@ Thanks to *Aaron Christophel* for providing instructions on how to modify the ha
    - Added support for the `R_MINI160x80` display type
    - Added documentation
    - Added an explicit dependency to `Adafruit_GFX` port by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which is a port of https://github.com/adafruit/Adafruit-GFX-Library
+ - The `kionix-kx123-driver` library (https://platformio.org/lib/show/3975/kionix-kx123-driver) by *Rohm*
+ - The `RegisterWriter` library (https://platformio.org/lib/show/10695/RegisterWriter) by *Rohm* / *Mikko Koivunen*
+ - The `mbed-drivers` library (https://platformio.org/lib/show/962/mbed-drivers) by *Mbed* / *Bogdan Marinescu*
