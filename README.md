@@ -53,7 +53,7 @@ Other
  - Acceleration sensor: **KX023**
    - General: https://www.kionix.com/product/KX023-1025
    - Datasheet: http://kionixfs.kionix.com/en/datasheet/KX023-1025%20Specifications%20Rev%2012.0.pdf
-   - Driver: https://platformio.org/lib/show/3975/kionix-kx123-driver
+   - Driver: TBA
  - Heart rate sensor: **AFE4404**
    - General: https://www.ti.com/product/AFE4404
    - Datasheet: https://www.ti.com/lit/ds/symlink/afe4404.pdf?ts=1597861981560&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FAFE4404
@@ -79,21 +79,73 @@ Solder the SWDCLK and SWDIO testpoints to the unused USB data lines. You might w
 
 Do NOT connect the watch to a USB host port or "smart" (e.g. Quick Charge) adapter, because the USB protocol will confuse the SWD interface and reset/fault the chip. Instead, use a "dumb" charger, which only uses the outer USB 5V pins.
 
-### Flashing the watch
+### Unlocking the flash memory
 
-Flashing should work with any SWD capable programmer, like for example the **ST-Link V2** (the cheap clones work too). 
+First of all, the flash memory has to be reset in oder for the chip to accept new firmware and debug instructions.
 
-If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using **OpenOCD** (http://openocd.org/) while spamming the reset button on your adapter (or short `SWDIO` to `VCC`). This should not be needed during normal flashing and execution.
+#### Using a Segger J-Link
+
+Buy a **J-Link by Segger** (https://www.segger.com/products/debug-probes/j-link/). Connect the SWD interface to the watch and the J-Link to your PC. Then use the `nrf5x-command-line-tools` to reset the chip.
+
+```
+nrfjprog --family NRF52 --recover
+```
+
+#### Using a Black Magic Probe
+
+Buy or assemble - *Bluepill* boards (https://stm32-base.org/boards/STM32F103C8T6-Blue-Pill.html) are available for a few bucks - a **Black Magic Probe** (https://github.com/blacksphere/blackmagic/wiki). Connect the SWD interface to the watch, and the probe via USB to your PC. Then connect to the probe using GDB.
+
+```
+$ arm-none-eabi-gdb
+(gdb) target extended-remote /dev/ttyACM0
+(gdb) set non-stop on 
+(gdb) mon swdp_scan
+```
+
+On the first run, there probably will be only one target:
+
+```
+Target voltage: unknown
+Available Targets:
+No. Att Driver
+ 1      Nordic nRF52 Access Port
+```
+
+Next, clear the flash memory:
+
+```
+mon erase_mass
+```
+
+After reconnecting / restarting, there now should be two targets:
+
+```
+Target voltage: unknown
+Available Targets:
+No. Att Driver
+ 1      Nordic nRF52 M3/M4
+ 2      Nordic nRF52 Access Port 
+```
+
+This means everything worked and the chip should now be ready to accept new firmware.
+
+### Uploading new firmware
+
+Flashing the unlocked chip should then work with any basic SWD capable programmer, like for example the **ST-Link V2** (the cheap clones work too). The **J-Link** or the **Black Magic Probe** can be used as well.
+
+You can use **OpenOCD** (http://openocd.org/) to connect to the chip and manage its flash memory:
 
 ```
 openocd -d2 -f interface/stlink-v2.cfg -c "transport select hla_swd" -f target/nrf52.cfg
 ```
 
-On a successful connection OpenOCD displays something like "`Info : nrf52.cpu: hardware has 6 breakpoints, 4 watchpoints`". The script `tools/reset.sh` or the task "Reset Target" automates this spamming.
+The PlatformIO IDE is set up to use OpenOCD via some hardware adapter (default: ST-Link V2) to program the chip.
 
-Optinally, open up GDB via telnet and reset the core using `reset halt` via `telnet localhost 4444`.
+If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using OpenOCD while spamming the reset button on your adapter (or short `SWDCLK` to `VCC` - This should trigger a reset). This should not be needed during normal flashing and execution. Sometimes, this condition occurs randomly when the `SWDCLK` pin is left floating.
 
-You can then exit the OpenOCD instance if you want to use a other tool for flashing (e.g. PlatformIO). The core should run normally (or hang at the reset vector if you reset it) and accept SWD connections and flash commands reliably. The PlatformIO flash tool should leave the core in a useable, running state.
+On a successful connection OpenOCD displays something like "`Info : nrf52.cpu: hardware has 6 breakpoints, 4 watchpoints`". This means the chip was reset and is now in debug mode. The script `tools/reset.sh` or the task "Reset Target" automates this spamming.
+
+Optinally, open up GDB via telnet and reset the core using `reset halt` via `telnet localhost 4444`. The chip then halts at the first instruction, which may be good for debugging.
 
 ## Connecting to a phone
 
@@ -116,6 +168,8 @@ Thanks to *Aaron Christophel* for providing instructions on how to modify the ha
 
 ### Library credits and modifications
 
+All modified libraries have been or will be published to https://platformio.org .
+
  - ARM Mbed RTOS and API: https://os.mbed.com/
    - Hot-patch Nordic BLE driver to support deep sleep
    - Hot-patch NRF52 linker memory map to support crash dump retention
@@ -127,6 +181,8 @@ Thanks to *Aaron Christophel* for providing instructions on how to modify the ha
    - Added support for the `R_MINI160x80` display type
    - Added documentation
    - Added an explicit dependency to `Adafruit_GFX` port by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which is a port of https://github.com/adafruit/Adafruit-GFX-Library
- - The `kionix-kx123-driver` library (https://platformio.org/lib/show/3975/kionix-kx123-driver) by *Rohm*
- - The `RegisterWriter` library (https://platformio.org/lib/show/10695/RegisterWriter) by *Rohm* / *Mikko Koivunen*
- - The `mbed-drivers` library (https://platformio.org/lib/show/962/mbed-drivers) by *Mbed* / *Bogdan Marinescu*
+ - The `kionix-kx123-driver` library (TBA) is based on the library of the same name by *Rohm*: https://platformio.org/lib/show/3975/kionix-kx123-driver
+   - Fixed include paths
+ - The `RegisterWriter` library (TBA) is based on the library of the same name by *Rohm* / *Mikko Koivunen*: https://platformio.org/lib/show/10695/RegisterWriter
+   - Fixed include paths
+   - Fixed default pins
