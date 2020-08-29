@@ -39,7 +39,7 @@ uint16_t SensorService::getHRValue()
 
 uint8_t SensorService::getBatteryPercent()
 {
-    return (uint8_t)round(((_battery_value * 1.024f) - 0.330f) / 0.0009f);
+    return (uint8_t)round((_battery_value - 0.330f) / 0.0009f);
 }
 
 float SensorService::getBatteryRaw()

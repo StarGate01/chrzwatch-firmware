@@ -133,8 +133,6 @@ $ openocd -f interface/cmsis-dap.cfg -c "transport select swd" -f target/nrf52.c
 
 The PlatformIO IDE is set up to use OpenOCD via some hardware adapter (default: CMSIS-DAP) to program the chip. This can be changed in the `platformio.ini` file.
 
-The adapter should reset the watch in order for it to exit debug mode (if it is active) and reboot into normal mode. This greatly reduces power consumption. I am not completely sure if the ST-Link V2 is able to properly exit debug mode because it being a high level SWD adapter. That is why I use a CMSIS-DAP or a J-Link. The Black Magic Probe should be able to properly reset too, but I have not tested this yet.
-
 #### Troubleshooting
 
 If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using OpenOCD while spamming the reset button on your adapter (or short `SWDCLK` to `VCC` - This should trigger a debug init halt). This should not be needed during normal flashing and execution. Sometimes, this condition occurs randomly when the `SWDCLK` pin is left floating. On a successful connection OpenOCD displays something like "`Info : nrf52.cpu: hardware has 6 breakpoints, 4 watchpoints`". This means the chip was reset and is now in debug mode. The script `tools/reset.sh` or the task "Reset Target" automates this spamming.
