@@ -81,14 +81,24 @@ Do NOT connect the watch to a USB host port or "smart" (e.g. Quick Charge) adapt
 
 ### Unlocking the flash memory
 
-First of all, the flash memory has to be reset in oder for the chip to accept new firmware and debug instructions.
+First of all, the flash memory has to be reset in oder for the chip to accept new firmware and debug instructions. This requires lower level SWD access, and thus cant be performed by the cheap ST-Link V2 clones because they only provide high level access.
 
 #### Using a Segger J-Link
 
 Buy a **J-Link by Segger** (https://www.segger.com/products/debug-probes/j-link/). Connect the SWD interface to the watch and the J-Link to your PC. Then use the `nrf5x-command-line-tools` to reset the chip.
 
 ```
-nrfjprog --family NRF52 --recover
+$ nrfjprog --family NRF52 --recover
+```
+
+#### Using a CMSIS-DAP
+
+Either buy any **CMSIS-DAP** capable adapter, or buy a cheap **ST-Link V2** clone (the little USB adapter one), and open it. Then use any SWD capable programmer, like for example *another* ST-Link V2 to reprogram the first one with the firmware for CMSIS-DAP functionality (https://raw.githubusercontent.com/x893/CMSIS-DAP/master/Firmware/STM32/hex/CMSIS-DAP-STLINK21.hex). You can use any ST-compatible flash tool, like for example the ST-Link utility or OpenOCD.
+
+Then, connect the watch to the CMSIS-DAP, and the adapter to your PC via USB. Then connect to it using OpenOCD.
+
+```
+$ openocd -f interface/cmsis-dap.cfg -c "transport select swd" -f target/nrf52.cfg -c "init; reset halt; nrf5 mass_erase; reset; exit"
 ```
 
 #### Using a Black Magic Probe
@@ -100,52 +110,36 @@ $ arm-none-eabi-gdb
 (gdb) target extended-remote /dev/ttyACM0
 (gdb) set non-stop on 
 (gdb) mon swdp_scan
+(gdb) mon erase_mass
 ```
-
-On the first run, there probably will be only one target:
-
-```
-Target voltage: unknown
-Available Targets:
-No. Att Driver
- 1      Nordic nRF52 Access Port
-```
-
-Next, clear the flash memory:
-
-```
-mon erase_mass
-```
-
-After reconnecting / restarting, there now should be two targets:
-
-```
-Target voltage: unknown
-Available Targets:
-No. Att Driver
- 1      Nordic nRF52 M3/M4
- 2      Nordic nRF52 Access Port 
-```
-
-This means everything worked and the chip should now be ready to accept new firmware.
 
 ### Uploading new firmware
 
-Flashing the unlocked chip should then work with any basic SWD capable programmer, like for example the **ST-Link V2** (the cheap clones work too). The **J-Link** or the **Black Magic Probe** can be used as well.
+Flashing the unlocked chip should then work with any basic SWD capable programmer, like for example the **ST-Link V2** (the cheap clones work too). The **J-Link**, **CMSIS-DAP** or the **Black Magic Probe** can be used as well.
 
 You can use **OpenOCD** (http://openocd.org/) to connect to the chip and manage its flash memory:
 
+High level SWD access using a *ST-Link V2* clone:
+
 ```
-openocd -d2 -f interface/stlink-v2.cfg -c "transport select hla_swd" -f target/nrf52.cfg
+$ openocd -d2 -f interface/stlink-v2.cfg -c "transport select hla_swd" -f target/nrf52.cfg
 ```
 
-The PlatformIO IDE is set up to use OpenOCD via some hardware adapter (default: ST-Link V2) to program the chip.
+Lower level SWD access using a *CMSIS-DAP*:
 
-If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using OpenOCD while spamming the reset button on your adapter (or short `SWDCLK` to `VCC` - This should trigger a reset). This should not be needed during normal flashing and execution. Sometimes, this condition occurs randomly when the `SWDCLK` pin is left floating.
+```
+$ openocd -f interface/cmsis-dap.cfg -c "transport select swd" -f target/nrf52.cfg
+```
 
-On a successful connection OpenOCD displays something like "`Info : nrf52.cpu: hardware has 6 breakpoints, 4 watchpoints`". This means the chip was reset and is now in debug mode. The script `tools/reset.sh` or the task "Reset Target" automates this spamming.
+The PlatformIO IDE is set up to use OpenOCD via some hardware adapter (default: CMSIS-DAP) to program the chip. This can be changed in the `platformio.ini` file.
 
-Optinally, open up GDB via telnet and reset the core using `reset halt` via `telnet localhost 4444`. The chip then halts at the first instruction, which may be good for debugging.
+The adapter should reset the watch in order for it to exit debug mode (if it is active) and reboot into normal mode. This greatly reduces power consumption. I am not completely sure if the ST-Link V2 is able to properly exit debug mode because it being a high level SWD adapter. That is why I use a CMSIS-DAP or a J-Link. The Black Magic Probe should be able to properly reset too, but I have not tested this yet.
+
+#### Troubleshooting
+
+If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using OpenOCD while spamming the reset button on your adapter (or short `SWDCLK` to `VCC` - This should trigger a debug init halt). This should not be needed during normal flashing and execution. Sometimes, this condition occurs randomly when the `SWDCLK` pin is left floating. On a successful connection OpenOCD displays something like "`Info : nrf52.cpu: hardware has 6 breakpoints, 4 watchpoints`". This means the chip was reset and is now in debug mode. The script `tools/reset.sh` or the task "Reset Target" automates this spamming.
+
+Optionally, append `-c "reset halt"` to the OpenOCD command. The chip then halts at the first instruction, which may be good for debugging.
 
 ## Connecting to a phone
 
