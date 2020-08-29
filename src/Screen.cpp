@@ -52,7 +52,7 @@ void Screen::render()
     lcd.setCursor(0, 70);
     lcd.printf("%u%% (%f)", batteryPercent, batteryRaw);
     lcd.setCursor(0, 100);
-    lcd.printf(batteryCharging? "Yes" : "No ");
+    lcd.printf(batteryCharging? "Yes %lu" : "No  %lu", DWT->CYCCNT);
     lcd.setCursor(0, 115);
     if(bleStatus)
     {
