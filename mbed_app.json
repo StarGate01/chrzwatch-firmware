@@ -1,6 +1,12 @@
 {
     "target_overrides": {
         "*": {
+            "target.macros_remove": [
+                "CONFIG_GPIO_AS_PINRESET"
+            ],
+            "target.macros_add":[
+                "CONFIG_NFCT_PINS_AS_GPIOS"
+            ],
             "platform.cpu-stats-enabled": true,
             "target.lse_available": true,
             "events.use-lowpower-timer-ticker": true,
