@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "*.tpp": "cpp"
+        "*.tpp": "cpp",
+        "mstd_atomic": "cpp",
+        "*.tcc": "cpp",
+        "cmath": "cpp"
     }
 }

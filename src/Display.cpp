@@ -34,11 +34,11 @@ void DisplayService::setBLEStatusPtr(bool* bleStatus)
 
 void DisplayService::setPower(bool on)
 {
+    _lcd_bl.setPower(on);
     if(on)
     {
         // Enable LCD power
         _lcd_pwr.write(1);
-        _lcd_bl.enable();
         _lcd_bl.write(1.0f);
         // Start render thread
         if(_event_id == 0)
@@ -50,7 +50,6 @@ void DisplayService::setPower(bool on)
     {
         // Disable LCD power
         _lcd_pwr.write(0);
-        _lcd_bl.disable();
         // Stop render thread
         if(_event_id != 0) 
         {
@@ -82,6 +81,7 @@ void DisplayService::render()
         screen.batteryPercent = _sensor_service.getBatteryPercent();
         screen.batteryRaw = _sensor_service.getBatteryRaw();
         screen.batteryCharging = _sensor_service.getBatteryCharging();
+        screen.heartrate = _sensor_service.getHRValue();
         screen.render();
     }
 }

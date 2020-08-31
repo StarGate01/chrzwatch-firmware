@@ -47,6 +47,7 @@ class Screen
         Adafruit_ST7735_Mini lcd; //!< LCD output
         time_t epochTime; //!< Current time
         uint8_t batteryPercent; //!< Battery remaining in percent
+        uint8_t heartrate; //!< Heartrate
         float batteryRaw; //!< Battery remaining raw (volts)
         bool batteryCharging; //!< Battery charging state
         bool bleStatus; //!< Bluetooth status
@@ -73,16 +74,11 @@ class PwmOutLP: public PwmOut
         PwmOutLP(PinName pin) : PwmOut(pin) { }
 
         /**
-         * @brief Powers the interface up
+         * @brief Powers the interface up and down
          * 
+         * @param on True to turn on, false to turn off
          */
-        void enable();
-
-        /**
-         * @brief Powers the interface down
-         * 
-         */
-        void disable();
+        void setPower(bool on);
 
 };
 
