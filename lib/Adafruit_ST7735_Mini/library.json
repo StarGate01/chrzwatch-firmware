@@ -1,6 +1,6 @@
 {
     "name": "Adafruit_ST7735_Mini",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "keywords": "st7735, lcd, tft",
     "description": "A first port of the excellent Adafruit ST7735 library, with added support for the R_MINI160x80 display",
     "authors":
