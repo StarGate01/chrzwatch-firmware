@@ -1,0 +1,30 @@
+{
+    "name": "Heartrate3_AFE4404",
+    "version": "0.1",
+    "keywords": "heartrate, afe4404, pps964",
+    "description": "AFE4404 driver and data processing algorithms by MikroElektronika. Modified to provide a wrapper for Mbed.",
+    "authors":
+    [
+        {
+            "name": "Christoph Honal",
+            "email": "christoph.honal@web.de",
+            "url": "https://chrz.de",
+            "maintainer": true
+        },
+        {
+            "name": "MikroElektronika",
+            "url": "https://github.com/MikroElektronika"
+        }
+    ],
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/StarGate01/chrzwatch-firmware.git"
+    },
+    "export": {
+        "include": [
+            "lib/Heartrate3_AFE4404"
+        ]
+    },
+    "frameworks": "mbed"
+}
