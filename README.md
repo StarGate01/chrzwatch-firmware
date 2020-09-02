@@ -66,9 +66,9 @@ Other
    - Driver: N/A, currently unused
  - Ambient light sensor: Some **photodiode** combined with a **LED**
    - Driver: Simple ADC
- - Battery voltage sensor: Down-scaled battery voltage (0.3V - 0.4V)
+ - Battery voltage sensor: Down-scaled **battery voltage** (0.3V - 0.4V)
    - Driver: Simple ADC
- - Vibration motor:
+ - Vibration motor: Small axial **vibration motor**
    - Driver: Simple GPIO
 
 See `doc/pinout.png` for the pin mapping by *Aaron Christophel*.
@@ -183,3 +183,7 @@ All modified libraries have been or will be published to https://platformio.org 
  - The `RegisterWriter` library (TBA) is based on the library of the same name by *Rohm* / *Mikko Koivunen*: https://platformio.org/lib/show/10695/RegisterWriter
    - Fixed include paths
    - Fixed default pins
+
+### Licensing
+
+Please note that while most code in this repository may be licensed under the term of the GPL3 license, this explicitly does not apply to the libraries contained in `/lib`. All these libraries have their own license attached.
