@@ -58,15 +58,19 @@ Other
    - Driver: TBA
  - Heart rate sensor: **AFE4404**
    - General: https://www.ti.com/product/AFE4404
-   - Datasheet: https://www.ti.com/lit/ds/symlink/afe4404.pdf?ts=1597861981560&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FAFE4404
-   - Driver: TBA
+   - Datasheet: https://www.ti.com/lit/ds/symlink/afe4404.pdf
+   - Driver: https://platformio.org/lib/show/11099/Heartrate3_AFE4404
  - Font ROM: **GT24L24A2Y**
    - General: https://lcsc.com/product-detail/_Gotop-GT24L24A2Y_C124690.html
    - Datasheet: https://datasheet.lcsc.com/szlcsc/1912111436_Gotop-GT24L24A2Y_C124690.pdf
    - Driver: N/A, currently unused
  - Ambient light sensor: Some **photodiode** combined with a **LED**
    - Driver: Simple ADC
-  
+ - Battery voltage sensor: Down-scaled battery voltage (0.3V - 0.4V)
+   - Driver: Simple ADC
+ - Vibration motor:
+   - Driver: Simple GPIO
+
 See `doc/pinout.png` for the pin mapping by *Aaron Christophel*.
 
 ## Development setup
@@ -170,7 +174,7 @@ All modified libraries have been or will be published to https://platformio.org 
    - Added support for the `R_MINI160x80` display type
    - Added documentation
    - Added an explicit dependency to `Adafruit_GFX` port by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which is a port of https://github.com/adafruit/Adafruit-GFX-Library
- - The `Heartrate3_AFE4404` library (TBA) is based on the library and example code of `Click_Heartrate3_AFE4404` by *MikroElektronika* / *Corey Lakey*: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
+ - The `Heartrate3_AFE4404` library (https://platformio.org/lib/show/11099/Heartrate3_AFE4404) is based on the library and example code of `Click_Heartrate3_AFE4404` by *MikroElektronika* / *Corey Lakey*: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
    - Added Mbed integration
    - Added interrupt handling
    - Added powerdown/up functionality
