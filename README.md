@@ -21,13 +21,14 @@ Hardware interfacing
 - [x] Touch buttons
 - [x] Battery voltage sensor
 - [ ] Step sensor driver
-- [ ] Heartrate sensor driver
+- [x] Heartrate sensor driver
 
 Power saving
 
 - [x] Low power idle thread
 - [x] Energy saving display
 - [x] Energy saving touch input
+- [ ] Energy saving heartrate sensor
 - [ ] Endurance tests & verification
 
 Other
@@ -36,6 +37,7 @@ Other
 - [x] Graceful reboot on error
 - [ ] Wakeup on wrist turn
 - [ ] Step detection algorithm
+- [x] Heartrate detection algorithm
 - [x] Basic UI
 - [ ] Fancy UI
 - [x] Basic Android support
@@ -57,7 +59,7 @@ Other
  - Heart rate sensor: **AFE4404**
    - General: https://www.ti.com/product/AFE4404
    - Datasheet: https://www.ti.com/lit/ds/symlink/afe4404.pdf?ts=1597861981560&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FAFE4404
-   - Driver: TBD
+   - Driver: TBA
  - Font ROM: **GT24L24A2Y**
    - General: https://lcsc.com/product-detail/_Gotop-GT24L24A2Y_C124690.html
    - Datasheet: https://datasheet.lcsc.com/szlcsc/1912111436_Gotop-GT24L24A2Y_C124690.pdf
@@ -83,14 +85,6 @@ Do NOT connect the watch to a USB host port or "smart" (e.g. Quick Charge) adapt
 
 First of all, the flash memory has to be reset in oder for the chip to accept new firmware and debug instructions. This requires lower level SWD access, and thus cant be performed by the cheap ST-Link V2 clones because they only provide high level access.
 
-#### Using a Segger J-Link
-
-Buy a **J-Link by Segger** (https://www.segger.com/products/debug-probes/j-link/). Connect the SWD interface to the watch and the J-Link to your PC. Then use the `nrf5x-command-line-tools` to reset the chip.
-
-```
-$ nrfjprog --family NRF52 --recover
-```
-
 #### Using a CMSIS-DAP
 
 Either buy any **CMSIS-DAP** capable adapter, or buy a cheap **ST-Link V2** clone (the little USB adapter one), and open it. Then use any SWD capable programmer, like for example *another* ST-Link V2 to reprogram the first one with the firmware for CMSIS-DAP functionality (https://raw.githubusercontent.com/x893/CMSIS-DAP/master/Firmware/STM32/hex/CMSIS-DAP-STLINK21.hex). You can use any ST-compatible flash tool, like for example the ST-Link utility or OpenOCD.
@@ -115,7 +109,7 @@ $ arm-none-eabi-gdb
 
 ### Uploading new firmware
 
-Flashing the unlocked chip should then work with any basic SWD capable programmer, like for example the **ST-Link V2** (the cheap clones work too). The **J-Link**, **CMSIS-DAP** or the **Black Magic Probe** can be used as well.
+Flashing the unlocked chip should then work with any basic SWD capable programmer, like for example the **ST-Link V2** (the cheap clones work too). The **CMSIS-DAP** or the **Black Magic Probe** can be used as well.
 
 You can use **OpenOCD** (http://openocd.org/) to connect to the chip and manage its flash memory:
 
@@ -160,11 +154,14 @@ Thanks to *Aaron Christophel* for providing instructions on how to modify the ha
 
 ### Library credits and modifications
 
-All modified libraries have been or will be published to https://platformio.org .
+Hot-patches can be found in this repository under `/patch`.
 
- - ARM Mbed RTOS and API: https://os.mbed.com/
+- ARM Mbed RTOS and API: https://os.mbed.com/
    - Hot-patch Nordic BLE driver to support deep sleep
    - Hot-patch NRF52 linker memory map to support crash dump retention
+
+All modified libraries have been or will be published to https://platformio.org , their source code can be found in this repository under `/lib`.
+
  - The `CurrentTimeService` module of the `BLE_GATT_Services` library (https://platformio.org/lib/show/7372/BLE_GATT_Services) is based on `BLE_CurrentTimeService` by *Takehisa Oneta*: https://os.mbed.com/users/ohneta/code/BLE_CurrentTimeService/
    - Deferred calls in ISR context to EventQueue
    - Added documentation
@@ -173,6 +170,10 @@ All modified libraries have been or will be published to https://platformio.org 
    - Added support for the `R_MINI160x80` display type
    - Added documentation
    - Added an explicit dependency to `Adafruit_GFX` port by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which is a port of https://github.com/adafruit/Adafruit-GFX-Library
+ - The `Heartrate3_AFE4404` library (TBA) is based on the library and example code of `Click_Heartrate3_AFE4404` by *MikroElektronika* / *Corey Lakey*: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
+   - Added Mbed integration
+   - Added interrupt handling
+   - Added powerdown/up functionality
  - The `kionix-kx123-driver` library (TBA) is based on the library of the same name by *Rohm*: https://platformio.org/lib/show/3975/kionix-kx123-driver
    - Fixed include paths
  - The `RegisterWriter` library (TBA) is based on the library of the same name by *Rohm* / *Mikko Koivunen*: https://platformio.org/lib/show/10695/RegisterWriter

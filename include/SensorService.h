@@ -13,11 +13,12 @@
 #include <events/mbed_events.h>
 #include "HardwareConfiguration.h"
 
+// #include <rohm_hal2.h>
+// #include <kx123_registers.h>
+// #include <kx123.h>
 
-#include "rohm_hal2.h"
-
-#include <kx123_registers.h>
-#include <kx123.h>
+// #include <AFE_4404.h>
+#include <Heartrate3_AFE4404.h>
 
 #define POLL_FREQUENCY 100
 #define BUTTON_VIBRATION_LENGTH 75
@@ -45,9 +46,9 @@ class SensorService
         /**
          * @brief Get the heartrate (BPM) value
          * 
-         * @return uint16_t The heartrate
+         * @return uint8_t The heartrate
          */
-        uint16_t getHRValue();
+        uint8_t getHRValue();
 
         /**
          * @brief Get the Battery value in percent
@@ -78,9 +79,9 @@ class SensorService
 
         AnalogIn _battery; //!< Battery voltage input
         DigitalIn _charging; //!< Is charging input
-        uint16_t _hr_value; //!< The internal heartrate state
         float _battery_value; //!< The internal battery value state (volts)
         bool _charging_value; //!< The internal charging state
+        uint8_t _hr_value;
 
         InterruptIn _button1; //!< Button 1 input
         InterruptIn _button2; //!< Button 2 input
@@ -88,10 +89,16 @@ class SensorService
         int _last_button2; //!< Last state of button 2 for edge detection
         bool _cancel_timeout; //!< Whether a button timeout is already running
 
-        I2C _acc_i2c; //!< I2C interface for the acceleration sensor
+        // I2C _acc_i2c; //!< I2C interface for the acceleration sensor
+        // RegisterWriter _acc_rw; //!< Register access to the acceleration sensor
+        // KX123 _acc_kx123; //!< Access to the acceleration sensor
 
+        // AFE_4404 _hr_afe; //!< Access to heartrate sensor
+
+        Heartrate3_AFE4404 _hr; //!< Access to heartrate sensor
 
         void _poll(); //!< Read all sensors
+        void _finishPoll();
 
         void _handleButton(); //!< Handle press of buttons
         void _handleDisplayTimeout(); //!< Handle display timeout

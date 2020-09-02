@@ -14,13 +14,16 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     _display_service(display_service),
     _battery(PIN_BATTERY),
     _charging(PIN_CHARGE),
-    _hr_value(0),
     _battery_value(0),
     _charging_value(false),
     _button1(PIN_BUTTON1),
     _button2(PIN_BUTTON2),
-    _cancel_timeout(true),
-    _acc_i2c(ACC_SDA, ACC_SCL)
+    _cancel_timeout(true), //,
+    _hr(HR_SDA, HR_SCL, HR_ADCREADY, HR_RESET, HR_PWR), //, THREAD_SIZE),
+    _event_thread(osPriorityNormal, THREAD_SIZE)
+    // _acc_i2c(ACC_SDA, ACC_SCL),
+    // _acc_rw(_acc_i2c),
+    // _acc_kx123(_acc_rw)
 { 
     // Button interrupts
     _button1.fall(callback(this, &SensorService::_handleButton));
@@ -32,14 +35,14 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     _event_thread.start(callback(&_event_queue, &EventQueue::dispatch_forever));
 }
 
-uint16_t SensorService::getHRValue()
+uint8_t SensorService::getHRValue()
 {
     return _hr_value;
 }
 
 uint8_t SensorService::getBatteryPercent()
 {
-    return (uint8_t)round((_battery_value - 0.330f) / 0.0009f);
+    return (uint8_t)max(min(round((_battery_value - 0.3f) * 1000.0f), 100.0f), 0.0f);
 }
 
 float SensorService::getBatteryRaw()
@@ -54,11 +57,21 @@ bool SensorService::getBatteryCharging()
 
 void SensorService::_poll()
 {
-    // Update sensors
+    // Update battery
     _battery_value = _battery.read();
     _charging_value = (_charging.read() == 0);
-    _hr_value = rand() % 200; // TODO HR driver
 
+    // Begin HR measuring interval
+    // _hr.setPower(true);
+    // _event_queue.call_in(HR_DURATION, callback(this, &SensorService::_finishPoll));
+    _hr_value = _hr.getHeartrate();
+}
+
+void SensorService::_finishPoll()
+{
+    // End HR sensor interval
+    // _hr_value = _hr.getHeartrate();
+    // _hr.setPower(false);
 }
 
 void SensorService::_handleButton()

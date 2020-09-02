@@ -8,18 +8,18 @@
 
 #include "DisplayService.h"
 
-void PwmOutLP::enable()
+void PwmOutLP::setPower(bool on)
 {
     core_util_critical_section_enter();
-    lock_deep_sleep();
-    NRF_PWM0->ENABLE = 1;
-    core_util_critical_section_exit();
-}
-
-void PwmOutLP::disable()
-{
-    core_util_critical_section_enter();
-    NRF_PWM0->ENABLE = 0;
-    unlock_deep_sleep();
+    if(on)
+    {
+        lock_deep_sleep();
+        NRF_PWM0->ENABLE = 1;
+    }
+    else
+    {
+        NRF_PWM0->ENABLE = 0;
+        unlock_deep_sleep();
+    }
     core_util_critical_section_exit();
 }

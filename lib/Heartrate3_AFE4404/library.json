@@ -1,8 +1,8 @@
 {
-    "name": "BLE_GATT_Services",
-    "version": "0.2.2",
-    "keywords": "bluetooth, ble, gatt, service, currenttime",
-    "description": "Various Bluetooth LE GATT services: CurrentTime.",
+    "name": "Heartrate3_AFE4404",
+    "version": "0.1",
+    "keywords": "heartrate, afe4404, pps964",
+    "description": "AFE4404 driver and data processing algorithms by MikroElektronika. Modified to provide a wrapper for Mbed.",
     "authors":
     [
         {
@@ -12,8 +12,8 @@
             "maintainer": true
         },
         {
-            "name": "Takehisa Oneta",
-            "url": "https://os.mbed.com/users/ohneta/"
+            "name": "MikroElektronika",
+            "url": "https://github.com/MikroElektronika"
         }
     ],
     "repository":
@@ -23,7 +23,7 @@
     },
     "export": {
         "include": [
-            "lib/BLE_GATT_Services"
+            "lib/Heartrate3_AFE4404"
         ]
     },
     "frameworks": "mbed"

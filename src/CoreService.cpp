@@ -40,7 +40,7 @@ void CoreService::start()
     NRF_WDT->TASKS_START = 1;
 
     // Setup and start ble and watchdog queue
-    _event_queue.call_every(1000 * 30, this, &CoreService::doUpdateGATT);
+    _event_queue.call_every(SENSOR_FREQUENCY, this, &CoreService::doUpdateGATT);
     _event_queue.call_every(15000, this, &CoreService::kickWatchdog);
 }
 
