@@ -3,6 +3,9 @@
         "*.tpp": "cpp",
         "mstd_atomic": "cpp",
         "*.tcc": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "mstd_memory": "cpp",
+        "mstd_mutex": "cpp",
+        "memory": "cpp"
     }
 }

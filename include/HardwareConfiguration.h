@@ -32,8 +32,9 @@
 #define HR_RESET             P0_19
 #define HR_SDA               P0_20
 #define HR_SCL               P0_21
-#define SENSOR_FREQUENCY     10000
-#define HR_DURATION          3000
+#define SENSOR_FREQUENCY     20000
+#define HR_DURATION          10000
+#define THREAD_SIZE          2048
 
 #if defined(TARGET_VARIANT_I6HRC)
 #   define TARGET_VARIANT_NAME  "CHRZwatch I6HRC"

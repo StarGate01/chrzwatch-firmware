@@ -21,7 +21,8 @@ DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService
     _vibration_duration(200),
     _lcd_bl(PIN_LCD_BL),
     _lcd_pwr(PIN_LCD_PWR),
-    _event_id(0)
+    _event_id(0),
+    _vibration_thread(osPriorityNormal, THREAD_SIZE)
 {
     _vibration_thread.start(callback(this, &DisplayService::threadVibration));
     setPower(true);

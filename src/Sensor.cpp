@@ -16,23 +16,22 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     _charging(PIN_CHARGE),
     _battery_value(0),
     _charging_value(false),
-    // _button1(PIN_BUTTON1),
-    // _button2(PIN_BUTTON2),
+    _button1(PIN_BUTTON1),
+    _button2(PIN_BUTTON2),
     _cancel_timeout(true), //,
-    _hr(HR_SDA, HR_SCL, HR_ADCREADY, HR_RESET, HR_PWR, event_queue)
+    _hr(HR_SDA, HR_SCL, HR_ADCREADY, HR_RESET, HR_PWR), //, THREAD_SIZE),
+    _event_thread(osPriorityNormal, THREAD_SIZE)
     // _acc_i2c(ACC_SDA, ACC_SCL),
     // _acc_rw(_acc_i2c),
     // _acc_kx123(_acc_rw)
 { 
     // Button interrupts
-    // _button1.fall(callback(this, &SensorService::_handleButton));
-    // _button2.fall(callback(this, &SensorService::_handleButton));
-
-    // Init heartrate sensor
+    _button1.fall(callback(this, &SensorService::_handleButton));
+    _button2.fall(callback(this, &SensorService::_handleButton));
 
     // Handle dispatching events
     _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::_poll);
-    // _event_queue.call_every(LCD_TIMEOUT, this, &SensorService::_handleDisplayTimeout);
+    _event_queue.call_every(LCD_TIMEOUT, this, &SensorService::_handleDisplayTimeout);
     _event_thread.start(callback(&_event_queue, &EventQueue::dispatch_forever));
 }
 
@@ -62,10 +61,17 @@ void SensorService::_poll()
     _battery_value = _battery.read();
     _charging_value = (_charging.read() == 0);
 
+    // Begin HR measuring interval
     // _hr.setPower(true);
-    // ThisThread::sleep_for(HR_DURATION);
-    // _hr.setPower(false);
+    // _event_queue.call_in(HR_DURATION, callback(this, &SensorService::_finishPoll));
     _hr_value = _hr.getHeartrate();
+}
+
+void SensorService::_finishPoll()
+{
+    // End HR sensor interval
+    // _hr_value = _hr.getHeartrate();
+    // _hr.setPower(false);
 }
 
 void SensorService::_handleButton()

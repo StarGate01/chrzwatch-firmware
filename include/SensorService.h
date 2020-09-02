@@ -83,8 +83,8 @@ class SensorService
         bool _charging_value; //!< The internal charging state
         uint8_t _hr_value;
 
-        // InterruptIn _button1; //!< Button 1 input
-        // InterruptIn _button2; //!< Button 2 input
+        InterruptIn _button1; //!< Button 1 input
+        InterruptIn _button2; //!< Button 2 input
         int _last_button1; //!< Last state of button 1 for edge detection
         int _last_button2; //!< Last state of button 2 for edge detection
         bool _cancel_timeout; //!< Whether a button timeout is already running
@@ -98,6 +98,7 @@ class SensorService
         Heartrate3_AFE4404 _hr; //!< Access to heartrate sensor
 
         void _poll(); //!< Read all sensors
+        void _finishPoll();
 
         void _handleButton(); //!< Handle press of buttons
         void _handleDisplayTimeout(); //!< Handle display timeout
