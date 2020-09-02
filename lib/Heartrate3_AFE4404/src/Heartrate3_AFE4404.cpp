@@ -11,42 +11,45 @@
 #include "heartrate_3_hal.h"
 
 
-Heartrate3_AFE4404::Heartrate3_AFE4404(PinName sda, PinName scl, PinName intr, PinName reset, PinName pwr, events::EventQueue& event_queue):
+Heartrate3_AFE4404::Heartrate3_AFE4404(PinName sda, PinName scl, PinName intr, PinName reset, PinName pwr):
     _i2c(sda, scl),
     _int_adc(intr),
     _reset(reset),
-    _pwr(pwr),
-    _event_queue(event_queue)
+    _pwr(pwr)
 {
     _dynamic_modes.transmit = trans_en;                       //Transmitter disabled
     _dynamic_modes.curr_range = led_norm;                     //LED range 0 - 100
-    _dynamic_modes.adc_power = adc_on;                        //ADC on
+    _dynamic_modes.adc_power = adc_on;                        //ADC enabled in sleep
     _dynamic_modes.clk_mode = osc_mode;                       //Use internal Oscillator
-    _dynamic_modes.tia_power = tia_off;                       //TIA off
-    _dynamic_modes.rest_of_adc = rest_of_adc_off;             //Rest of ADC off
+    _dynamic_modes.tia_power = tia_off;                       //TIA off in sleep
+    _dynamic_modes.rest_of_adc = rest_of_adc_off;             //Rest of ADC off in sleep
     _dynamic_modes.afe_rx_mode = afe_rx_normal;               //Normal Receiving on AFE
     _dynamic_modes.afe_mode = afe_normal;                     //Normal AFE functionality
 
     hr3_hal_init(&_i2c, I2C_ADDRESS);
-    setPower(true);
+    _pwr.write(1);
+    _reset.write(1);
+    ThisThread::sleep_for(10);
+    _init();
     _int_adc.rise(callback(this, &Heartrate3_AFE4404::_handleADCInterrupt)); // Setup interrupt handler
+    _is_on = true;
 }
 
 void Heartrate3_AFE4404::setPower(bool on)
 {
-    if(on)
+    if(on && !_is_on)
     {
-        _pwr.write(1);
-        _reset.write(1);
-        ThisThread::sleep_for(10);
-        _init();
+        _dynamic_modes.afe_mode = afe_normal;
+        initStatHRM();
+        hr3_set_dynamic_settings(&_dynamic_modes);
+        _is_on = on;
     }
-    else
+    else if(!on && _is_on)
     {
-        _pwr.write(0);
-        _reset.write(0);
+        _dynamic_modes.afe_mode = afe_off;
+        hr3_set_dynamic_settings(&_dynamic_modes);
+        _is_on = on;
     }
-    _is_on = on;
 }
 
 uint8_t Heartrate3_AFE4404::getHeartrate()
@@ -85,7 +88,7 @@ void Heartrate3_AFE4404::_init()
     hr3_set_clkout_div( false, 2 );
     hr3_set_int_clk_div( 1 );
 
-    initStatHRM(); // Initializes values to 0
+    initStatHRM();
 }
 
 
@@ -93,12 +96,6 @@ void Heartrate3_AFE4404::_handleADCInterrupt()
 {
     if(_is_on)
     {
-        _event_queue.call(this, &Heartrate3_AFE4404::_handleADC);
+        statHRMAlgo(hr3_get_led1_val());
     }
-}
-
-void Heartrate3_AFE4404::_handleADC()
-{
-    // Give led1 ambient value to heartrate function. ( 100 times a second )
-    statHRMAlgo(hr3_get_led1_val());
 }

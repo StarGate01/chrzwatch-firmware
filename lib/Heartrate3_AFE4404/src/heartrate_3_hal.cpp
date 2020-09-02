@@ -9,16 +9,17 @@
 #include "heartrate_3_hal.h"
 
 #include <mbed.h>
+#include "UnsafeI2C.h"
 
 
-static I2C* _hal_i2c = nullptr;
+static UnsafeI2C* _hal_i2c = nullptr;
 
 static uint8_t _i2c_hw_address;
 
 
 void hr3_hal_init(void* mbed_i2c, uint8_t address_id)
 {
-    _hal_i2c = (I2C*)mbed_i2c;
+    _hal_i2c = (UnsafeI2C*)mbed_i2c;
     _i2c_hw_address = (address_id << 1); //Mbed uses 8 bit addresses
 }
 

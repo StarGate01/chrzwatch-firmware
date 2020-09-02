@@ -13,6 +13,8 @@
 #include <events/mbed_events.h>
 
 #include "heartrate_3.h"
+#include "UnsafeI2C.h"
+
 
 #define I2C_ADDRESS 0x58
 
@@ -32,7 +34,7 @@ class Heartrate3_AFE4404
          * @param scl I2C SCL pin
          * @param intr ADC ready interrupt pin
          */
-        Heartrate3_AFE4404(PinName sda, PinName scl, PinName intr, PinName reset, PinName pwr, events::EventQueue& event_queue);
+        Heartrate3_AFE4404(PinName sda, PinName scl, PinName intr, PinName reset, PinName pwr);
 
         /**
          * @brief Set the power on or of
@@ -50,19 +52,17 @@ class Heartrate3_AFE4404
         
     protected:
 
-        I2C _i2c; //!< I2C interface
+        UnsafeI2C _i2c; //!< I2C interface
         InterruptIn _int_adc; //!< ADC ready interrupt
         DigitalOut _reset; //!< Reset pin
         DigitalOut _pwr; //!< Power pin
-        events::EventQueue& _event_queue; //!< Eventqueue for dispatch
 
         dynamic_modes_t _dynamic_modes;
-        bool _is_on;
+        volatile bool _is_on;
 
         void _init();
 
         void _handleADCInterrupt(); //!< ADC interrupt handler
-        void _handleADC();
 
 };
 
