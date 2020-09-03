@@ -141,7 +141,9 @@ class DisplayService
         events::EventQueue& _event_queue; //!< Event queue
         bool* _ble_connected; //!< BLE status
         DigitalOut _vibration; //!< Vibration output
-        bool _is_vibrating; //!< Vibration status
+        Thread _vibration_thread; //!< Thread for vibration duration
+        Semaphore _vibration_trigger; //!< Interlock to trigger vibration
+        uint16_t _vibration_duration; //!< Duration of the vibration in ms
 
         PwmOutLP _lcd_bl; //!< LCD backlight
         DigitalOut _lcd_pwr; //!< LCD power
@@ -149,7 +151,11 @@ class DisplayService
         bool _is_on; //!< Power state
         int _event_id; //!< Render loop event id
 
-        void _endVibrate(); //!< Ends the vibration
+        /**
+         * @brief Waits for the vibration interlock and then vibrates the motor
+         * 
+         */
+        void threadVibration();
 
 };
 
