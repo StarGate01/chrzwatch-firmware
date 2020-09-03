@@ -46,8 +46,6 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::_poll);
     _event_queue.call_every(LCD_TIMEOUT, this, &SensorService::_handleDisplayTimeout);
     _event_thread.start(callback(&_event_queue, &EventQueue::dispatch_forever));
-
-    _poll();
 }
 
 uint8_t SensorService::getHRValue()
@@ -84,7 +82,6 @@ void SensorService::_poll()
     // Begin HR measuring interval
     _hr.setPower(true);
     _event_queue.call_in(HR_DURATION, callback(this, &SensorService::_finishPoll));
-    _hr_value = _hr.getHeartrate();
 }
 
 void SensorService::_finishPoll()

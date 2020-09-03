@@ -39,10 +39,18 @@ Other
 - [ ] Wake up on wrist turn
 - [ ] Step detection algorithm
 - [x] Heartrate detection algorithm
+- [ ] Sleep state detection algorithm
 - [x] Basic UI
 - [ ] Fancy UI
-- [x] Basic Android support
-- [ ] Complete Android support
+
+Android App: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
+
+- [x] Basic device support
+- [x] Time synchronization
+- [x] Sample database
+- [ ] Heartrate logging
+- [ ] Step logging
+- [ ] Sleep state logging
 
 ## Hardware overview
 
