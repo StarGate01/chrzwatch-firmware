@@ -88,7 +88,7 @@ Use `doxygen` or the "Build Documentation" task to generate documentation.
 
 Solder the SWDCLK and SWDIO testpoints to the unused USB data lines. You might want to fabricate a custom USB to ISP adapter.
 
-Do NOT connect the watch to a USB host port or "smart" (e.g. Quick Charge) adapter, because the USB protocol will confuse the SWD interface and reset/fault the chip. Instead, use a "dumb" charger, which only uses the outer USB 5V pins.
+You can still charge the watch using any USB A compliant charger or port.
 
 ### Unlocking the flash memory
 
@@ -128,7 +128,7 @@ High level SWD access using a *ST-Link V2* clone:
 $ openocd -d2 -f interface/stlink-v2.cfg -c "transport select hla_swd" -f target/nrf52.cfg
 ```
 
-Lower level SWD access using a *CMSIS-DAP*:
+Lower level SWD access using a *CMSIS-DAP* (recommended):
 
 ```
 $ openocd -f interface/cmsis-dap.cfg -c "transport select swd" -f target/nrf52.cfg
