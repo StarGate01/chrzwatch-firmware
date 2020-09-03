@@ -13,11 +13,9 @@
 #include <events/mbed_events.h>
 #include "HardwareConfiguration.h"
 
-// #include <rohm_hal2.h>
-// #include <kx123_registers.h>
-// #include <kx123.h>
+#include <RegisterWriter.h>
+#include <kx123.h>
 
-// #include <AFE_4404.h>
 #include <Heartrate3_AFE4404.h>
 
 #define POLL_FREQUENCY 100
@@ -72,6 +70,13 @@ class SensorService
          */
         bool getBatteryCharging();
 
+        /**
+         * @brief Get the Acceleration value
+         * 
+         * @param data Buffer for the acceleration data
+         */
+        void getAccValue(float* data);
+
     protected:
         events::EventQueue& _event_queue; //!< Eventqueue for dispatch timer for polling
         Thread _event_thread; //!< Thread for polling
@@ -89,13 +94,15 @@ class SensorService
         int _last_button2; //!< Last state of button 2 for edge detection
         bool _cancel_timeout; //!< Whether a button timeout is already running
 
-        // I2C _acc_i2c; //!< I2C interface for the acceleration sensor
-        // RegisterWriter _acc_rw; //!< Register access to the acceleration sensor
-        // KX123 _acc_kx123; //!< Access to the acceleration sensor
-
-        // AFE_4404 _hr_afe; //!< Access to heartrate sensor
+        I2C _acc_i2c; //!< I2C interface for the acceleration sensor
+        RegisterWriter _acc_rw; //!< Register access to the acceleration sensor
+        KX123 _acc_kx123; //!< Access to the acceleration sensor
+        InterruptIn _acc_irq; //!< Interrupt for the acceleration sensor
+        DigitalOut _acc_addr; //!< Address select pin of the acceleration sensor
+        DigitalOut _acc_cs; //!< Chip select pin of the acceleration sensor
 
         Heartrate3_AFE4404 _hr; //!< Access to heartrate sensor
+        DigitalOut _hr_pwr; //!< Power pin of the heartrate sensor
 
         void _poll(); //!< Read all sensors
         void _finishPoll();

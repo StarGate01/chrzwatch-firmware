@@ -19,29 +19,30 @@
 #define KX123_DEFAULT_SLAVE_ADDRESS 0x1F
 #define KX123_SECONDARY_SLAVE_ADDRESS 0x1E
 
-enum e_axis {
-    KX123_X_N = (uint8_t) (0x01 << 5),
-    KX123_X_P = (uint8_t) (0x01 << 4),
-    KX123_Y_N = (uint8_t) (0x01 << 3),
-    KX123_Y_P = (uint8_t) (0x01 << 2),
-    KX123_Z_N = (uint8_t) (0x01 << 1),
-    KX123_Z_P = (uint8_t) (0x01 << 0)
-    };
+enum e_axis
+{
+    KX123_X_N = (uint8_t)(0x01 << 5),
+    KX123_X_P = (uint8_t)(0x01 << 4),
+    KX123_Y_N = (uint8_t)(0x01 << 3),
+    KX123_Y_P = (uint8_t)(0x01 << 2),
+    KX123_Z_N = (uint8_t)(0x01 << 1),
+    KX123_Z_P = (uint8_t)(0x01 << 0)
+};
 
 #define KX123_AXIS_MASK 0x3f
 
-enum e_interrupt_reason {
-    KX123_FREEFALL          = (uint8_t) (0x01 << 7),
-    KX122_BUFFER_FULL       = (uint8_t) (0x01 << 6),
-    KX122_WATERMARK         = (uint8_t) (0x01 << 5),
-    KX122_DATAREADY         = (uint8_t) (0x01 << 4),
-    KX122_DOUBLE_TAP        = (uint8_t) (0x02 << 2),
-    KX122_SINGLE_TAP        = (uint8_t) (0x01 << 2),
-    KX122_MOTION_INTERRUPT  = (uint8_t) (0x01 << 1),
-    KX122_TILT_CHANGED      = (uint8_t) (0x01 << 0)
-    };
+enum e_interrupt_reason
+{
+    KX123_FREEFALL = (uint8_t)(0x01 << 7),
+    KX122_BUFFER_FULL = (uint8_t)(0x01 << 6),
+    KX122_WATERMARK = (uint8_t)(0x01 << 5),
+    KX122_DATAREADY = (uint8_t)(0x01 << 4),
+    KX122_DOUBLE_TAP = (uint8_t)(0x02 << 2),
+    KX122_SINGLE_TAP = (uint8_t)(0x01 << 2),
+    KX122_MOTION_INTERRUPT = (uint8_t)(0x01 << 1),
+    KX122_TILT_CHANGED = (uint8_t)(0x01 << 0)
+};
 
-    
 /* registers */
 // x- hp filter output
 #define KX122_XHP_L 0x00
@@ -507,7 +508,7 @@ enum e_interrupt_reason {
 #define KX122_SELF_TEST_MEMS_TEST_OFF (0x00 << 0)
 // MEMS Test ON
 #define KX122_SELF_TEST_MEMS_TEST_ON (0xCA << 0)
- /*registers bit masks */
+/*registers bit masks */
 
 #define KX122_COTR_DCSTR_MASK 0xFF
 

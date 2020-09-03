@@ -1,7 +1,7 @@
 /**
  * @file heartrate_3_hal_mbed.cpp
  * @author Christoph Honal
- * @brief Implements the HAL function defined in heartrate_3_hal.h for Mbed using native I2C
+ * @brief Implements the HAL function defined in heartrate_3_hal.h for Mbed using native (unsafe) I2C
  * @version 0.1
  * @date 2020-08-30
  */
@@ -13,7 +13,6 @@
 
 
 static UnsafeI2C* _hal_i2c = nullptr;
-
 static uint8_t _i2c_hw_address;
 
 

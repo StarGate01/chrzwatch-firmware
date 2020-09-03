@@ -52,7 +52,7 @@ void Screen::render()
     lcd.setCursor(0, 70);
     lcd.printf("%u%% (%f)", batteryPercent, batteryRaw);
     lcd.setCursor(0, 100);
-    lcd.printf(batteryCharging? "Yes %u  " : "No  %u  ", heartrate);
+    lcd.printf(batteryCharging? "Yes, HR: %u  " : "No, HR: %u  ", heartrate);
     lcd.setCursor(0, 115);
     if(bleStatus)
     {
@@ -68,10 +68,12 @@ void Screen::render()
     lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
     lcd.setCursor(0, 130);
 
-    mbed_stats_cpu_t stats;
-    mbed_stats_cpu_get(&stats);
-    lcd.printf("UP: %llu\nST: %llu\nDS: %llu", 
-        stats.uptime / 1000, stats.sleep_time / 1000, stats.deep_sleep_time / 1000);
+    lcd.printf("X: %f\nY: %f\nZ: %f", accData[0], accData[1], accData[2]);
+
+    // mbed_stats_cpu_t stats;
+    // mbed_stats_cpu_get(&stats);
+    // lcd.printf("UP: %llu\nST: %llu\nDS: %llu", 
+        // stats.uptime / 1000, stats.sleep_time / 1000, stats.deep_sleep_time / 1000);
 
     _display_guard.release();
 }
