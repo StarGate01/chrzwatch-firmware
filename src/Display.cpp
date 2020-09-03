@@ -17,14 +17,11 @@ DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService
     _event_queue(event_queue),
     _ble_connected(nullptr),
     _vibration(PIN_VIBRATION),
-    _vibration_trigger(1),
-    _vibration_duration(200),
+    _is_vibrating(false),
     _lcd_bl(PIN_LCD_BL),
     _lcd_pwr(PIN_LCD_PWR),
-    _event_id(0),
-    _vibration_thread(osPriorityNormal, THREAD_SIZE)
+    _event_id(0)
 {
-    _vibration_thread.start(callback(this, &DisplayService::threadVibration));
     setPower(true);
 }
 
@@ -68,8 +65,12 @@ bool DisplayService::getPower()
 
 void DisplayService::vibrate(uint16_t duration)
 {
-    _vibration_duration = duration;
-    _vibration_trigger.release();
+    if(!_is_vibrating)
+    {
+        _is_vibrating = true;
+        _vibration.write(1);
+        _event_queue.call_in(duration, callback(this, &DisplayService::_endVibrate));
+    }
 }
 
 void DisplayService::render()
@@ -88,22 +89,8 @@ void DisplayService::render()
     }
 }
 
-void DisplayService::threadVibration()
+void DisplayService::_endVibrate()
 {
-    while(true)
-    {
-        // Use mutex to collapse vibration requests
-        _vibration_trigger.acquire();
-#       if defined(PIN_VIBRATION_INVERT)
-            _vibration = 0;
-#       else
-            _vibration = 1;
-#       endif
-        ThisThread::sleep_for(_vibration_duration);
-#       if defined(PIN_VIBRATION_INVERT)
-            _vibration = 1;
-#       else
-            _vibration = 0;
-#       endif
-    }
+    _vibration.write(0);
+    _is_vibrating = false;
 }
