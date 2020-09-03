@@ -56,7 +56,7 @@ Other
  - Acceleration sensor: **KX023**
    - General: https://www.kionix.com/product/KX023-1025
    - Datasheet: http://kionixfs.kionix.com/en/datasheet/KX023-1025%20Specifications%20Rev%2012.0.pdf
-   - Driver: TBA
+   - Driver: https://platformio.org/lib/show/11101/kionix-kx123-driver
  - Heart rate sensor: **AFE4404**
    - General: https://www.ti.com/product/AFE4404
    - Datasheet: https://www.ti.com/lit/ds/symlink/afe4404.pdf
@@ -66,7 +66,7 @@ Other
    - Datasheet: https://datasheet.lcsc.com/szlcsc/1912111436_Gotop-GT24L24A2Y_C124690.pdf
    - Driver: *N/A, currently unused*
  - Ambient light sensor: Some **photodiode** combined with a **LED**
-   - Driver: Mbed ADC
+   - Driver: *N/A, currently unused*
  - Battery voltage sensor: Down-scaled **battery voltage** (0.3V - 0.4V)
    - Driver: Mbed ADC
  - Vibration motor: Small axial **vibration motor**
@@ -185,10 +185,10 @@ Please note that while most code in this repository may be licensed under the te
    - Added Mbed integration
    - Added interrupt handling
    - Added power down/up functionality
- - The `kionix-kx123-driver` library (TBA) is based on the library of the same name by *Rohm*: https://platformio.org/lib/show/3975/kionix-kx123-driver
+ - The `kionix-kx123-driver` library (https://platformio.org/lib/show/11101/kionix-kx123-driver) is based on the library of the same name by *Rohm*: https://platformio.org/lib/show/3975/kionix-kx123-driver
    - Adapted to Mbed 5
    - Fixed include paths
- - The `RegisterWriter` library (TBA) is based on the library of the same name by *Rohm* / *Mikko Koivunen*: https://platformio.org/lib/show/10695/RegisterWriter
+ - The `RegisterWriter` library (https://platformio.org/lib/show/11100/RegisterWriter) is based on the library of the same name by *Rohm* / *Mikko Koivunen*: https://platformio.org/lib/show/10695/RegisterWriter
    - Adapted to Mbed 5
    - Fixed include paths
    - Fixed default pins
