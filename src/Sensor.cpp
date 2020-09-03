@@ -18,16 +18,29 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     _charging_value(false),
     _button1(PIN_BUTTON1),
     _button2(PIN_BUTTON2),
-    _cancel_timeout(true), //,
-    _hr(HR_SDA, HR_SCL, HR_ADCREADY, HR_RESET, HR_PWR), //, THREAD_SIZE),
-    _event_thread(osPriorityNormal, THREAD_SIZE)
-    // _acc_i2c(ACC_SDA, ACC_SCL),
-    // _acc_rw(_acc_i2c),
-    // _acc_kx123(_acc_rw)
+    _cancel_timeout(true),
+    _hr(HR_SDA, HR_SCL, HR_ADCREADY, HR_RESET),
+    _hr_pwr(HR_PWR),
+    _event_thread(osPriorityNormal, THREAD_SIZE),
+    _acc_i2c(ACC_SDA, ACC_SCL),
+    _acc_rw(_acc_i2c),
+    _acc_kx123(_acc_rw, KX123_DEFAULT_SLAVE_ADDRESS, KX023_WHO_AM_I_WAI_ID),
+    _acc_irq(ACC_INT),
+    _acc_addr(ACC_ADDR),
+    _acc_cs(ACC_CS)
 { 
-    // Button interrupts
+    // Setup buttons
     _button1.fall(callback(this, &SensorService::_handleButton));
     _button2.fall(callback(this, &SensorService::_handleButton));
+
+    // Setup heartrate sensor
+    _hr_pwr.write(1);
+    _hr.init();
+
+    // Setup acceleration sensor
+    _acc_addr.write(1);
+    _acc_cs.write(1);
+    _acc_kx123.set_defaults();
 
     // Handle dispatching events
     _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::_poll);
@@ -37,7 +50,7 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
 
 uint8_t SensorService::getHRValue()
 {
-    return _hr_value;
+    return _hr.getHeartrate();
 }
 
 uint8_t SensorService::getBatteryPercent()
@@ -55,6 +68,11 @@ bool SensorService::getBatteryCharging()
     return _charging_value;
 }
 
+void SensorService::getAccValue(float* data)
+{
+    _acc_kx123.getresults_g(data);
+}
+
 void SensorService::_poll()
 {
     // Update battery
@@ -64,14 +82,14 @@ void SensorService::_poll()
     // Begin HR measuring interval
     // _hr.setPower(true);
     // _event_queue.call_in(HR_DURATION, callback(this, &SensorService::_finishPoll));
-    _hr_value = _hr.getHeartrate();
+    // _hr_value = _hr.getHeartrate();
 }
 
 void SensorService::_finishPoll()
 {
     // End HR sensor interval
-    // _hr_value = _hr.getHeartrate();
-    // _hr.setPower(false);
+//     _hr_value = _hr.getHeartrate();
+//     _hr.setPower(false);
 }
 
 void SensorService::_handleButton()

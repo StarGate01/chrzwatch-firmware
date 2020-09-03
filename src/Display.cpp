@@ -83,6 +83,7 @@ void DisplayService::render()
         screen.batteryRaw = _sensor_service.getBatteryRaw();
         screen.batteryCharging = _sensor_service.getBatteryCharging();
         screen.heartrate = _sensor_service.getHRValue();
+        _sensor_service.getAccValue(screen.accData);
         screen.render();
     }
 }

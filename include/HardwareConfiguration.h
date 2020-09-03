@@ -25,7 +25,7 @@
 #define ACC_SDA              P0_3
 #define ACC_SCL              P0_2
 #define ACC_CS               P0_16
-#define ACC_MISO             P0_17
+#define ACC_ADDR             P0_17
 #define ACC_INT              P0_22
 #define HR_PWR               P0_10
 #define HR_ADCREADY          P0_18

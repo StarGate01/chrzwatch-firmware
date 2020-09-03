@@ -51,6 +51,7 @@ class Screen
         float batteryRaw; //!< Battery remaining raw (volts)
         bool batteryCharging; //!< Battery charging state
         bool bleStatus; //!< Bluetooth status
+        float accData[3]; //!< Acceleration data
 
     protected:
         Semaphore _display_guard; //!< Serialize display bus access
