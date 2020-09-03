@@ -2,7 +2,7 @@
     "name": "kionix-kx123-driver",
     "version": "0.1",
     "keywords": "i2c, kionix",
-    "description": "Kionix KX123 accelerometer C++ driver. Can be used for some extend also with kx022, kx023, kx122, etc. when used features are present in sensor. Modified to fix file includes.",
+    "description": "Kionix KX123 accelerometer C++ driver. Can be used for some extend also with kx022, kx023, kx122, etc. when used features are present in sensor. Adapted to Mbed 5 and modified to fix file includes.",
     "authors":
     [
         {
