@@ -1,7 +1,7 @@
 /**
  * @file UnsafeI2C.cpp
  * @author Christoph Honal
- * @brief Implements a I2C interface with non-exclusive access
+ * @brief Implements a I2C interface without locks, which makes it unsafe for parallel usage, but enables usage in interrupt handlers (which dont support mutexes).
  * @version 0.1
  * @date 2020-09-02
  */
@@ -26,8 +26,8 @@ class UnsafeI2C: public I2C
          */
         UnsafeI2C(PinName sda, PinName scl) : I2C(sda, scl) { }
 
-        void lock() override { } //!< Defunct function
+        void lock() override { } //!< Disabled function
 
-        void unlock() override { } //!< Defunct function
+        void unlock() override { } //!< Disabled function
 
 };

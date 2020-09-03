@@ -67,84 +67,76 @@ typedef struct
 /******************************************************************************
 * Function Prototypes
 *******************************************************************************/
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
-    /**
-     * @brief <h3> Get Values </h3>
-     *
-     * @par
-     *  Gets all three values from the ADC ( LED1, LED2, LED3 ) and puts
-     * them into a struct.
-     *
-     *
-     * @retval LED Values
-     *
-     */
-    led_values_t *hr3_get_values(void);
+/**
+ * @brief <h3> Get Values </h3>
+ *
+ * @par
+ *  Gets all three values from the ADC ( LED1, LED2, LED3 ) and puts
+ * them into a struct.
+ *
+ *
+ * @retval LED Values
+ *
+ */
+led_values_t *hr3_get_values(void);
 
-    /**
-     * @brief <h3> Get HeartRate </h3>
-     *
-     * @par
-     *  Uses heartrate monitor functions to produce a bpm for user to use.
-     *
-     *
-     * @retval Heart rate
-     *
-     */
-    uint8_t hr3_get_heartrate(void);
+/**
+ * @brief <h3> Get HeartRate </h3>
+ *
+ * @par
+ *  Uses heartrate monitor functions to produce a bpm for user to use.
+ *
+ *
+ * @retval Heart rate
+ *
+ */
+uint8_t hr3_get_heartrate(void);
 
-    //*******************TI HRM Library
-    /**
-     * @brief initStatHRM
-     */
-    void initStatHRM(void);
-    /**
-     * @brief statHRMAlgo
-     * @param ppgData
-     */
-    void statHRMAlgo(unsigned long ppgData);
-    /**
-     * @brief updateWindow
-     * @param peakWindow
-     * @param Y
-     * @param n
-     */
-    void updateWindow(unsigned long *peakWindow, unsigned long Y, unsigned char n);
-    /**
-     * @brief chooseRate
-     * @param rate
-     * @return
-     */
-    unsigned char chooseRate(unsigned char *rate);
-    /**
-     * @brief updateHeartRate
-     * @param rate
-     * @param freq
-     * @param last
-     */
-    void updateHeartRate(unsigned char *rate, unsigned int freq, unsigned int last);
-    /**
-     * @brief findMax
-     * @param X
-     * @return
-     */
-    unsigned long findMax(unsigned long *X);
-    /**
-     * @brief findMin
-     * @param X
-     * @return
-     */
-    unsigned long findMin(unsigned long *X);
+//*******************TI HRM Library
+/**
+ * @brief initStatHRM
+ */
+void initStatHRM(void);
+/**
+ * @brief statHRMAlgo
+ * @param ppgData
+ */
+void statHRMAlgo(unsigned long ppgData);
+/**
+ * @brief updateWindow
+ * @param peakWindow
+ * @param Y
+ * @param n
+ */
+void updateWindow(unsigned long *peakWindow, unsigned long Y, unsigned char n);
+/**
+ * @brief chooseRate
+ * @param rate
+ * @return
+ */
+unsigned char chooseRate(unsigned char *rate);
+/**
+ * @brief updateHeartRate
+ * @param rate
+ * @param freq
+ * @param last
+ */
+void updateHeartRate(unsigned char *rate, unsigned int freq, unsigned int last);
+/**
+ * @brief findMax
+ * @param X
+ * @return
+ */
+unsigned long findMax(unsigned long *X);
+/**
+ * @brief findMin
+ * @param X
+ * @return
+ */
+unsigned long findMin(unsigned long *X);
 
-    /**********************************/
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
+/**********************************/
 
 #endif /*HEARTRATE_3_H_*/
 

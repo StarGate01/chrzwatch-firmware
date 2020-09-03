@@ -19,7 +19,7 @@
 #define I2C_ADDRESS 0x58
 
 /**
- * @brief Provides methods to access the heartrate API
+ * @brief Provides methods to access the heartrate sensor and API
  * 
  */
 class Heartrate3_AFE4404
@@ -33,8 +33,15 @@ class Heartrate3_AFE4404
          * @param sda I2C SDA pin
          * @param scl I2C SCL pin
          * @param intr ADC ready interrupt pin
+         * @param reset Reset pin
          */
-        Heartrate3_AFE4404(PinName sda, PinName scl, PinName intr, PinName reset, PinName pwr);
+        Heartrate3_AFE4404(PinName sda, PinName scl, PinName intr, PinName reset);
+
+        /**
+         * @brief Starts the sensor up
+         * 
+         */
+        void init();
 
         /**
          * @brief Set the power on or of
@@ -55,12 +62,11 @@ class Heartrate3_AFE4404
         UnsafeI2C _i2c; //!< I2C interface
         InterruptIn _int_adc; //!< ADC ready interrupt
         DigitalOut _reset; //!< Reset pin
-        DigitalOut _pwr; //!< Power pin
 
-        dynamic_modes_t _dynamic_modes;
-        volatile bool _is_on;
+        dynamic_modes_t _dynamic_modes; //!< Dynamic register configuration
+        volatile bool _is_on; //!< Tracks the power state
 
-        void _init();
+        void _init(); //!< Initialises the registers
 
         void _handleADCInterrupt(); //!< ADC interrupt handler
 
