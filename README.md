@@ -15,27 +15,28 @@ Bluetooth
 
 Hardware interfacing
 
-- [x] Display driver
+- [x] LC Display
 - [x] Vibration
 - [x] Charging detection
-- [x] Touch buttons
+- [x] Capacitive touch buttons
 - [x] Battery voltage sensor
-- [ ] Step sensor driver
-- [x] Heartrate sensor driver
+- [x] Acceleration sensor
+- [x] Heartrate sensor
 
 Power saving
 
-- [x] Low power idle thread
+- [x] Deep sleep in idle thread
 - [x] Energy saving display
 - [x] Energy saving touch input
 - [ ] Energy saving heartrate sensor
+- [ ] Energy saving acceleration sensor
 - [ ] Endurance tests & verification
 
 Other
 
 - [x] Timekeeping
 - [x] Graceful reboot on error
-- [ ] Wakeup on wrist turn
+- [ ] Wake up on wrist turn
 - [ ] Step detection algorithm
 - [x] Heartrate detection algorithm
 - [x] Basic UI
@@ -48,8 +49,8 @@ Other
  - CPU: **NRF52832** with 512K ROM, 64K RAM
    - General: https://www.nordicsemi.com/Products/Low-power-short-range-wireless/nRF52832/Getting-started
    - Datasheet: https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.0.pdf
-   - OS: https://os.mbed.com/
- - Display: 0.96 inch LCD with **ST7735** driver
+   - OS: https://os.mbed.com/ (V5.14)
+ - Display: 0.96 inch LCD with **ST7735** driver IC
    - Datasheet: https://www.displayfuture.com/Display/datasheet/controller/ST7735.pdf
    - Driver: https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini
  - Acceleration sensor: **KX023**
@@ -63,15 +64,19 @@ Other
  - Font ROM: **GT24L24A2Y**
    - General: https://lcsc.com/product-detail/_Gotop-GT24L24A2Y_C124690.html
    - Datasheet: https://datasheet.lcsc.com/szlcsc/1912111436_Gotop-GT24L24A2Y_C124690.pdf
-   - Driver: N/A, currently unused
+   - Driver: *N/A, currently unused*
  - Ambient light sensor: Some **photodiode** combined with a **LED**
-   - Driver: Simple ADC
+   - Driver: Mbed ADC
  - Battery voltage sensor: Down-scaled **battery voltage** (0.3V - 0.4V)
-   - Driver: Simple ADC
+   - Driver: Mbed ADC
  - Vibration motor: Small axial **vibration motor**
-   - Driver: Simple GPIO
+   - Driver: Mbed GPIO
+ - Buttons: **Capacitive buttons** below display
+   - Driver: Mbed GPIO Interrupts
+ - Charging detection: Down-scaled **charging voltage** (0V | 5V)
+   - Driver: Mbed GPIO
 
-See `doc/pinout.png` for the pin mapping by *Aaron Christophel*.
+See `doc/pinout.png` for the pin mapping by *Aaron Christophel*. Please note that pins `P0_23` and `P0_24` are swapped.
 
 ## Development setup
 
@@ -156,7 +161,7 @@ Thanks to *Aaron Christophel* for providing instructions on how to modify the ha
  - https://www.mikrocontroller.net/topic/467136
  - https://www.youtube.com/watch?v=0Fu-VSuKHEg 
 
-### Library credits and modifications
+### Library credits, modifications and licensing
 
 Hot-patches can be found in this repository under `/patch`.
 
@@ -165,6 +170,8 @@ Hot-patches can be found in this repository under `/patch`.
    - Hot-patch NRF52 linker memory map to support crash dump retention
 
 All modified libraries have been or will be published to https://platformio.org , their source code can be found in this repository under `/lib`.
+
+Please note that while most code in this repository may be licensed under the term of the GPL3 license, this explicitly does not apply to the libraries contained in `/lib`. All these libraries have their own license attached.
 
  - The `CurrentTimeService` module of the `BLE_GATT_Services` library (https://platformio.org/lib/show/7372/BLE_GATT_Services) is based on `BLE_CurrentTimeService` by *Takehisa Oneta*: https://os.mbed.com/users/ohneta/code/BLE_CurrentTimeService/
    - Deferred calls in ISR context to EventQueue
@@ -177,13 +184,11 @@ All modified libraries have been or will be published to https://platformio.org 
  - The `Heartrate3_AFE4404` library (https://platformio.org/lib/show/11099/Heartrate3_AFE4404) is based on the library and example code of `Click_Heartrate3_AFE4404` by *MikroElektronika* / *Corey Lakey*: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
    - Added Mbed integration
    - Added interrupt handling
-   - Added powerdown/up functionality
+   - Added power down/up functionality
  - The `kionix-kx123-driver` library (TBA) is based on the library of the same name by *Rohm*: https://platformio.org/lib/show/3975/kionix-kx123-driver
+   - Adapted to Mbed 5
    - Fixed include paths
  - The `RegisterWriter` library (TBA) is based on the library of the same name by *Rohm* / *Mikko Koivunen*: https://platformio.org/lib/show/10695/RegisterWriter
+   - Adapted to Mbed 5
    - Fixed include paths
    - Fixed default pins
-
-### Licensing
-
-Please note that while most code in this repository may be licensed under the term of the GPL3 license, this explicitly does not apply to the libraries contained in `/lib`. All these libraries have their own license attached.
