@@ -51,6 +51,7 @@ class Screen
         float batteryRaw; //!< Battery remaining raw (volts)
         bool batteryCharging; //!< Battery charging state
         bool bleStatus; //!< Bluetooth status
+        bool bleEncStatus; //!< Bluetooth Enc status
         float accData[3]; //!< Acceleration data
 
     protected:
@@ -133,6 +134,13 @@ class DisplayService
          */
         void setBLEStatusPtr(bool* ble_status);
 
+        /**
+         * @brief Set the BLE enc status pointer
+         * 
+         * @param ble__enc_status The pointer
+         */
+        void setBLEEncStatusPtr(bool* ble_enc_status);
+
         Screen screen; //!< The LCD screen model and controller
 
     protected:
@@ -140,6 +148,7 @@ class DisplayService
         CurrentTimeService& _current_time_service; //! Current time service
         events::EventQueue& _event_queue; //!< Event queue
         bool* _ble_connected; //!< BLE status
+        bool* _ble_encrypted; //!< BLE enc status
         DigitalOut _vibration; //!< Vibration output
         Thread _vibration_thread; //!< Thread for vibration duration
         Semaphore _vibration_trigger; //!< Interlock to trigger vibration

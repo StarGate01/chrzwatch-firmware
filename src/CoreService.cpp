@@ -11,6 +11,7 @@
 CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _event_queue(event_queue),
     _connected(false),
+    _encrypted(false),
     _ble(ble),
     _adv_data_builder(_adv_buffer),
     _ble_hr_service(ble, 0, HeartRateService::LOCATION_WRIST),
@@ -20,6 +21,7 @@ CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _sensor_service(_display_service, event_queue)
 { 
     _display_service.setBLEStatusPtr(&_connected);
+    _display_service.setBLEEncStatusPtr(&_encrypted);
 }
 
 CoreService::~CoreService()

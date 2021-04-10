@@ -12,6 +12,7 @@ Bluetooth
 - [x] Current time GATT profile
 - [ ] Steps & cadence GATT profile
 - [ ] Phone alerts / Immediate alert GATT
+- [x] Proper bonding support
 
 Hardware interfacing
 
@@ -48,9 +49,9 @@ Android App: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 - [x] Basic device support
 - [x] Time synchronization
 - [x] Sample database
-- [ ] Heartrate logging
-- [ ] Step logging
-- [ ] Sleep state logging
+- [x] Heartrate logging
+- [x] Step logging
+- [x] Sleep state logging
 
 ## Hardware overview
 

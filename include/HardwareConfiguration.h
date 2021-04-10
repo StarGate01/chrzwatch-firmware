@@ -32,8 +32,8 @@
 #define PIN_HR_RESET         P0_19
 #define PIN_HR_SDA           P0_20
 #define PIN_HR_SCL           P0_21
-#define SENSOR_FREQUENCY     20000
-#define HR_DURATION          10000
+#define SENSOR_FREQUENCY     60000
+#define HR_DURATION          20000
 #define THREAD_SIZE          2048
 
 #if defined(TARGET_VARIANT_I6HRC)

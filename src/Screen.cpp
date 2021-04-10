@@ -16,6 +16,7 @@ Screen::Screen():
     batteryRaw(0),
     batteryCharging(true),
     bleStatus(false),
+    bleEncStatus(false),
     lcd(PIN_LCD_SDA, NC, PIN_LCD_SCL, PIN_LCD_CS, PIN_LCD_DC, PIN_LCD_RESET),
     _display_guard(1)
 {
@@ -57,13 +58,21 @@ void Screen::render()
     if(bleStatus)
     {
         lcd.setTextColor(ST7735_GREEN, ST7735_BLACK);
-        lcd.printf("BLE: [x]");
+        if(bleEncStatus)
+        {
+            lcd.printf("BLE: [x, E]");
+        }
+        else
+        {
+            lcd.printf("BLE: [x, N]");
+        }
     }
     else
     {
         lcd.setTextColor(ST7735_RED, ST7735_BLACK);
-        lcd.printf("BLE: [ ]");
+        lcd.printf("BLE: [ ]   ");
     }
+    
 
     lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
     lcd.setCursor(0, 130);

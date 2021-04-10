@@ -16,6 +16,7 @@ DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService
     _current_time_service(current_time_service),
     _event_queue(event_queue),
     _ble_connected(nullptr),
+    _ble_encrypted(nullptr),
     _vibration(PIN_VIBRATION),
     _vibration_trigger(1),
     _vibration_duration(200),
@@ -31,6 +32,11 @@ DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService
 void DisplayService::setBLEStatusPtr(bool* bleStatus)
 {
     _ble_connected = bleStatus;
+}
+
+void DisplayService::setBLEEncStatusPtr(bool* bleEncStatus)
+{
+    _ble_encrypted = bleEncStatus;
 }
 
 void DisplayService::setPower(bool on)
@@ -78,6 +84,7 @@ void DisplayService::render()
     if(_is_on)
     {
         if(_ble_connected != nullptr) screen.bleStatus = *_ble_connected;
+        if(_ble_encrypted != nullptr) screen.bleEncStatus = *_ble_encrypted;
         _current_time_service.readEpoch(screen.epochTime);
         screen.batteryPercent = _sensor_service.getBatteryPercent();
         screen.batteryRaw = _sensor_service.getBatteryRaw();
