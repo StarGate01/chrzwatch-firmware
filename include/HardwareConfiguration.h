@@ -22,24 +22,24 @@
 #define LCD_COLSHIFT         0
 #define LCD_ROWSHIFT         0
 #define LCD_TIMEOUT          10000
-#define ACC_SDA              P0_3
-#define ACC_SCL              P0_2
-#define ACC_CS               P0_16
-#define ACC_ADDR             P0_17
-#define ACC_INT              P0_22
-#define HR_PWR               P0_10
-#define HR_ADCREADY          P0_18
-#define HR_RESET             P0_19
-#define HR_SDA               P0_20
-#define HR_SCL               P0_21
-#define SENSOR_FREQUENCY     20000
-#define HR_DURATION          10000
+#define PIN_ACC_SDA          P0_3
+#define PIN_ACC_SCL          P0_2
+#define PIN_ACC_CS           P0_16
+#define PIN_ACC_ADDR         P0_17
+#define PIN_ACC_INT          P0_22
+#define PIN_HR_PWR           P0_10
+#define PIN_HR_ADCREADY      P0_18
+#define PIN_HR_RESET         P0_19
+#define PIN_HR_SDA           P0_20
+#define PIN_HR_SCL           P0_21
+#define SENSOR_FREQUENCY     60000
+#define HR_DURATION          30000
 #define THREAD_SIZE          2048
 
 #if defined(TARGET_VARIANT_I6HRC)
-#   define TARGET_VARIANT_NAME  "CHRZwatch I6HRC"
+#   define TARGET_VARIANT_NAME  u8"CHRZwatch I6HRC\0"
 #elif defined(TARGET_VARIANT_NRF52_DK)
-#   define TARGET_VARIANT_NAME  "CHRZwatch NRF52_DK"
+#   define TARGET_VARIANT_NAME  u8"CHRZwatch NRF52_DK\0"
 #   define PIN_VIBRATION        LED2
 #   define PIN_BUTTON1          BUTTON1
 #   define PIN_BUTTON2          BUTTON2  

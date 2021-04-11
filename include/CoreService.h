@@ -22,6 +22,7 @@
 #include "ble/services/DeviceInformationService.h"
 
 #include <CurrentTimeService.h>
+#include <ImmediateAlertService.h>
 
 #include "HardwareConfiguration.h"
 #include "SensorService.h"
@@ -34,7 +35,7 @@ const static char DEVICE_NAME[] = TARGET_VARIANT_NAME;
  * @brief Handles BLE connections, GAP advertising and contains all sub-service objects
  * 
  */
-class CoreService : ble::Gap::EventHandler
+class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
 {
 
     public:
@@ -62,6 +63,7 @@ class CoreService : ble::Gap::EventHandler
         events::EventQueue& _event_queue; //!< Reference to the event queue for dispatching
 
         bool _connected; //!< Connection state of the BLE system
+        bool _encrypted; //!< BLE link encryption state
         BLE& _ble; //!< Reference to the BLE instance
         uint8_t _adv_buffer[ble::LEGACY_ADVERTISING_MAX_SIZE]; //!< BLE GAP advertising buffer
         ble::AdvertisingDataBuilder _adv_data_builder; //!< BLE GAP factory
@@ -69,6 +71,7 @@ class CoreService : ble::Gap::EventHandler
         HeartRateService _ble_hr_service; //!< BLE heartrate service
         BatteryService _ble_bat_service; //!< BLE battery service
         CurrentTimeService _ble_time_service; //!< BLE current time service
+        ImmediateAlertService _ble_alert_service; //!< BLE immediate alert service
 
         DisplayService _display_service; //!< Display subsystem
         SensorService _sensor_service; //!< Sensor subsystem
@@ -85,6 +88,13 @@ class CoreService : ble::Gap::EventHandler
          */
         void doUpdateGATT();
 
+        /**
+         * @brief Handles the resulting link encryption event
+         * 
+         * @param connectionHandle Handle to the BLE connection
+         * @param result The type of encryption
+         */
+        virtual void linkEncryptionResult(ble::connection_handle_t connectionHandle, ble::link_encryption_t result);
 
         /**
          * @brief Handles the BLE init completion event
@@ -113,6 +123,13 @@ class CoreService : ble::Gap::EventHandler
          * 
          */
         void kickWatchdog();
+
+        /**
+         * @brief Callback handler for the immediate alert service
+         * 
+         * @param level Alert level
+         */
+        void onAlert(int level);
 
 };
 

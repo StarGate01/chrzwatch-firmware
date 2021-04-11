@@ -11,7 +11,10 @@ Bluetooth
 - [x] Heartrate GATT profile
 - [x] Current time GATT profile
 - [ ] Steps & cadence GATT profile
-- [ ] Phone alerts / Immediate alert GATT
+- [x] Immediate alert GATT
+- [ ] Text message GATT
+- [ ] Activity / sleep monitor GATT
+- [x] Proper bonding support
 
 Hardware interfacing
 
@@ -39,10 +42,19 @@ Other
 - [ ] Wake up on wrist turn
 - [ ] Step detection algorithm
 - [x] Heartrate detection algorithm
+- [ ] Sleep state detection algorithm
 - [x] Basic UI
 - [ ] Fancy UI
-- [x] Basic Android support
-- [ ] Complete Android support
+
+Android App: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
+
+- [x] Basic device support
+- [x] Time synchronization
+- [x] Sample database
+- [x] Heartrate logging
+- [x] Step logging
+- [x] Sleep state logging
+- [x] Immediate alert on messages
 
 ## Hardware overview
 
@@ -147,6 +159,8 @@ Optionally, append `-c "reset halt"` to the OpenOCD command. The chip then halts
 A fork of the Android app **Gadgetbridge** (https://gadgetbridge.org/) with support for this firmware is available at *Codeberg*: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch .
 
 You can use the Android app "**nRF Connect**" (https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp&hl=en) to test the Bluetooth functions. Sometimes, connecting takes multiple tries.
+
+Various other apps like e.g. **FitoTrack** (https://play.google.com/store/apps/details?id=de.tadris.fitness&hl=en&gl=US) are able to read the heartrate from this sensor. The device has to be paired.
 
 ## Stock firmware
 

@@ -16,18 +16,27 @@ DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService
     _current_time_service(current_time_service),
     _event_queue(event_queue),
     _ble_connected(nullptr),
+    _ble_encrypted(nullptr),
     _vibration(PIN_VIBRATION),
-    _is_vibrating(false),
+    _vibration_trigger(1),
+    _vibration_duration(200),
     _lcd_bl(PIN_LCD_BL),
     _lcd_pwr(PIN_LCD_PWR),
-    _event_id(0)
+    _event_id(0),
+    _vibration_thread(osPriorityNormal, THREAD_SIZE)
 {
+    _vibration_thread.start(callback(this, &DisplayService::threadVibration));
     setPower(true);
 }
 
 void DisplayService::setBLEStatusPtr(bool* bleStatus)
 {
     _ble_connected = bleStatus;
+}
+
+void DisplayService::setBLEEncStatusPtr(bool* bleEncStatus)
+{
+    _ble_encrypted = bleEncStatus;
 }
 
 void DisplayService::setPower(bool on)
@@ -65,12 +74,8 @@ bool DisplayService::getPower()
 
 void DisplayService::vibrate(uint16_t duration)
 {
-    if(!_is_vibrating)
-    {
-        _is_vibrating = true;
-        _vibration.write(1);
-        _event_queue.call_in(duration, callback(this, &DisplayService::_endVibrate));
-    }
+    _vibration_duration = duration;
+    _vibration_trigger.release();
 }
 
 void DisplayService::render()
@@ -79,6 +84,7 @@ void DisplayService::render()
     if(_is_on)
     {
         if(_ble_connected != nullptr) screen.bleStatus = *_ble_connected;
+        if(_ble_encrypted != nullptr) screen.bleEncStatus = *_ble_encrypted;
         _current_time_service.readEpoch(screen.epochTime);
         screen.batteryPercent = _sensor_service.getBatteryPercent();
         screen.batteryRaw = _sensor_service.getBatteryRaw();
@@ -89,8 +95,22 @@ void DisplayService::render()
     }
 }
 
-void DisplayService::_endVibrate()
+void DisplayService::threadVibration()
 {
-    _vibration.write(0);
-    _is_vibrating = false;
+    while(true)
+    {
+        // Use mutex to collapse vibration requests
+        _vibration_trigger.acquire();
+#       if defined(PIN_VIBRATION_INVERT)
+            _vibration = 0;
+#       else
+            _vibration = 1;
+#       endif
+        ThisThread::sleep_for(_vibration_duration);
+#       if defined(PIN_VIBRATION_INVERT)
+            _vibration = 1;
+#       else
+            _vibration = 0;
+#       endif
+    }
 }
