@@ -46,3 +46,11 @@ void CoreService::linkEncryptionResult(ble::connection_handle_t connectionHandle
 {
     _encrypted = (result != ble::link_encryption_t::NOT_ENCRYPTED);
 }
+
+void CoreService::onAlert(int level)
+{
+    if(level > 0)
+    {
+        _display_service.vibrate(ALERT_VIBRATION_LENGTH);
+    }
+}

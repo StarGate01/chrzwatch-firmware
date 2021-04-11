@@ -20,6 +20,7 @@
 
 #define POLL_FREQUENCY 100
 #define BUTTON_VIBRATION_LENGTH 75
+#define ALERT_VIBRATION_LENGTH 200
 
 
 // Forward decalarations

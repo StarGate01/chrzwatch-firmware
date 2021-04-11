@@ -33,13 +33,13 @@
 #define PIN_HR_SDA           P0_20
 #define PIN_HR_SCL           P0_21
 #define SENSOR_FREQUENCY     60000
-#define HR_DURATION          20000
+#define HR_DURATION          30000
 #define THREAD_SIZE          2048
 
 #if defined(TARGET_VARIANT_I6HRC)
-#   define TARGET_VARIANT_NAME  "CHRZwatch I6HRC"
+#   define TARGET_VARIANT_NAME  u8"CHRZwatch I6HRC\0"
 #elif defined(TARGET_VARIANT_NRF52_DK)
-#   define TARGET_VARIANT_NAME  "CHRZwatch NRF52_DK"
+#   define TARGET_VARIANT_NAME  u8"CHRZwatch NRF52_DK\0"
 #   define PIN_VIBRATION        LED2
 #   define PIN_BUTTON1          BUTTON1
 #   define PIN_BUTTON2          BUTTON2  

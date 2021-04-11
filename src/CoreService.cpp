@@ -17,11 +17,13 @@ CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _ble_hr_service(ble, 0, HeartRateService::LOCATION_WRIST),
     _ble_bat_service(ble, 0),
     _ble_time_service(ble, event_queue),
+    _ble_alert_service(ble),
     _display_service(_sensor_service, _ble_time_service, event_queue),
     _sensor_service(_display_service, event_queue)
 { 
     _display_service.setBLEStatusPtr(&_connected);
     _display_service.setBLEEncStatusPtr(&_encrypted);
+    _ble_alert_service.setCallback(callback(this, &CoreService::onAlert));
 }
 
 CoreService::~CoreService()
@@ -58,6 +60,8 @@ void CoreService::startAdvertising()
     // Services are added at runtime, client is notified via Service Changed indicator
     // Setup advertising parameters
     _ble.gap().setAdvertisingParameters(ble::LEGACY_ADVERTISING_HANDLE, adv_parameters);
+    _ble.gap().setDeviceName((uint8_t*)DEVICE_NAME);
+    _ble.gap().setAppearance(GapAdvertisingData::Appearance::GENERIC_WATCH);
 
     // Setup advertising payload and start
     _ble.gap().setAdvertisingPayload(ble::LEGACY_ADVERTISING_HANDLE, _adv_data_builder.getAdvertisingData());
