@@ -1,8 +1,8 @@
 {
     "name": "BLE_GATT_Services",
-    "version": "0.2.2",
-    "keywords": "bluetooth, ble, gatt, service, currenttime",
-    "description": "Various Bluetooth LE GATT services: CurrentTime.",
+    "version": "0.3",
+    "keywords": "bluetooth, ble, gatt, service, currenttime, alert",
+    "description": "Various Bluetooth LE GATT services: CurrentTime, ImmediateAlert.",
     "authors":
     [
         {
