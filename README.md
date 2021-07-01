@@ -160,7 +160,7 @@ A fork of the Android app **Gadgetbridge** (https://gadgetbridge.org/) with supp
 
 You can use the Android app "**nRF Connect**" (https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp&hl=en) to test the Bluetooth functions. Sometimes, connecting takes multiple tries.
 
-Various other apps like e.g. **FitoTrack** (https://play.google.com/store/apps/details?id=de.tadris.fitness&hl=en&gl=US) are able to read the heartrate from this sensor. The device has to be paired.
+Various other apps like e.g. **FitoTrack** (https://play.google.com/store/apps/details?id=de.tadris.fitness&hl=en&gl=US) are able to read the heartrate from this sensor. Update: The device has not to be bonded in the recent version.
 
 ## Stock firmware
 
