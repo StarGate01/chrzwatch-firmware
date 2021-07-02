@@ -77,7 +77,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 ## Hardware overview
 
 <details>
-<summary>CPU: **NRF52832** with 512K ROM, 64K RAM</summary>
+<summary>CPU: NRF52832 with 512K ROM, 64K RAM</summary>
 
 - General: https://www.nordicsemi.com/Products/Low-power-short-range-wireless/nRF52832/Getting-started
 - Datasheet: https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.0.pdf
@@ -86,7 +86,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 </details>
 
 <details>
-<summary>Display: 0.96 inch LCD with **ST7735** driver IC</summary>
+<summary>Display: 0.96 inch LCD with ST7735 driver IC</summary>
 
 - Datasheet: https://www.displayfuture.com/Display/datasheet/controller/ST7735.pdf
 - Driver: https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini
@@ -94,7 +94,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 </details>
 
 <details>
-<summary>Acceleration sensor: **KX023**</summary>
+<summary>Acceleration sensor: KX023</summary>
 
 - General: https://www.kionix.com/product/KX023-1025
 - Datasheet: http://kionixfs.kionix.com/en/datasheet/KX023-1025%20Specifications%20Rev%2012.0.pdf
@@ -104,7 +104,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 </details>
 
 <details>
-<summary>Heart rate sensor: **AFE4404**</summary>
+<summary>Heart rate sensor: AFE4404</summary>
 
 - General: https://www.ti.com/product/AFE4404
 - Datasheet: https://www.ti.com/lit/ds/symlink/afe4404.pdf
@@ -113,7 +113,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 </details>
 
 <details>
-<summary>Font ROM: **GT24L24A2Y**</summary>
+<summary>Font ROM: GT24L24A2Y</summary>
 
 - General: https://lcsc.com/product-detail/_Gotop-GT24L24A2Y_C124690.html
 - Datasheet: https://datasheet.lcsc.com/szlcsc/1912111436_Gotop-GT24L24A2Y_C124690.pdf
@@ -122,39 +122,40 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 </details>
 
 <details>
-<summary>Ambient light sensor: Some **photodiode** combined with a **LED**</summary>
+<summary>Ambient light sensor: Some photodiode combined with a **LED**</summary>
 
 - Driver: *N/A, currently unused*
 
 </details>
 
 <details>
-<summary>Battery voltage sensor: Down-scaled **battery voltage** (0.3V - 0.4V)</summary>
+<summary>Battery voltage sensor: Down-scaled battery voltage (0.3V - 0.4V)</summary>
 
 - Driver: Mbed ADC
 
 </details>
 
 <details>
-<summary>Vibration motor: Small axial **vibration motor**</summary>
+<summary>Vibration motor: Small axial vibration motor</summary>
 
 - Driver: Mbed GPIO
 
 </details>
 
 <details>
-<summary>Buttons: **Capacitive buttons** below display</summary>
+<summary>Buttons: Two capacitive buttons below display</summary>
 
 - Driver: Mbed GPIO Interrupts
 
 </details>
 
 <details>
-<summary>Charging detection: Down-scaled **charging voltage** (0V | 5V)</summary>
+<summary>Charging detection: Down-scaled charging voltage (0V | 5V)</summary>
 
 - Driver: Mbed GPIO
 
 </details>
+
 
 See `doc/pinout.png` for the pin mapping by *Aaron Christophel*. Please note that pins `P0_23` and `P0_24` are swapped.
 
