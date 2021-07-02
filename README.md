@@ -171,7 +171,7 @@ Solder the `SWDCLK` and `SWDIO` testpoints to the unused inner two USB data line
 
 You can still charge the watch using any USB A compliant charger or port.
 
-<img src="https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/schematics/swd-usb-adapter/swd-usb-adapter_schematic.jpg" height="400">
+<img src="https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/schematics/swd-usb-adapter/swd-usb-adapter_schematic2.jpg" height="400">
 
 ### Unlocking the flash memory
 
