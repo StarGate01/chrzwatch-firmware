@@ -43,7 +43,7 @@ KX123::~KX123()
 bool KX123::start_setup_mode(void)
 {
     setup_mode_on = true;
-    return i2c_rw.change_bits(_sad, KX122_CNTL1, KX122_CNTL1_PC1, KX122_CNTL1_PC1);
+    return i2c_rw.change_bits(_sad, KX122_CNTL1, KX122_CNTL1_PC1, 0);
 }
 
 /**
@@ -53,7 +53,7 @@ bool KX123::start_setup_mode(void)
 bool KX123::start_measurement_mode(void)
 {
     setup_mode_on = false;
-    return i2c_rw.change_bits(_sad, KX122_CNTL1, KX122_CNTL1_PC1, 0);
+    return i2c_rw.change_bits(_sad, KX122_CNTL1, KX122_CNTL1_PC1, KX122_CNTL1_PC1);
 }
 
 /**
