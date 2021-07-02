@@ -4,7 +4,9 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed 5.14 RTO
 
 ## State of the project
 
-Bluetooth
+
+<details>
+<summary>Bluetooth</summary>
 
 - [x] Complete BLE Stack
 - [x] Battery GATT profile
@@ -16,7 +18,10 @@ Bluetooth
 - [ ] Activity / sleep monitor GATT
 - [x] Proper bonding support
 
-Hardware interfacing
+</details>
+
+<details>
+<summary>Hardware interfacing</summary>
 
 - [x] LC Display
 - [x] Vibration
@@ -26,7 +31,10 @@ Hardware interfacing
 - [x] Acceleration sensor
 - [x] Heartrate sensor
 
-Power saving
+</details>
+
+<details>
+<summary>Power saving</summary>
 
 - [x] Deep sleep in idle thread
 - [x] Energy saving display
@@ -35,18 +43,26 @@ Power saving
 - [ ] Energy saving acceleration sensor
 - [ ] Endurance tests & verification
 
-Other
+</details>
+
+<details>
+<summary>Other</summary>
 
 - [x] Timekeeping
 - [x] Graceful reboot on error
 - [ ] Wake up on wrist turn
 - [ ] Step detection algorithm
 - [x] Heartrate detection algorithm
-- [ ] Sleep state detection algorithm
+- [ ] Sleep / rest detection algorithm
 - [x] Basic UI
 - [ ] Fancy UI
 
-Android App: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
+</details>
+
+<details>
+<summary>Android app</summary>
+
+Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 
 - [x] Basic device support
 - [x] Time synchronization
@@ -56,18 +72,21 @@ Android App: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 - [x] Sleep state logging
 - [x] Immediate alert on messages
 
+</details>
+
 ## Hardware overview
 
  - CPU: **NRF52832** with 512K ROM, 64K RAM
    - General: https://www.nordicsemi.com/Products/Low-power-short-range-wireless/nRF52832/Getting-started
    - Datasheet: https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.0.pdf
-   - OS: https://os.mbed.com/ (V5.14)
+   - RTOS: https://os.mbed.com/ (V5.14)
  - Display: 0.96 inch LCD with **ST7735** driver IC
    - Datasheet: https://www.displayfuture.com/Display/datasheet/controller/ST7735.pdf
    - Driver: https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini
  - Acceleration sensor: **KX023**
    - General: https://www.kionix.com/product/KX023-1025
    - Datasheet: http://kionixfs.kionix.com/en/datasheet/KX023-1025%20Specifications%20Rev%2012.0.pdf
+   - Application note: https://www.yic-electronics.de/datasheet/dc/ATS-19D-122-C2-R0.pdf
    - Driver: https://platformio.org/lib/show/11101/kionix-kx123-driver
  - Heart rate sensor: **AFE4404**
    - General: https://www.ti.com/product/AFE4404
@@ -106,7 +125,8 @@ You can still charge the watch using any USB A compliant charger or port.
 
 First of all, the flash memory has to be reset in oder for the chip to accept new firmware and debug instructions. This requires lower level SWD access, and thus cant be performed by the cheap ST-Link V2 clones because they only provide high level access.
 
-#### Using a CMSIS-DAP
+<details>
+<summary>Using a CMSIS-DAP</summary>
 
 Either buy any **CMSIS-DAP** capable adapter, or buy a cheap **ST-Link V2** clone (the little USB adapter one), and open it. Then use any SWD capable programmer, like for example *another* ST-Link V2 to reprogram the first one with the firmware for CMSIS-DAP functionality (https://raw.githubusercontent.com/x893/CMSIS-DAP/master/Firmware/STM32/hex/CMSIS-DAP-STLINK21.hex). You can use any ST-compatible flash tool, like for example the ST-Link utility or OpenOCD.
 
@@ -116,7 +136,10 @@ Then, connect the watch to the CMSIS-DAP, and the adapter to your PC via USB. Th
 $ openocd -f interface/cmsis-dap.cfg -c "transport select swd" -f target/nrf52.cfg -c "init; reset halt; nrf5 mass_erase; reset; exit"
 ```
 
-#### Using a Black Magic Probe
+</details>
+
+<details>
+<summary>Using a Black Magic Probe</summary>
 
 Buy or assemble - *Bluepill* boards (https://stm32-base.org/boards/STM32F103C8T6-Blue-Pill.html) are available for a few bucks - a **Black Magic Probe** (https://github.com/blacksphere/blackmagic/wiki). Connect the SWD interface to the watch, and the probe via USB to your PC. Then connect to the probe using GDB.
 
@@ -127,6 +150,8 @@ $ arm-none-eabi-gdb
 (gdb) mon swdp_scan
 (gdb) mon erase_mass
 ```
+
+</details>
 
 ### Uploading new firmware
 
@@ -173,9 +198,9 @@ Thanks to *Aaron Christophel* for providing instructions on how to modify the ha
  - https://github.com/atc1441
  - http://atcnetz.blogspot.com/2019/02/arduino-auf-dem-fitness-tracker-dank.html
  - https://www.mikrocontroller.net/topic/467136
- - https://www.youtube.com/watch?v=0Fu-VSuKHEg 
+ - https://www.youtube.com/watch?v=0Fu-VSuKHEg
 
-### Library credits, modifications and licensing
+## Library credits, modifications and licensing
 
 Hot-patches can be found in this repository under `/patch`.
 
