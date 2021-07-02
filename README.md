@@ -76,36 +76,85 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 
 ## Hardware overview
 
- - CPU: **NRF52832** with 512K ROM, 64K RAM
-   - General: https://www.nordicsemi.com/Products/Low-power-short-range-wireless/nRF52832/Getting-started
-   - Datasheet: https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.0.pdf
-   - RTOS: https://os.mbed.com/ (V5.14)
- - Display: 0.96 inch LCD with **ST7735** driver IC
-   - Datasheet: https://www.displayfuture.com/Display/datasheet/controller/ST7735.pdf
-   - Driver: https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini
- - Acceleration sensor: **KX023**
-   - General: https://www.kionix.com/product/KX023-1025
-   - Datasheet: http://kionixfs.kionix.com/en/datasheet/KX023-1025%20Specifications%20Rev%2012.0.pdf
-   - Application note: https://www.yic-electronics.de/datasheet/dc/ATS-19D-122-C2-R0.pdf
-   - Driver: https://platformio.org/lib/show/11101/kionix-kx123-driver
- - Heart rate sensor: **AFE4404**
-   - General: https://www.ti.com/product/AFE4404
-   - Datasheet: https://www.ti.com/lit/ds/symlink/afe4404.pdf
-   - Driver: https://platformio.org/lib/show/11099/Heartrate3_AFE4404
- - Font ROM: **GT24L24A2Y**
-   - General: https://lcsc.com/product-detail/_Gotop-GT24L24A2Y_C124690.html
-   - Datasheet: https://datasheet.lcsc.com/szlcsc/1912111436_Gotop-GT24L24A2Y_C124690.pdf
-   - Driver: *N/A, currently unused*
- - Ambient light sensor: Some **photodiode** combined with a **LED**
-   - Driver: *N/A, currently unused*
- - Battery voltage sensor: Down-scaled **battery voltage** (0.3V - 0.4V)
-   - Driver: Mbed ADC
- - Vibration motor: Small axial **vibration motor**
-   - Driver: Mbed GPIO
- - Buttons: **Capacitive buttons** below display
-   - Driver: Mbed GPIO Interrupts
- - Charging detection: Down-scaled **charging voltage** (0V | 5V)
-   - Driver: Mbed GPIO
+<details>
+<summary>CPU: **NRF52832** with 512K ROM, 64K RAM</summary>
+
+- General: https://www.nordicsemi.com/Products/Low-power-short-range-wireless/nRF52832/Getting-started
+- Datasheet: https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.0.pdf
+- RTOS: https://os.mbed.com/ (V5.14)
+
+</details>
+
+<details>
+<summary>Display: 0.96 inch LCD with **ST7735** driver IC</summary>
+
+- Datasheet: https://www.displayfuture.com/Display/datasheet/controller/ST7735.pdf
+- Driver: https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini
+
+</details>
+
+<details>
+<summary>Acceleration sensor: **KX023**</summary>
+
+- General: https://www.kionix.com/product/KX023-1025
+- Datasheet: http://kionixfs.kionix.com/en/datasheet/KX023-1025%20Specifications%20Rev%2012.0.pdf
+- Application note: https://www.yic-electronics.de/datasheet/dc/ATS-19D-122-C2-R0.pdf
+- Driver: https://platformio.org/lib/show/11101/kionix-kx123-driver
+
+</details>
+
+<details>
+<summary>Heart rate sensor: **AFE4404**</summary>
+
+- General: https://www.ti.com/product/AFE4404
+- Datasheet: https://www.ti.com/lit/ds/symlink/afe4404.pdf
+- Driver: https://platformio.org/lib/show/11099/Heartrate3_AFE4404
+
+</details>
+
+<details>
+<summary>Font ROM: **GT24L24A2Y**</summary>
+
+- General: https://lcsc.com/product-detail/_Gotop-GT24L24A2Y_C124690.html
+- Datasheet: https://datasheet.lcsc.com/szlcsc/1912111436_Gotop-GT24L24A2Y_C124690.pdf
+- Driver: *N/A, currently unused*
+
+</details>
+
+<details>
+<summary>Ambient light sensor: Some **photodiode** combined with a **LED**</summary>
+
+- Driver: *N/A, currently unused*
+
+</details>
+
+<details>
+<summary>Battery voltage sensor: Down-scaled **battery voltage** (0.3V - 0.4V)</summary>
+
+- Driver: Mbed ADC
+
+</details>
+
+<details>
+<summary>Vibration motor: Small axial **vibration motor**</summary>
+
+- Driver: Mbed GPIO
+
+</details>
+
+<details>
+<summary>Buttons: **Capacitive buttons** below display</summary>
+
+- Driver: Mbed GPIO Interrupts
+
+</details>
+
+<details>
+<summary>Charging detection: Down-scaled **charging voltage** (0V | 5V)</summary>
+
+- Driver: Mbed GPIO
+
+</details>
 
 See `doc/pinout.png` for the pin mapping by *Aaron Christophel*. Please note that pins `P0_23` and `P0_24` are swapped.
 
@@ -115,11 +164,13 @@ Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i
 
 Use `doxygen` or the "Build Documentation" task to generate documentation.
 
-### Modding a I6HRC watch
+### Modifying an I6HRC watch
 
-Solder the SWDCLK and SWDIO testpoints to the unused USB data lines. You might want to fabricate a custom USB to ISP adapter.
+Solder the `SWDCLK` and `SWDIO` testpoints to the unused inner two USB data lines. You might want to fabricate a custom USB to ISP adapter, link shown in the schematic below.
 
 You can still charge the watch using any USB A compliant charger or port.
+
+![SWD via USB to ISP adapter](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/schematics/swd-usb-adapter/swd-usb-adapter_schematic.jpg)
 
 ### Unlocking the flash memory
 
