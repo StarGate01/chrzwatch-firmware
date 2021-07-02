@@ -167,15 +167,15 @@ Use `doxygen` or the "Build Documentation" task to generate documentation.
 
 ### Modifying an I6HRC watch
 
-Solder the `SWDCLK` and `SWDIO` testpoints to the unused inner two USB data lines. You might want to fabricate a custom USB to ISP adapter, link shown in the schematic below.
+Solder the `SWDCLK` and `SWDIO` testpoints to the unused inner two USB data lines. You might want to fabricate a custom USB to ISP adapter, link shown in the schematic below (KiCAD schematic is available in `schematics/swd-usb-adapter`.
 
 You can still charge the watch using any USB A compliant charger or port.
 
-![SWD via USB to ISP adapter](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/schematics/swd-usb-adapter/swd-usb-adapter_schematic.jpg)
+<img src="https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/schematics/swd-usb-adapter/swd-usb-adapter_schematic.jpg" height="400">
 
 ### Unlocking the flash memory
 
-First of all, the flash memory has to be reset in oder for the chip to accept new firmware and debug instructions. This requires lower level SWD access, and thus cant be performed by the cheap ST-Link V2 clones because they only provide high level access.
+First of all, the flash memory has to be reset in oder for the chip to accept new firmware and debug instructions. This requires *lower level* SWD access, and thus cant be performed by the cheap ST-Link V2 clones because these only provide *high level* access.
 
 <details>
 <summary>Using a CMSIS-DAP</summary>
@@ -207,7 +207,7 @@ $ arm-none-eabi-gdb
 
 ### Uploading new firmware
 
-Flashing the unlocked chip should then work with any basic SWD capable programmer, like for example the **ST-Link V2** (the cheap clones work too). The **CMSIS-DAP** or the **Black Magic Probe** can be used as well.
+Flashing the unlocked chip should then work with any basic SWD capable programmer, like the **ST-Link V2** (the cheap clones work too). The **CMSIS-DAP** or the **Black Magic Probe** can be used as well.
 
 You can use **OpenOCD** (http://openocd.org/) to connect to the chip and manage its flash memory:
 
@@ -223,11 +223,15 @@ Lower level SWD access using a *CMSIS-DAP* (recommended):
 $ openocd -f interface/cmsis-dap.cfg -c "transport select swd" -f target/nrf52.cfg
 ```
 
-The PlatformIO IDE is set up to use OpenOCD via some hardware adapter (default: CMSIS-DAP) to program the chip. This can be changed in the `platformio.ini` file.
+The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (default: CMSIS-DAP) to program the chip. This can be changed in the `platformio.ini` file.
 
 #### Troubleshooting
 
-If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using OpenOCD while spamming the reset button on your adapter (or short `SWDCLK` to `VCC` - This should trigger a debug init halt). This should not be needed during normal flashing and execution. Sometimes, this condition occurs randomly when the `SWDCLK` pin is left floating. On a successful connection OpenOCD displays something like "`Info : nrf52.cpu: hardware has 6 breakpoints, 4 watchpoints`". This means the chip was reset and is now in debug mode. The script `tools/reset.sh` or the task "Reset Target" automates this spamming.
+Unfortunatly, the SWD `RESET` line is not easily accessible. However, shorting `SWDCLK` to `VCC` triggers a debug init halt as well.
+
+If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using OpenOCD while spamming the reset button on your adapter. This should not be needed during normal flashing and execution. Sometimes, this condition occurs randomly when the `SWDCLK` pin is left floating due to EMI. On a successful connection OpenOCD displays something like "`Info : nrf52.cpu: hardware has 6 breakpoints, 4 watchpoints`". This means the chip was reset, caught and is now in debug mode. 
+
+The script `tools/reset.sh` or the task "Reset Target" automates this spamming, waiting for you to press the reset button.
 
 Optionally, append `-c "reset halt"` to the OpenOCD command. The chip then halts at the first instruction, which may be good for debugging.
 
