@@ -1,0 +1,152 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title "CHRZwatch SWD (via USB) to ISP adapter"
+Date "2021-07-02"
+Rev "1"
+Comp "Christoph Honal"
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector:USB_A J2
+U 1 1 60DF5005
+P 5100 4400
+F 0 "J2" H 5100 4900 50  0000 C CNN
+F 1 "USB_A" H 5100 4800 50  0000 C CNN
+F 2 "" H 5250 4350 50  0001 C CNN
+F 3 " ~" H 5250 4350 50  0001 C CNN
+	1    5100 4400
+	1    0    0    -1  
+$EndComp
+Text GLabel 5400 3200 2    50   Input ~ 0
+SWDIO
+Text GLabel 5400 3400 2    50   Input ~ 0
+SWCLK
+$Comp
+L power:GND #PWR05
+U 1 1 60DFDE88
+P 5850 3300
+F 0 "#PWR05" H 5850 3050 50  0001 C CNN
+F 1 "GND" H 5855 3127 50  0000 C CNN
+F 2 "" H 5850 3300 50  0001 C CNN
+F 3 "" H 5850 3300 50  0001 C CNN
+	1    5850 3300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5850 3300 5400 3300
+$Comp
+L power:+5V #PWR08
+U 1 1 60E02672
+P 6050 3300
+F 0 "#PWR08" H 6050 3150 50  0001 C CNN
+F 1 "+5V" H 6065 3473 50  0000 C CNN
+F 2 "" H 6050 3300 50  0001 C CNN
+F 3 "" H 6050 3300 50  0001 C CNN
+	1    6050 3300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5400 4200 5600 4200
+$Comp
+L power:+5V #PWR07
+U 1 1 60E06A71
+P 6250 3900
+F 0 "#PWR07" H 6250 3750 50  0001 C CNN
+F 1 "+5V" H 6265 4073 50  0000 C CNN
+F 2 "" H 6250 3900 50  0001 C CNN
+F 3 "" H 6250 3900 50  0001 C CNN
+	1    6250 3900
+	1    0    0    -1  
+$EndComp
+NoConn ~ 5000 4800
+$Comp
+L power:GND #PWR04
+U 1 1 60E0766F
+P 5100 4950
+F 0 "#PWR04" H 5100 4700 50  0001 C CNN
+F 1 "GND" H 5105 4777 50  0000 C CNN
+F 2 "" H 5100 4950 50  0001 C CNN
+F 3 "" H 5100 4950 50  0001 C CNN
+	1    5100 4950
+	1    0    0    -1  
+$EndComp
+Text GLabel 5400 4400 2    50   Input ~ 0
+SWDIO
+Text GLabel 6150 4500 2    50   Input ~ 0
+SWCLK
+$Comp
+L Switch:SW_Push SW1
+U 1 1 60E08068
+P 6050 4350
+F 0 "SW1" H 6050 4635 50  0000 C CNN
+F 1 "RESET" H 6050 4544 50  0000 C CNN
+F 2 "" H 6050 4550 50  0001 C CNN
+F 3 "~" H 6050 4550 50  0001 C CNN
+	1    6050 4350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5400 4500 5850 4500
+Wire Wire Line
+	5850 4500 5850 4850
+Wire Wire Line
+	6150 4500 5850 4500
+Connection ~ 5850 4500
+Wire Wire Line
+	5850 4500 5850 4350
+Wire Wire Line
+	5100 4800 5100 4850
+$Comp
+L Device:R R1
+U 1 1 60E1754D
+P 5550 4850
+F 0 "R1" V 5343 4850 50  0000 C CNN
+F 1 "1K" V 5434 4850 50  0000 C CNN
+F 2 "" V 5480 4850 50  0001 C CNN
+F 3 "~" H 5550 4850 50  0001 C CNN
+	1    5550 4850
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	5850 4850 5700 4850
+Wire Wire Line
+	5400 4850 5100 4850
+Connection ~ 5100 4850
+Wire Wire Line
+	5100 4850 5100 4950
+Wire Wire Line
+	6250 3900 6250 4350
+Wire Wire Line
+	5600 3900 6250 3900
+Wire Wire Line
+	5600 3900 5600 4200
+Connection ~ 6250 3900
+$Comp
+L Connector_Generic:Conn_02x05_Top_Bottom J1
+U 1 1 60DFB943
+P 5100 3400
+F 0 "J1" H 5150 3850 50  0000 C CNN
+F 1 "ST-LINK_V2" H 5150 3750 50  0000 C CNN
+F 2 "" H 5100 3400 50  0001 C CNN
+F 3 "~" H 5100 3400 50  0001 C CNN
+	1    5100 3400
+	1    0    0    -1  
+$EndComp
+NoConn ~ 4900 3600
+NoConn ~ 4900 3500
+NoConn ~ 4900 3400
+NoConn ~ 4900 3300
+NoConn ~ 4900 3200
+Wire Wire Line
+	5400 3600 6050 3600
+Wire Wire Line
+	6050 3600 6050 3300
+NoConn ~ 5400 3500
+$EndSCHEMATC
