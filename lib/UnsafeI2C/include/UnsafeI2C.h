@@ -1,11 +1,13 @@
 /**
- * @file UnsafeI2C.cpp
+ * @file UnsafeI2C.h
  * @author Christoph Honal
  * @brief Implements a I2C interface without locks, which makes it unsafe for parallel usage, but enables usage in interrupt handlers (which dont support mutexes).
- * @version 0.1
+ * @version 0.1.1
  * @date 2020-09-02
  */
 
+#ifndef UNSAFE_I2C_H
+#define UNSAFE_I2C_H
 
 #include <mbed.h>
 
@@ -31,3 +33,5 @@ class UnsafeI2C: public I2C
         void unlock() override { } //!< Disabled function
 
 };
+
+#endif

@@ -122,7 +122,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 </details>
 
 <details>
-<summary>Ambient light sensor: Some photodiode combined with a **LED**</summary>
+<summary>Ambient light sensor: Some photodiode combined with a LED</summary>
 
 - Driver: *N/A, currently unused*
 
@@ -276,10 +276,13 @@ Please note that while most code in this repository may be licensed under the te
    - Added support for the `R_MINI160x80` display type
    - Added documentation
    - Added an explicit dependency to `Adafruit_GFX` port by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which is a port of https://github.com/adafruit/Adafruit-GFX-Library
+ - The `UnsafeI2C` library (https://platformio.org/lib/show/12500/UnsafeI2C) is a wrapper for the existing Mbed I2C library
+   - Removed threadsafe mutex
  - The `Heartrate3_AFE4404` library (https://platformio.org/lib/show/11099/Heartrate3_AFE4404) is based on the library and example code of `Click_Heartrate3_AFE4404` by *MikroElektronika* / *Corey Lakey*: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
    - Added Mbed integration
    - Added interrupt handling
    - Added power down/up functionality
+   - Added an explicit dependency to `UnsafeI2C`, see above
  - The `kionix-kx123-driver` library (https://platformio.org/lib/show/11101/kionix-kx123-driver) is based on the library of the same name by *Rohm*: https://platformio.org/lib/show/3975/kionix-kx123-driver
    - Adapted to Mbed 5
    - Fixed include paths

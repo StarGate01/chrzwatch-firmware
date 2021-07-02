@@ -13,7 +13,7 @@
 #include <events/mbed_events.h>
 
 #include "heartrate_3.h"
-#include "UnsafeI2C.h"
+#include <UnsafeI2C.h>
 
 
 #define I2C_ADDRESS 0x58

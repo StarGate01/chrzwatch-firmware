@@ -1,0 +1,26 @@
+{
+    "name": "UnsafeI2C",
+    "version": "0.1.1",
+    "keywords": "i2c, thread, lock",
+    "description": "Mbed I2C interface without locks, which makes it unsafe for parallel usage, but enables usage in interrupt handlers.",
+    "authors":
+    [
+        {
+            "name": "Christoph Honal",
+            "email": "christoph.honal@web.de",
+            "url": "https://chrz.de",
+            "maintainer": true
+        }
+    ],
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/StarGate01/chrzwatch-firmware.git"
+    },
+    "export": {
+        "include": [
+            "lib/UnsafeI2C"
+        ]
+    },
+    "frameworks": "mbed"
+}
