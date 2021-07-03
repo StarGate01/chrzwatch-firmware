@@ -35,6 +35,11 @@ CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue
     _ticker.attach(_event_queue.event(this, &CurrentTimeService::onTickerCallback), 1.0);
 }
 
+void CurrentTimeService::setMonotonicCallback(Callback<void(const time_t epoch)> second_notify)
+{
+    _second_notify = second_notify;
+}
+
 void CurrentTimeService::writeDateTime(const BLE_DateTime& dateTime, const bool writeRtc)
 {
     // Populate buffer from date-time-stamp
@@ -120,6 +125,9 @@ void CurrentTimeService::onTickerCallback(void)
     readEpoch(tmpEpochTime);
     tmpEpochTime++;
     writeEpoch(tmpEpochTime, false);
+
+    // Defer the second handler if existing
+    if(_second_notify != nullptr) _event_queue.call(_second_notify, tmpEpochTime);
 }
 
 void CurrentTimeService::onDataWritten(const GattWriteCallbackParams* params)

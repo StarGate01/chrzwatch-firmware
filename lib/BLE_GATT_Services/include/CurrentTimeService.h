@@ -57,6 +57,13 @@ class CurrentTimeService
         CurrentTimeService(BLE& ble, events::EventQueue &event_queue);
 
         /**
+         * @brief Attach a attach Seconds Notify Handler
+         * 
+         * @param second_notify The Notify callback
+         */
+        void setMonotonicCallback(Callback<void(const time_t epoch)> second_notify);
+
+        /**
          * @brief Sets the internal time using a date-time-stamp
          * 
          * @param dateTime The date-time-stamp
@@ -89,6 +96,7 @@ class CurrentTimeService
     protected:
         BLE& _ble; //!< Reference to the BLE instance
         events::EventQueue &_event_queue; //!< Reference to the event queue for dispatching
+        Callback<void(const time_t epoch)> _second_notify = nullptr; //!< Notify callback handler
         uint8_t _valueBytes[BLE_CURRENT_TIME_CHAR_VALUE_SIZE]; //!< Buffer for the internal time
         GattCharacteristic _currentTimeCharacteristic; //!< BLE characteristic definition
 #       if LOW_POWER == 1

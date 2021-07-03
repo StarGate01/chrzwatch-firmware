@@ -43,7 +43,7 @@ class ImmediateAlertService
 
     protected:
         BLE& _ble; //!< Reference to the BLE instance
-        Callback<void(int)> _alert_callback; //!< Callback for the alert
+        Callback<void(int)> _alert_callback = nullptr; //!< Callback for the alert
         uint8_t _valueBytes[UUID_ALERT_LEVEL_CHAR_VALUE_SIZE]; //!< Buffer for the alert level
         GattCharacteristic _immediateAlertCharacteristic; //!< BLE characteristic definition
 

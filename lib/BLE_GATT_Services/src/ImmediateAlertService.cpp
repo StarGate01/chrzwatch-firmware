@@ -37,6 +37,6 @@ void ImmediateAlertService::onDataWritten(const GattWriteCallbackParams* params)
     {
         // Callback with alert value
         memcpy((void*)&_valueBytes, params->data, params->len);
-        _alert_callback((int)(_valueBytes[0]));
+        if(_alert_callback != nullptr) _alert_callback((int)(_valueBytes[0]));
     }
 }
