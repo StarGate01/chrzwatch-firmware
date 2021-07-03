@@ -52,7 +52,7 @@ class Screen
         bool batteryCharging; //!< Battery charging state
         bool bleStatus; //!< Bluetooth status
         bool bleEncStatus; //!< Bluetooth Enc status
-        float accData[3]; //!< Acceleration data
+        uint8_t stepsCadence; //!< Steps cadence
 
     protected:
         Semaphore _display_guard; //!< Serialize display bus access

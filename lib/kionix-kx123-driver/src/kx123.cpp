@@ -62,8 +62,8 @@ bool KX123::start_measurement_mode(void)
 */
 bool KX123::set_defaults()
 {
+    // Validate I2C and who_am_i register
     unsigned char buf;
-
     DEBUG_print("\n\r");
     DEBUG_print("KX123 init started\n\r");
     i2c_rw.read_register(_sad, KX122_WHO_AM_I, &buf, 1);
@@ -110,21 +110,49 @@ bool KX123::set_defaults()
         DEBUG_print(" though, trying to use that.\n\r");
     }
 
-    //First set CNTL1 PC1-bit to stand-by mode, after that setup can be made
+    // Configure chip, true = error
+    if(set_config(KX122_ODCNTL_OSA_25600, KX122_CNTL1_GSEL_8G)) return true;
+
+    // Power up chip
+    return start_measurement_mode();
+}
+
+/**
+* Check if sensor is connected, setup defaults to sensor and start measuring.
+* @param odcntl_odr_osa Output data rate (KX122_ODCNTL_OSA_*)
+* @param cntl1_gsel G-Range selection (KX122_CNTL1_GSEL_*)
+* @param cntl1_res_high Enable high-resolution output
+* @param enable_tap Enable directional tap engine
+* @param enable_motion Enable motion wake engine
+* @param enable_tilt Enable tilt detection engine
+* @return true on error, false on config ok.
+*/
+bool KX123::set_config(uint8_t odcntl_odr_osa, uint8_t cntl1_gsel, bool cntl1_res_high,
+    bool enable_tap, bool enable_motion, bool enable_tilt)
+{
+    if(cntl1_gsel == KX122_CNTL1_GSEL_2G) resolution_divider = 32768/2;
+    else if(cntl1_gsel == KX122_CNTL1_GSEL_4G) resolution_divider = 32768/4;
+    else if(cntl1_gsel == KX122_CNTL1_GSEL_4G) resolution_divider = 32768/8;
+    else
+    {
+        DEBUG_print("Invalid value for odcntl_odr_osa\n\r");
+        return true;
+    }
+
+    //First clear CNTL1, this also enables setup mode
     i2c_rw.write_register(_sad, KX122_CNTL1, 0);
     setup_mode_on = true;
 
-    //set_tilt_position_defaults();
-
     //ODCNTL: Output Data Rate control (ODR)
-    i2c_rw.write_register(_sad, KX122_ODCNTL, KX122_ODCNTL_OSA_25600);
-    //Setup G-range and 8/16-bit resolution + set CNTL1 PC1-bit to operating mode (also WUF_EN, TP_EN and DT_EN)
-    i2c_rw.write_register(_sad, KX122_CNTL1, (KX122_CNTL1_PC1 | KX122_CNTL1_GSEL_8G | KX122_CNTL1_RES));
-    setup_mode_on = false;
+    i2c_rw.write_register(_sad, KX122_ODCNTL, odcntl_odr_osa);
 
-    //resolution_divider = 32768/2;  //KX122_CNTL1_GSEL_2G
-    //resolution_divider = 32768/4;  //KX122_CNTL1_GSEL_4G
-    resolution_divider = 32768 / 8; //KX122_CNTL1_GSEL_8G
+    //CNTL1: G-range and resolution, directional tap, wake up, tilt position
+    uint8_t cntl1 = cntl1_gsel;
+    if(cntl1_res_high) cntl1 |= KX122_CNTL1_RES;
+    if(enable_tap) cntl1 |= KX122_CNTL1_TDTE;
+    if(enable_motion) cntl1 |= KX122_CNTL1_WUFE;
+    if(enable_tilt) cntl1 |= KX122_CNTL1_TPE;
+    i2c_rw.write_register(_sad, KX122_CNTL1, cntl1);
 
     return false;
 }
@@ -450,12 +478,8 @@ bool KX123::set_odcntl(bool iir_filter_off, uint8_t lowpass_filter_freq_half, ui
 * @param spi3wire_enabled Use 3 wires instead of 4.
 * @return true on error or setup mode off, false on setup ok.
 **/
-bool KX123::int1_setup(uint8_t pwsel,
-                       bool physical_int_pin_enabled,
-                       bool physical_int_pin_active_high,
-                       bool physical_int_pin_latch_disabled,
-                       bool self_test_polarity_positive,
-                       bool spi3wire_enabled)
+bool KX123::int1_setup(uint8_t pwsel, bool physical_int_pin_enabled, bool physical_int_pin_active_high,
+    bool physical_int_pin_latch_disabled, bool self_test_polarity_positive, bool spi3wire_enabled)
 {
 
     uint8_t inc1;
@@ -497,12 +521,8 @@ bool KX123::int1_setup(uint8_t pwsel,
 * @param aclr1_enabled 
 * @return true on error or setup mode off, false on setup ok.
 **/
-bool KX123::int2_setup(uint8_t pwsel,
-                       bool physical_int_pin_enabled,
-                       bool physical_int_pin_active_high,
-                       bool physical_int_pin_latch_disabled,
-                       bool aclr2_enabled,
-                       bool aclr1_enabled)
+bool KX123::int2_setup(uint8_t pwsel, bool physical_int_pin_enabled, bool physical_int_pin_active_high,
+    bool physical_int_pin_latch_disabled, bool aclr2_enabled, bool aclr1_enabled)
 {
 
     uint8_t inc5;
@@ -561,6 +581,8 @@ bool KX123::set_int2_interrupt_reason(uint8_t interrupt_reason)
 /**
 * Select axis that are monitored for motion detect interrupt.
 * @param xxyyzz combination of e_axis -values for enabling axis
+* @param wufc amount of ticks (in output data rate) condition has to be true before interrupt is raised
+* @param ath differential accelleration value in 1/16th g treshold before interrupt is raised
 * @param axis_and_combination_enabled true for AND or false for OR
 *
 * true for AND configuration = (XN || XP) && (YN || YP) && (ZN || ZP)
@@ -568,19 +590,23 @@ bool KX123::set_int2_interrupt_reason(uint8_t interrupt_reason)
 * false for OR configuration = (XN || XP || YN || TP || ZN || ZP)
 * @return true on error or setup mode off, false on setup ok.
 **/
-bool KX123::set_motion_detect_axis(uint8_t xxyyzz, bool axis_and_combination_enabled)
+bool KX123::set_motion_detect_config(uint8_t xxyyzz, uint8_t wufc, uint8_t ath,
+    bool axis_and_combination_enabled)
 {
-    uint8_t inc2;
+    if (setup_mode_on == false) return true;
 
-    if (setup_mode_on == false)
-        return true;
+    //Set INC2: Axes config
+    uint8_t inc2 = (xxyyzz & KX122_INC2_WUE_MASK);
+    if(axis_and_combination_enabled) inc2 |= KX122_INC2_AOI_AND;
+    if(i2c_rw.write_register(_sad, KX122_INC2, inc2)) return true;
 
-    inc2 = (xxyyzz & KX122_INC2_WUE_MASK);
-    if (axis_and_combination_enabled)
-    {
-        inc2 = (inc2 | KX122_INC2_AOI_AND);
-    }
-    return i2c_rw.write_register(_sad, KX122_INC2, inc2);
+    //Set WUFC: Interrupt wake timer
+    if(i2c_rw.write_register(_sad, KX122_WUFC, wufc)) return true;
+
+    //Set ATH: Wake-up treshold
+    if(i2c_rw.write_register(_sad, KX122_ATH, ath)) return true;
+
+    return false;
 }
 
 /**

@@ -161,9 +161,13 @@ See `doc/pinout.png` for the pin mapping by *Aaron Christophel*. Please note tha
 
 ## Development setup
 
+It is recommended to use Linux, however Windows should work as well, provided all the command line tools, compilers and interface drivers are installed.
+
 Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i6hrc` env for deployment, or the `nrf52_dk` env for debugging on a NRF52-DK board.
 
-Use `doxygen` or the "Build Documentation" task to generate documentation.
+Install the `patch` command line utility, this might ship with `git`, depending on your distribution.
+
+Install and use `doxygen` or the "Build Documentation" task to generate documentation.
 
 ### Modifying an I6HRC watch
 
@@ -285,6 +289,8 @@ Please note that while most code in this repository may be licensed under the te
    - Added an explicit dependency to `UnsafeI2C`, see above
  - The `kionix-kx123-driver` library (https://platformio.org/lib/show/11101/kionix-kx123-driver) is based on the library of the same name by *Rohm*: https://platformio.org/lib/show/3975/kionix-kx123-driver
    - Adapted to Mbed 5
+   - Added interrupt configuration functionality
+   - Added motion detecting functionality
    - Fixed include paths
  - The `RegisterWriter` library (https://platformio.org/lib/show/11100/RegisterWriter) is based on the library of the same name by *Rohm* / *Mikko Koivunen*: https://platformio.org/lib/show/10695/RegisterWriter
    - Adapted to Mbed 5

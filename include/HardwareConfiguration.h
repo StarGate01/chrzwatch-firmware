@@ -6,7 +6,7 @@
  * @date 2020-05-30
  */
 
-#define TARGET_VARIANT_NAME  "CHRZwatch Unknown"
+#define TARGET_VARIANT_NAME  u8"CHRZwatch Unknown\0"
 #define PIN_VIBRATION        P0_25
 #define PIN_BUTTON1          P0_26
 #define PIN_BUTTON2          P0_27
@@ -46,6 +46,6 @@
 #   define PIN_CHARGE           BUTTON3
 #   define PIN_VIBRATION_INVERT 1
 #   define LCD_COLSHIFT         2
-#   define LCD_ROWSHIFT         2
+#   define LCD_ROWSHIFT         1
 #   define LCD_INVERT           1
 #endif

@@ -15,12 +15,15 @@
 
 #include <RegisterWriter.h>
 #include <kx123.h>
+#include <UnsafeI2C.h>
 
 #include <Heartrate3_AFE4404.h>
 
-#define POLL_FREQUENCY 100
+
+#define POLL_FREQUENCY          100
 #define BUTTON_VIBRATION_LENGTH 75
-#define ALERT_VIBRATION_LENGTH 200
+#define BUTTON_DEBOUNCE         200
+#define ALERT_VIBRATION_LENGTH  200
 
 
 // Forward decalarations
@@ -72,11 +75,11 @@ class SensorService
         bool getBatteryCharging();
 
         /**
-         * @brief Get the Acceleration value
+         * @brief Get the steps cadence
          * 
-         * @param data Buffer for the acceleration data
+         * @return uint8_t The cadence of the steps
          */
-        void getAccValue(float* data);
+        uint8_t getStepsCadence();
 
     protected:
         events::EventQueue& _event_queue; //!< Eventqueue for dispatch timer for polling
@@ -87,15 +90,15 @@ class SensorService
         DigitalIn _charging; //!< Is charging input
         float _battery_value; //!< The internal battery value state (volts)
         bool _charging_value; //!< The internal charging state
-        uint8_t _hr_value;
+        uint8_t _hr_value; //!< The internal heartrate value
+        uint8_t _motion_count; //!< The internal count of motion events
 
         InterruptIn _button1; //!< Button 1 input
         InterruptIn _button2; //!< Button 2 input
-        int _last_button1; //!< Last state of button 1 for edge detection
-        int _last_button2; //!< Last state of button 2 for edge detection
+        uint64_t _last_button; //!< Time since button press for debouncing
         bool _cancel_timeout; //!< Whether a button timeout is already running
 
-        I2C _acc_i2c; //!< I2C interface for the acceleration sensor
+        UnsafeI2C _acc_i2c; //!< I2C interface for the acceleration sensor
         RegisterWriter _acc_rw; //!< Register access to the acceleration sensor
         KX123 _acc_kx123; //!< Access to the acceleration sensor
         InterruptIn _acc_irq; //!< Interrupt for the acceleration sensor
@@ -105,10 +108,11 @@ class SensorService
         Heartrate3_AFE4404 _hr; //!< Access to heartrate sensor
         DigitalOut _hr_pwr; //!< Power pin of the heartrate sensor
 
-        void _poll(); //!< Read all sensors
-        void _finishPoll();
+        void _poll(); //!< Begin to read all sensors
+        void _finishPoll(); //!< Called after sensor reading is complete
 
-        void _handleButton(); //!< Handle press of buttons
+        void _handleButtonIRQ(); //!< Handle press of buttons interrupt request
+        void _handleAccIRQ(); //!< Handle accelleration sensor interrupt request
         void _handleDisplayTimeout(); //!< Handle display timeout
 
 };

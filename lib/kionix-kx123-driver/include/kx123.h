@@ -36,6 +36,8 @@ class KX123
         bool start_setup_mode(void);
         bool start_measurement_mode(void);
         bool set_defaults(void);
+        bool set_config(uint8_t odcntl_odr_osa, uint8_t cntl1_gsel, bool cntl1_res_high = true,
+                        bool enable_tap = false, bool enable_motion = false, bool enable_tilt = false);
         bool getresults_highpass(int16_t *buf);
         bool getresults_raw(int16_t *buf);
         bool getresults_highpass_g(float *buf);
@@ -55,22 +57,14 @@ class KX123
 
         bool set_cntl3_odrs(uint8_t tilt_position_odr, uint8_t directional_tap_odr, uint8_t motion_wuf_odr); //0xff for DONT_SET
         bool set_odcntl(bool iir_filter_off, uint8_t lowpass_filter_freq_half, uint8_t odr);
-        bool int1_setup(uint8_t pwsel,
-                        bool physical_int_pin_enabled,
-                        bool physical_int_pin_active_high,
-                        bool physical_int_pin_latch_disabled,
-                        bool self_test_polarity_positive,
-                        bool spi3wire_enabled);
-        bool int2_setup(uint8_t pwsel,
-                        bool physical_int_pin_enabled,
-                        bool physical_int_pin_active_high,
-                        bool physical_int_pin_latch_disabled,
-                        bool aclr2_enabled,
-                        bool aclr1_enabled);
+        bool int1_setup(uint8_t pwsel, bool physical_int_pin_enabled, bool physical_int_pin_active_high,
+                        bool physical_int_pin_latch_disabled, bool self_test_polarity_positive, bool spi3wire_enabled);
+        bool int2_setup(uint8_t pwsel, bool physical_int_pin_enabled, bool physical_int_pin_active_high,
+                        bool physical_int_pin_latch_disabled, bool aclr2_enabled, bool aclr1_enabled);
         bool set_int1_interrupt_reason(uint8_t interrupt_reason);
         bool set_int2_interrupt_reason(uint8_t interrupt_reason);
 
-        bool set_motion_detect_axis(uint8_t xxyyzz, bool axis_and_combination_enabled = false);
+        bool set_motion_detect_config(uint8_t xxyyzz, uint8_t wufc, uint8_t ath, bool axis_and_combination_enabled = true);
         bool set_tap_axis(uint8_t xxyyzz);
         
         /**

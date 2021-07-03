@@ -72,12 +72,10 @@ void Screen::render()
         lcd.setTextColor(ST7735_RED, ST7735_BLACK);
         lcd.printf("BLE: [ ]   ");
     }
-    
 
     lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
     lcd.setCursor(0, 130);
-
-    lcd.printf("X: %f\nY: %f\nZ: %f", accData[0], accData[1], accData[2]);
+    lcd.printf("SC: %u", stepsCadence);
 
     // mbed_stats_cpu_t stats;
     // mbed_stats_cpu_get(&stats);

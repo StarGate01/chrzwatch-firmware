@@ -75,7 +75,7 @@ bool DisplayService::getPower()
 void DisplayService::vibrate(uint16_t duration)
 {
     _vibration_duration = duration;
-    _vibration_trigger.release();
+    _vibration_trigger.release(); // Returns even if token is already released
 }
 
 void DisplayService::render()
@@ -90,7 +90,7 @@ void DisplayService::render()
         screen.batteryRaw = _sensor_service.getBatteryRaw();
         screen.batteryCharging = _sensor_service.getBatteryCharging();
         screen.heartrate = _sensor_service.getHRValue();
-        _sensor_service.getAccValue(screen.accData);
+        screen.stepsCadence = _sensor_service.getStepsCadence();
         screen.render();
     }
 }
