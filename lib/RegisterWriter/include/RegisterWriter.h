@@ -26,6 +26,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define i2c_common_pp_h
 
 #include "rohm_hal2.h" //types, DEBUG_print*, USE_*_HARDWARE_I2C
+#include <UnsafeI2C.h>
 
 /**
 * RegisterWriter class for writing sensor registers via I2C object
@@ -39,7 +40,7 @@ class RegisterWriter
         *
         * @param i2c_obj pre-instantiated i2c object.
         */
-        RegisterWriter(I2C &i2c_obj);
+        RegisterWriter(UnsafeI2C &i2c_obj);
 
         /**
         * Create a i2c instance which is connected to specified I2C pins.
@@ -119,7 +120,7 @@ class RegisterWriter
         bool change_bits(uint8_t sad, uint8_t reg, uint8_t mask, uint8_t bits);
 
     private:
-        I2C i2c_bus;
+        UnsafeI2C i2c_bus;
         bool self_created_i2c;
         bool write_single; //Single command write or two command write
 

@@ -1,6 +1,6 @@
 {
     "name": "RegisterWriter",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "keywords": "rohm, hal",
     "description": "Rohm HAL cpp for sensor driver development. Adapted to Mbed 5 and modified to fix file includes.",
     "authors":
@@ -14,6 +14,16 @@
         {
             "name": "Mikko Koivunen",
             "url": "https://os.mbed.com/teams/Rohm/"
+        }
+    ],
+    "dependencies":
+    [
+        {
+            "name": "UnsafeI2C",
+            "authors":
+            [
+                "Christoph Honal"
+            ]
         }
     ],
     "repository":
