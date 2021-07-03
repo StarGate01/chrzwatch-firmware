@@ -1,6 +1,6 @@
 {
     "name": "RegisterWriter",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "keywords": "rohm, hal",
     "description": "Rohm HAL cpp for sensor driver development. Adapted to Mbed 5 and modified to fix file includes.",
     "authors":

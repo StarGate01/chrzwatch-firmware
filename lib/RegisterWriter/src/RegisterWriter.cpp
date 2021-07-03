@@ -151,10 +151,10 @@ bool RegisterWriter::write_register(uint8_t sad, uint8_t reg, uint8_t data)
 /* @return error true/false */
 bool RegisterWriter::change_bits(uint8_t sad, uint8_t reg, uint8_t mask, uint8_t bits)
 {
-    uint8_t value, error;
+    uint8_t value, read;
 
-    error = read_register(sad, reg, &value, 1);
-    if (!error)
+    read = read_register(sad, reg, &value, 1);
+    if (read == 1) // check length
     {
         value = value & ~mask;
         value = value | (bits & mask);
@@ -162,7 +162,7 @@ bool RegisterWriter::change_bits(uint8_t sad, uint8_t reg, uint8_t mask, uint8_t
     }
     else
     {
-        //DEBUG_printf("Read before change_bits() failed.");
+        DEBUG_printf("Read before change_bits() failed.");
         return true;
     }
 }
