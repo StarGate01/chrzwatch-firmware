@@ -88,7 +88,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 <summary>Display: 0.96 inch LCD with ST7735 driver IC</summary>
 
 - Datasheet: https://www.displayfuture.com/Display/datasheet/controller/ST7735.pdf
-- Driver: https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini
+- Driver: https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini via Mbed SPI
 
 </details>
 
@@ -98,7 +98,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 - General: https://www.kionix.com/product/KX023-1025
 - Datasheet: http://kionixfs.kionix.com/en/datasheet/KX023-1025%20Specifications%20Rev%2012.0.pdf
 - Application note: https://www.yic-electronics.de/datasheet/dc/ATS-19D-122-C2-R0.pdf
-- Driver: https://platformio.org/lib/show/11101/kionix-kx123-driver and Mbed GPIO Interrupt
+- Driver: https://platformio.org/lib/show/11101/kionix-kx123-driver via Mbed I2C and Mbed GPIO Interrupt
 
 </details>
 
@@ -107,7 +107,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 
 - General: https://www.ti.com/product/AFE4404
 - Datasheet: https://www.ti.com/lit/ds/symlink/afe4404.pdf
-- Driver: https://platformio.org/lib/show/11099/Heartrate3_AFE4404
+- Driver: https://platformio.org/lib/show/11099/Heartrate3_AFE4404 via Mbed I2C and Mbed GPIO
 
 </details>
 
@@ -116,7 +116,8 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 
 - General: https://lcsc.com/product-detail/_Gotop-GT24L24A2Y_C124690.html
 - Datasheet: https://datasheet.lcsc.com/szlcsc/1912111436_Gotop-GT24L24A2Y_C124690.pdf
-- Driver: *N/A, currently unused*
+- Map: https://github.com/RichardBsolut/GT24L24A2Y
+- Driver: Mbed SPI and Mbed GPIO
 
 </details>
 

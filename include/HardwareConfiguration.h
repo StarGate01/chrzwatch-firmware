@@ -32,6 +32,10 @@
 #define PIN_HR_RESET         P0_19
 #define PIN_HR_SDA           P0_20
 #define PIN_HR_SCL           P0_21
+#define PIN_FONT_MISO        P0_5
+#define PIN_FONT_CS          P0_6
+#define PIN_FONT_CLK         P0_7
+#define PIN_FONT_MOSI        P0_8
 #define SENSOR_FREQUENCY     60000
 #define HR_DURATION          30000
 #define THREAD_SIZE          2048

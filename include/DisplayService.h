@@ -25,6 +25,33 @@
 class SensorService;
 
 
+class FontROMReader
+{
+
+    public:
+        /**
+         * @brief Construct a new font ROM reader object
+         * 
+         */
+        FontROMReader();
+
+        /**
+         * @brief Read from the font ROM
+         * 
+         * @param buffer Target buffer
+         * @param addr Offset address
+         * @param size Size in bytes
+         * @return int success = 0
+         */
+        int read(char* buffer, uint32_t addr, uint32_t size);
+
+    protected:
+        SPI _spi; //!< SPI device interface
+        DigitalOut _cs; //!< Chip select pin
+
+};
+
+
 /**
  * @brief Holds the state of the display screen and talks to the LCD controller
  * 
@@ -54,9 +81,12 @@ class Screen
         bool bleEncStatus; //!< Bluetooth Enc status
         uint8_t stepsCadence; //!< Steps cadence
         uint32_t stepsTotal; //!< Steps total
+        uint32_t test;
+        int test2;
 
     protected:
         Semaphore _display_guard; //!< Serialize display bus access
+        FontROMReader _font_reader; //!< Font ROM interface
 
 };
 
@@ -84,6 +114,7 @@ class PwmOutLP: public PwmOut
         void setPower(bool on);
 
 };
+
 
 /**
  * @brief Provides methods to interact with the LCD display and other actors
