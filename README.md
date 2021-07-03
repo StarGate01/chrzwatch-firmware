@@ -40,7 +40,7 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed 5.14 RTO
 - [x] Energy saving display
 - [x] Energy saving touch input
 - [ ] Energy saving heartrate sensor
-- [ ] Energy saving acceleration sensor
+- [x] Energy saving acceleration sensor
 - [ ] Endurance tests & verification
 
 </details>
@@ -99,7 +99,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 - General: https://www.kionix.com/product/KX023-1025
 - Datasheet: http://kionixfs.kionix.com/en/datasheet/KX023-1025%20Specifications%20Rev%2012.0.pdf
 - Application note: https://www.yic-electronics.de/datasheet/dc/ATS-19D-122-C2-R0.pdf
-- Driver: https://platformio.org/lib/show/11101/kionix-kx123-driver
+- Driver: https://platformio.org/lib/show/11101/kionix-kx123-driver and Mbed GPIO Interrupt
 
 </details>
 
@@ -276,6 +276,7 @@ Please note that while most code in this repository may be licensed under the te
    - Deferred calls in ISR context to EventQueue
    - Added documentation
    - Added LOW_POWER macro (default 1) to use a low-power ticker.
+   - Exposed monotonic timer callback
  - The `Adafruit_ST7735_Mini` library (https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini) is based on the `Adafruit_ST7735` library by *Andrew Lindsay*: https://platformio.org/lib/show/2150/Adafruit_ST7735, which in turn is a port of a library by Adafruit: https://github.com/adafruit/Adafruit-ST7735-Library
    - Added support for the `R_MINI160x80` display type
    - Added documentation
@@ -296,3 +297,4 @@ Please note that while most code in this repository may be licensed under the te
    - Adapted to Mbed 5
    - Fixed include paths
    - Fixed default pins
+   - Added an explicit dependency to `UnsafeI2C`, see above

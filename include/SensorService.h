@@ -23,7 +23,9 @@
 #define POLL_FREQUENCY          100
 #define BUTTON_VIBRATION_LENGTH 75
 #define BUTTON_DEBOUNCE         200
-#define ALERT_VIBRATION_LENGTH  200
+#define ALERT_VIBRATION_LENGTH  200 
+#define ACC_MOTION_TRESHOLD_16  24  //!< Motion detection threshold in 1/16 g
+#define ACC_MOTION_DURATION_50  10  //!< Motion detection time window in 1/50 s
 
 
 // Forward decalarations
@@ -81,6 +83,18 @@ class SensorService
          */
         uint8_t getStepsCadence();
 
+        /**
+         * @brief Reevaluate steps cadence
+         */
+        void reevaluateStepsCadence();
+
+        /**
+         * @brief Get the total step count
+         * 
+         * @return uint32_t Step count
+         */
+        uint32_t getStepsTotal();
+
     protected:
         events::EventQueue& _event_queue; //!< Eventqueue for dispatch timer for polling
         Thread _event_thread; //!< Thread for polling
@@ -92,6 +106,9 @@ class SensorService
         bool _charging_value; //!< The internal charging state
         uint8_t _hr_value; //!< The internal heartrate value
         uint8_t _motion_count; //!< The internal count of motion events
+        uint64_t _motion_count_age; //<! Age of the motion count buffer
+        uint8_t _steps_cadence; //!< Computed steps cadence over the last minute
+        uint32_t _motion_count_total; //!< Number of total motions since boot
 
         InterruptIn _button1; //!< Button 1 input
         InterruptIn _button2; //!< Button 2 input

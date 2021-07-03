@@ -75,12 +75,12 @@ void Screen::render()
 
     lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
     lcd.setCursor(0, 130);
-    lcd.printf("SC: %u", stepsCadence);
+    lcd.printf("ST: %u\nSC: %u", stepsTotal, stepsCadence);
 
     // mbed_stats_cpu_t stats;
     // mbed_stats_cpu_get(&stats);
     // lcd.printf("UP: %llu\nST: %llu\nDS: %llu", 
-        // stats.uptime / 1000, stats.sleep_time / 1000, stats.deep_sleep_time / 1000);
+    // stats.uptime / 1000, stats.sleep_time / 1000, stats.deep_sleep_time / 1000);
 
     _display_guard.release();
 }

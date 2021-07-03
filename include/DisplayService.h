@@ -53,6 +53,7 @@ class Screen
         bool bleStatus; //!< Bluetooth status
         bool bleEncStatus; //!< Bluetooth Enc status
         uint8_t stepsCadence; //!< Steps cadence
+        uint32_t stepsTotal; //!< Steps total
 
     protected:
         Semaphore _display_guard; //!< Serialize display bus access
@@ -107,6 +108,13 @@ class DisplayService
         void vibrate(uint16_t duration);
 
         /**
+         * @brief Get the Vibration Duration
+         * 
+         * @return uint16_t duration of the last vibration or zero if not vibrating
+         */
+        uint16_t getVibrationDuration();
+
+        /**
          * @brief Render the internal state to the LCD display
          * 
          */
@@ -158,7 +166,6 @@ class DisplayService
         DigitalOut _lcd_pwr; //!< LCD power
 
         bool _is_on; //!< Power state
-        int _event_id; //!< Render loop event id
 
         /**
          * @brief Waits for the vibration interlock and then vibrates the motor

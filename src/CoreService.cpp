@@ -24,6 +24,7 @@ CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _display_service.setBLEStatusPtr(&_connected);
     _display_service.setBLEEncStatusPtr(&_encrypted);
     _ble_alert_service.setCallback(callback(this, &CoreService::onAlert));
+    _ble_time_service.setMonotonicCallback(callback(this, &CoreService::onMonotonic));
 }
 
 CoreService::~CoreService()

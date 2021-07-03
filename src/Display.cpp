@@ -19,10 +19,9 @@ DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService
     _ble_encrypted(nullptr),
     _vibration(PIN_VIBRATION),
     _vibration_trigger(1),
-    _vibration_duration(200),
+    _vibration_duration(0),
     _lcd_bl(PIN_LCD_BL),
     _lcd_pwr(PIN_LCD_PWR),
-    _event_id(0),
     _vibration_thread(osPriorityNormal, THREAD_SIZE)
 {
     _vibration_thread.start(callback(this, &DisplayService::threadVibration));
@@ -47,22 +46,11 @@ void DisplayService::setPower(bool on)
         // Enable LCD power
         _lcd_pwr.write(1);
         _lcd_bl.write(1.0f);
-        // Start render thread
-        if(_event_id == 0)
-        {
-            _event_id = _event_queue.call_every(1000, this, &DisplayService::render);
-        }
     }
     else
     {
         // Disable LCD power
         _lcd_pwr.write(0);
-        // Stop render thread
-        if(_event_id != 0) 
-        {
-            _event_queue.cancel(_event_id);
-            _event_id = 0;
-        }
     }
     _is_on = on;
 }
@@ -78,9 +66,13 @@ void DisplayService::vibrate(uint16_t duration)
     _vibration_trigger.release(); // Returns even if token is already released
 }
 
+uint16_t DisplayService::getVibrationDuration()
+{
+    return _vibration_duration;
+}
+
 void DisplayService::render()
 {
-    // This guard only makes sense when method is invoked manually
     if(_is_on)
     {
         if(_ble_connected != nullptr) screen.bleStatus = *_ble_connected;
@@ -91,6 +83,7 @@ void DisplayService::render()
         screen.batteryCharging = _sensor_service.getBatteryCharging();
         screen.heartrate = _sensor_service.getHRValue();
         screen.stepsCadence = _sensor_service.getStepsCadence();
+        screen.stepsTotal = _sensor_service.getStepsTotal();
         screen.render();
     }
 }

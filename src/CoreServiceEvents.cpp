@@ -54,3 +54,9 @@ void CoreService::onAlert(int level)
         _display_service.vibrate(ALERT_VIBRATION_LENGTH);
     }
 }
+
+void CoreService::onMonotonic(const time_t epoch)
+{
+    _sensor_service.reevaluateStepsCadence();
+    _display_service.render(); // Only renders if display is on
+}

@@ -29,7 +29,7 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     _acc_addr(PIN_ACC_ADDR),
     _acc_cs(PIN_ACC_CS)
 { 
-    // Setup buttons
+    // Setup button interrupts
     _button1.fall(callback(this, &SensorService::_handleButtonIRQ));
     _button2.fall(callback(this, &SensorService::_handleButtonIRQ));
 
@@ -40,15 +40,14 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     // Setup acceleration sensor
     _acc_addr.write(1);
     _acc_cs.write(1);
-    bool res = _acc_kx123.set_config(KX122_ODCNTL_OSA_50, KX122_CNTL1_GSEL_2G, true, false, true); // 50Hz data rate default output, 2g range
-    res = res || _acc_kx123.set_cntl3_odrs(0xff, 0xff, KX122_CNTL3_OWUF_50); // 50Hz data rate for motion engine
-    res = res || _acc_kx123.set_motion_detect_config(KX122_INC2_WUE_MASK, 5, 8); // All axes, 0.5g (8 1/16th steps) over 0.1s (5 ticks at 50Hz) trigger
-    res = res ||  _acc_kx123.int1_setup(0, true, true, false, false, false); // Latch interrupt 1, active high
-    res = res || _acc_kx123.set_int1_interrupt_reason(KX122_MOTION_INTERRUPT); // Route interrupt source
-    _acc_irq.rise(callback(this, &SensorService::_handleAccIRQ)); // Attach interrupt handler
-    res = res || _acc_kx123.start_measurement_mode();
-
-    printf("RES: %u\n", res? 1: 0);
+    _acc_kx123.soft_reset();
+    _acc_kx123.set_config(KX122_ODCNTL_OSA_50, KX122_CNTL1_GSEL_2G, true, false, true); // 50Hz data rate default output, 2g range
+    _acc_kx123.set_cntl3_odrs(0xff, 0xff, KX122_CNTL3_OWUF_50); // 50Hz data rate for motion engine
+    _acc_kx123.set_motion_detect_config(KX122_INC2_WUE_MASK, ACC_MOTION_DURATION_50, ACC_MOTION_TRESHOLD_16); // All axes
+    _acc_kx123.int1_setup(0, true, false, false, false, false); // Latch interrupt 1, active low
+    _acc_kx123.set_int1_interrupt_reason(KX122_MOTION_INTERRUPT); // Route interrupt source
+    _acc_irq.fall(callback(this, &SensorService::_handleAccIRQ)); // Attach interrupt handler
+    _acc_kx123.start_measurement_mode();
 
     // Handle dispatching events
     _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::_poll);
@@ -81,7 +80,23 @@ bool SensorService::getBatteryCharging()
 
 uint8_t SensorService::getStepsCadence()
 {
-    return _motion_count;
+    return _steps_cadence;
+}
+
+uint32_t SensorService::getStepsTotal()
+{
+    return _motion_count_total;
+}
+
+void SensorService::reevaluateStepsCadence()
+{
+    uint64_t now = get_ms_count();
+    if(now - _motion_count_age > 60000) // 1 minute
+    {
+        _steps_cadence = _motion_count;
+        _motion_count = 0;
+        _motion_count_age = now;
+    }
 }
 
 void SensorService::_poll()
@@ -119,19 +134,17 @@ void SensorService::_handleButtonIRQ()
 
 void SensorService::_handleAccIRQ()
 {
-    // Clear the interrupt latch register
-    _acc_kx123.clear_interrupt();
-
-    // Check reason and direction
+    // Check reason
     enum e_interrupt_reason reason;
     _acc_kx123.get_interrupt_reason(&reason);
     if(reason == e_interrupt_reason::KX122_MOTION_INTERRUPT) 
     {
-        enum e_axis axis;
-        _acc_kx123.get_detected_motion_axis(&axis);
-        // TODO: Do sth with the axis?
         _motion_count++;
+        _motion_count_total++;
     }
+
+    // Clear the interrupt latch register
+    _acc_kx123.clear_interrupt();
 }
 
 void SensorService::_handleDisplayTimeout()

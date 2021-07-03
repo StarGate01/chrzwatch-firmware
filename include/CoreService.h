@@ -131,6 +131,14 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
          */
         void onAlert(int level);
 
+
+        /**
+         * @brief Callback handler for monotonic time events
+         * 
+         * @param epoch Current time
+         */
+        void onMonotonic(const time_t epoch);
+
 };
 
 #endif
