@@ -18,7 +18,8 @@ Screen::Screen():
     bleStatus(false),
     bleEncStatus(false),
     lcd(PIN_LCD_SDA, NC, PIN_LCD_SCL, PIN_LCD_CS, PIN_LCD_DC, PIN_LCD_RESET),
-    _display_guard(1)
+    _display_guard(1),
+    _font_reader(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_FONT_CS)
 {
     _display_guard.acquire();
 
@@ -31,9 +32,16 @@ Screen::Screen():
     lcd.setCursor(0, 0);
     lcd.setTextSize(1);
     lcd.setTextWrap(false);
-    lcd.fillScreen(ST7735_BLACK);
     lcd.setTextColor(ST7735_CYAN, ST7735_BLACK);
-    lcd.printf("CHRZ Watch\n\nTime:\n\n\n\n\nBattery:\n\n\n\nCharging:\n");
+    lcd.fillScreen(ST7735_BLACK);
+    // lcintf("CHRZ Watch\n\nTime:\n\n\n\n\nBattery:\n\n\n\nCharging:\n");
+
+    struct font_layout_t font = FONT(CLOCK4_32);
+    char buffer[FONT_CLOCK4_32_BSIZE];
+    uint16_t actual_width;
+    test = _font_reader.read(font, 0, buffer, &actual_width);
+    test2 = actual_width;
+    lcd.drawBitmap(0, 0, (uint8_t*)buffer, 22, 32, ST7735_CYAN, true, 2);
 
     _display_guard.release();
 }
@@ -43,39 +51,39 @@ void Screen::render()
     bool sem = _display_guard.try_acquire();
     if(!sem) return; // Cancel if a rendering is already in progress
 
-    // Decode timestamp to string
-    char time_buff[20];
-    strftime(time_buff, 20, "%H:%M:%S\n%d.%m.%Y", localtime(&epochTime));
+    // // Decode timestamp to string
+    // char time_buff[20];
+    // strftime(time_buff, 20, "%H:%M:%S\n%d.%m.%Y", localtime(&epochTime));
 
-    lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
-    lcd.setCursor(0, 30);
-    lcd.printf(time_buff);
-    lcd.setCursor(0, 70);
-    lcd.printf("%u%% (%f)", batteryPercent, batteryRaw);
-    lcd.setCursor(0, 100);
-    lcd.printf(batteryCharging? "Yes, HR: %u  " : "No, HR: %u  ", heartrate);
-    lcd.setCursor(0, 115);
-    if(bleStatus)
-    {
-        lcd.setTextColor(ST7735_GREEN, ST7735_BLACK);
-        if(bleEncStatus)
-        {
-            lcd.printf("BLE: [x, E]");
-        }
-        else
-        {
-            lcd.printf("BLE: [x, N]");
-        }
-    }
-    else
-    {
-        lcd.setTextColor(ST7735_RED, ST7735_BLACK);
-        lcd.printf("BLE: [ ]   ");
-    }
+    // lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
+    // lcd.setCursor(0, 30);
+    // lcd.printf(time_buff);
+    // lcd.setCursor(0, 70);
+    // lcd.printf("%u%% (%f)", batteryPercent, batteryRaw);
+    // lcd.setCursor(0, 100);
+    // lcd.printf(batteryCharging? "Yes, HR: %u  " : "No, HR: %u  ", heartrate);
+    // lcd.setCursor(0, 115);
+    // if(bleStatus)
+    // {
+    //     lcd.setTextColor(ST7735_GREEN, ST7735_BLACK);
+    //     if(bleEncStatus)
+    //     {
+    //         lcd.printf("BLE: [x, E]");
+    //     }
+    //     else
+    //     {
+    //         lcd.printf("BLE: [x, N]");
+    //     }
+    // }
+    // else
+    // {
+    //     lcd.setTextColor(ST7735_RED, ST7735_BLACK);
+    //     lcd.printf("BLE: [ ]   ");
+    // }
 
     lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
     lcd.setCursor(0, 130);
-    lcd.printf("ST: %u\nSC: %u", stepsTotal, stepsCadence);
+    lcd.printf("ST: %u\nT1: %u\nT2: %u", stepsTotal, test, test2);
 
     // mbed_stats_cpu_t stats;
     // mbed_stats_cpu_get(&stats);

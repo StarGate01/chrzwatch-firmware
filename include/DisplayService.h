@@ -16,6 +16,7 @@
 #include <rtos.h>
 
 #include <Adafruit_ST7735_Mini.h>
+#include <GT24L24A2Y_Reader.h>
 
 #include "HardwareConfiguration.h"
 #include "CurrentTimeService.h"
@@ -23,33 +24,6 @@
 
 // Forward decalarations
 class SensorService;
-
-
-class FontROMReader
-{
-
-    public:
-        /**
-         * @brief Construct a new font ROM reader object
-         * 
-         */
-        FontROMReader();
-
-        /**
-         * @brief Read from the font ROM
-         * 
-         * @param buffer Target buffer
-         * @param addr Offset address
-         * @param size Size in bytes
-         * @return int success = 0
-         */
-        int read(char* buffer, uint32_t addr, uint32_t size);
-
-    protected:
-        SPI _spi; //!< SPI device interface
-        DigitalOut _cs; //!< Chip select pin
-
-};
 
 
 /**
@@ -86,7 +60,7 @@ class Screen
 
     protected:
         Semaphore _display_guard; //!< Serialize display bus access
-        FontROMReader _font_reader; //!< Font ROM interface
+        GT24L24A2Y_Reader _font_reader; //!< Font ROM interface
 
 };
 

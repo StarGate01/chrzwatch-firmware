@@ -6,6 +6,10 @@
         "cmath": "cpp",
         "mstd_memory": "cpp",
         "mstd_mutex": "cpp",
-        "memory": "cpp"
+        "memory": "cpp",
+        "array": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "utility": "cpp"
     }
 }

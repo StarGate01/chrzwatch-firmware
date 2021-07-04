@@ -277,12 +277,16 @@ Please note that while most code in this repository may be licensed under the te
    - Added documentation
    - Added LOW_POWER macro (default 1) to use a low-power ticker.
    - Exposed monotonic timer callback
+ - The `Adafruit_GFX` library (https://platformio.org/lib/show/12501/Adafruit_GFX) is based on the library of the same name by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which in turn is a port of https://github.com/adafruit/Adafruit-GFX-Library
+   - Added convenience bitmap functions
  - The `Adafruit_ST7735_Mini` library (https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini) is based on the `Adafruit_ST7735` library by *Andrew Lindsay*: https://platformio.org/lib/show/2150/Adafruit_ST7735, which in turn is a port of a library by Adafruit: https://github.com/adafruit/Adafruit-ST7735-Library
    - Added support for the `R_MINI160x80` display type
    - Added documentation
-   - Added an explicit dependency to `Adafruit_GFX` port by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which is a port of https://github.com/adafruit/Adafruit-GFX-Library
+   - Added an explicit dependency to `Adafruit_GFX` port, see above
  - The `UnsafeI2C` library (https://platformio.org/lib/show/12500/UnsafeI2C) is a wrapper for the existing Mbed I2C library
    - Removed threadsafe mutex
+ - The `GT24L24A2Y` library (TBA) is a driver for the font chip of the same name
+   - Initial implementation
  - The `Heartrate3_AFE4404` library (https://platformio.org/lib/show/11099/Heartrate3_AFE4404) is based on the library and example code of `Click_Heartrate3_AFE4404` by *MikroElektronika* / *Corey Lakey*: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
    - Added Mbed integration
    - Added interrupt handling
