@@ -1,6 +1,6 @@
 # CHRZ Watch Firmware
 
-Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed 5.14 RTOS. Supported by a custom version of the Gadgetbridge Android app.
+Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Supported by a custom version of the Gadgetbridge Android app.
 
 ## State of the project
 
@@ -80,7 +80,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 
 - General: https://www.nordicsemi.com/Products/Low-power-short-range-wireless/nRF52832/Getting-started
 - Datasheet: https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.0.pdf
-- RTOS: https://os.mbed.com/ (V5.14)
+- RTOS: https://os.mbed.com/ (V6.51401.0)
 
 </details>
 
@@ -171,20 +171,42 @@ Install and use `doxygen` or the "Build Documentation" task to generate document
 
 ### Modifying an I6HRC watch
 
-Solder the `SWDCLK` and `SWDIO` testpoints to the unused inner two USB data lines. You might want to fabricate a custom USB to ISP adapter, link shown in the schematic below (KiCAD schematic is available in `schematics/swd-usb-adapter`.
+Disassemble the watch and solder the `SWCLK` and `SWDIO` testpoints to the unused inner two USB data lines like shown in this video: https://www.youtube.com/watch?v=0Fu-VSuKHEg . Verify that the PCB actually contains a `NRF52832` IC, and not an off-brand `HS6620D` IC.
 
-You can still charge the watch using any USB A compliant charger or port.
+You might want to fabricate a custom SWD via USB to ISP adapter, link shown in the schematic below (KiCAD schematic is available in `schematics/swd-usb-adapter`). You can still charge the watch using any USB A compliant charger or port.
 
 <img src="https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/schematics/swd-usb-adapter/swd-usb-adapter_schematic2.jpg" height="400">
 
+### Dumping the stock firmware
+
+The watch does not use read-back-protection. To dump the stock ROM and RAM, you need to use a genuine J-Link programmer and the official Nordic dev tools (`nrfjprog`). Then, disassemble the watch to expose the internal testpoints. Connect the `VDD`, `SWDIO` and `SWCLK` testpoints and also the ground terminal. Then, dump the data like this:
+
+```
+$ nrfjprog -f nrf52 --readcode i6hrc_code.bin
+$ nrfjprog -f nrf52 --readram i6hrc_ram.bin
+```
+
+These files can also be found at `doc/dump` (armv7le) for decompiling (e.g. using **Ghidra**: https://ghidra-sre.org/) or restoring the watch (untested).
+
 ### Unlocking the flash memory
 
-First of all, the flash memory has to be reset in oder for the chip to accept new firmware and debug instructions. This requires *lower level* SWD access, and thus cant be performed by the cheap ST-Link V2 clones because these only provide *high level* access.
+First of all, the flash memory has to be reset in oder for the chip to accept new firmware and debug instructions. This requires *lower level* SWD access (`SWD`), and thus cant be performed by the cheap ST-Link V2 clones because these only provide *high level* access (`SWD_HLA`).
+
+<details>
+<summary>Using a J-Link</summary>
+
+Buy any genuine **J-Link** adapter, and connect it like in the paragraph above. This is annoying, since the internal `VDD` testpoint has to be tapped, requiring the watch to be disassembled. Hence, one of the other methods is recommended.
+
+```
+$ nrfjprog -f nrf52 --eraseall
+```
+
+</details>
 
 <details>
 <summary>Using a CMSIS-DAP</summary>
 
-Either buy any **CMSIS-DAP** capable adapter, or buy a cheap **ST-Link V2** clone (the little USB adapter one), and open it. Then use any SWD capable programmer, like for example *another* ST-Link V2 to reprogram the first one with the firmware for CMSIS-DAP functionality (https://raw.githubusercontent.com/x893/CMSIS-DAP/master/Firmware/STM32/hex/CMSIS-DAP-STLINK21.hex). You can use any ST-compatible flash tool, like for example the ST-Link utility or OpenOCD.
+Either buy any **CMSIS-DAP** capable adapter, or buy a cheap **ST-Link V2** clone (the little USB adapter one), and open it. Then use any SWD high level capable programmer, like for example *another* ST-Link V2 to reprogram the first one with the firmware for CMSIS-DAP functionality (https://raw.githubusercontent.com/x893/CMSIS-DAP/master/Firmware/STM32/hex/CMSIS-DAP-STLINK21.hex). You can use any ST-compatible flash tool, like for example the ST-Link utility or OpenOCD.
 
 Then, connect the watch to the CMSIS-DAP, and the adapter to your PC via USB. Then connect to it using OpenOCD.
 
@@ -213,21 +235,33 @@ $ arm-none-eabi-gdb
 
 Flashing the unlocked chip should then work with any basic SWD capable programmer, like the **ST-Link V2** (the cheap clones work too). The **CMSIS-DAP** or the **Black Magic Probe** can be used as well.
 
-You can use **OpenOCD** (http://openocd.org/) to connect to the chip and manage its flash memory:
+You can use **OpenOCD** (http://openocd.org/) to connect to the chip and manage its flash memory (... means subsequent commands or arguments):
 
 High level SWD access using a *ST-Link V2* clone:
 
 ```
-$ openocd -d2 -f interface/stlink-v2.cfg -c "transport select hla_swd" -f target/nrf52.cfg
+$ openocd -d2 -f interface/stlink-v2.cfg -c "transport select hla_swd; ..." -f target/nrf52.cfg
 ```
 
 Lower level SWD access using a *CMSIS-DAP* (recommended):
 
 ```
-$ openocd -f interface/cmsis-dap.cfg -c "transport select swd" -f target/nrf52.cfg
+$ openocd -f interface/cmsis-dap.cfg -c "transport select swd; ..." -f target/nrf52.cfg
+```
+
+Lower level SWD access using a *J-Link* (not recommended):
+
+```
+$ nrfjprog -f nrf52 ...
 ```
 
 The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (default: CMSIS-DAP) to program the chip. This can be changed in the `platformio.ini` file.
+
+### Dumping the Font ROM
+
+Disassemble your watch and connect the `TX` and `RX` testpoints to the corresponding pins of a Serial-to-USB converter. Connect power and ground of the USB plug to the `5V` and `GND` pins of the converter.
+
+Next, compile and upload the firmware using the `i6hrc_flashdump` environment. Then, open a terminal to the serial port.
 
 #### Troubleshooting
 
@@ -246,10 +280,6 @@ A fork of the Android app **Gadgetbridge** (https://gadgetbridge.org/) with supp
 You can use the Android app "**nRF Connect**" (https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp&hl=en) to test the Bluetooth functions. Sometimes, connecting takes multiple tries.
 
 Various other apps like e.g. **FitoTrack** (https://play.google.com/store/apps/details?id=de.tadris.fitness&hl=en&gl=US) are able to read the heartrate from this sensor. Update: The device has not to be bonded in the recent version.
-
-## Stock firmware
-
-A dump of the stock ROM can be found at `doc/stock_rom_dump.bin` (armv7le) for decompiling (e.g. using **Ghidra**: https://ghidra-sre.org/) or restoring the watch (untested).
 
 ## Thanks to
 
