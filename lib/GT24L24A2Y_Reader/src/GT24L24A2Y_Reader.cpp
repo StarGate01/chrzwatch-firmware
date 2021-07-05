@@ -21,18 +21,10 @@ GT24L24A2Y_Reader::GT24L24A2Y_Reader(PinName mosi, PinName miso, PinName clk, Pi
 int GT24L24A2Y_Reader::read(const struct font_layout_t& font, uint16_t glyph_id, char* buffer, uint16_t* actual_width)
 {
     // Compute glyph byte offset
-    uint32_t glyph_offset = 0x60000000 + font.offset + ((uint32_t)glyph_id * (uint32_t)font.bsize);
-    char command[4] = { 
-        0x03, // Read Opcode
-        (glyph_offset >> 16) & 0xFF, // MSB
-        (glyph_offset >> 8) & 0xFF,
-        glyph_offset & 0xFF // LSB
-    };
-
-    // Send 32 bit command and read response
-    _cs.write(0);
-    int res = _spi.write(command, 4, buffer, font.bsize);
-    _cs.write(1);
+    uint32_t glyph_offset = font.offset + ((uint32_t)glyph_id * (uint32_t)font.bsize);
+ 
+    // Read glyph
+    int res = read_raw(glyph_offset, font.bsize, buffer);
 
     // Blank first two bytes in lattice mode
     if(font.width == 0) 
@@ -47,5 +39,56 @@ int GT24L24A2Y_Reader::read(const struct font_layout_t& font, uint16_t glyph_id,
     }
 
     // Result should be max of tx and rx bytes
-    return (res == max((uint16_t)4, font.bsize))? 0 : 3;
+    return res;
+}
+
+int GT24L24A2Y_Reader::read_raw(uint32_t offset, uint16_t size, char* buffer)
+{
+    // Check offset
+    if(offset > 0x1FFFFF) return 1;
+
+    // Build command
+    char command[4] = { 
+        0x03, // Read Opcode
+        (offset >> 16) & 0xFF, // MSB
+        (offset >> 8) & 0xFF,
+        offset & 0xFF // LSB
+    };
+
+    // Send 32 bit command and read response
+    _cs.write(0);
+    int res = _spi.write(command, 4, buffer, size);
+    _cs.write(1);
+
+    // Result should be max of tx and rx bytes
+    return (res == max((uint16_t)4, size))? 0 : 2;
+}
+
+void GT24L24A2Y_Reader::dump(RawSerial& serial, Callback<void()> watchdog)
+{
+    while(true)
+    {
+        // Wait for "d" command
+        while(serial.getc() != 0x64) 
+        {
+            if(watchdog != nullptr) watchdog();
+            ThisThread::sleep_for(100);
+        }
+
+        // Dump whole 2MB
+        uint32_t offset;
+        char buffer[255];
+        for(offset = 0; offset < 0x1FFFFF; offset += 255)
+        {
+            // 255 byte chunks
+            read_raw(offset, 255, buffer);
+            for(uint8_t j = 0; j < 255; j++) serial.putc(buffer[j]);
+            if(watchdog != nullptr) watchdog();
+        }
+        // The rest
+        uint32_t rest_size = 0x1FFFFF - offset;
+        read_raw(offset, rest_size, buffer);
+        for(uint8_t j = 0; j < rest_size; j++) serial.putc(buffer[j]);
+        if(watchdog != nullptr) watchdog();
+    }
 }

@@ -59,6 +59,18 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
          */
         void start();
 
+        /**
+         * @brief Initialized the watchdog timer
+         * 
+         */
+        static void initWatchdog();
+
+        /**
+         * @brief Restarts the deadlock watchdog
+         * 
+         */
+        static void kickWatchdog();
+
     protected:
         events::EventQueue& _event_queue; //!< Reference to the event queue for dispatching
 
@@ -117,12 +129,6 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
          * @param event Event information
          */
         virtual void onConnectionComplete(const ble::ConnectionCompleteEvent &event);
-
-        /**
-         * @brief Restarts the deadlock watchdog
-         * 
-         */
-        void kickWatchdog();
 
         /**
          * @brief Callback handler for the immediate alert service

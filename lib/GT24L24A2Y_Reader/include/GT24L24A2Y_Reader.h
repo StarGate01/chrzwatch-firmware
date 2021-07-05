@@ -10,6 +10,8 @@
 #define GT24L24A2Y_READER_H
 
 #include <mbed.h>
+#include <RawSerial.h>
+#include <events/mbed_events.h>
 
 
 /**
@@ -85,10 +87,31 @@ class GT24L24A2Y_Reader
          * @return int success = 0
          */
         int read(const struct font_layout_t& font, uint16_t glyph_id, char* buffer, uint16_t* actual_width);
+        
+        /**
+         * @brief Dumps the flash content to the serial interface
+         * 
+         * @param serial Serial interface to use
+         * @param watchdog Callback to reset the watchdog
+         * 
+         * @return int success = 0
+         */
+        void dump(RawSerial& serial, Callback<void()> watchdog = nullptr);
+
 
     protected:
         SPI _spi; //!< SPI device interface
         DigitalOut _cs; //!< Chip select pin
+
+        /**
+         * @brief Reads bytes from the font ROM (max. 255)
+         * 
+         * @param offset Memory offset to start from
+         * @param size Amount of bytes to read
+         * @param buffer Target buffer
+         * @return int success = 0
+         */
+        int read_raw(uint32_t offset, uint16_t size, char* buffer);
 
 };
 

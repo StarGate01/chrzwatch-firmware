@@ -261,7 +261,7 @@ The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (defau
 
 Disassemble your watch and connect the `TX` and `RX` testpoints to the corresponding pins of a Serial-to-USB converter. Connect power and ground of the USB plug to the `5V` and `GND` pins of the converter.
 
-Next, compile and upload the firmware using the `i6hrc_flashdump` environment. Then, open a terminal to the serial port.
+emove the lines ` "SERIAL", "SERIAL_ASYNCH", "SERIAL_FC"` from `mbed_app.json` to enable serial build support. Next, compile and upload the firmware using the `i6hrc_flashdump` environment. R Then, launch the script `tools/flash.dump.py`. The content of the flash will be downloaded to `dump.bin`. However, on some models I noticed the flash memory to be empty.
 
 #### Troubleshooting
 

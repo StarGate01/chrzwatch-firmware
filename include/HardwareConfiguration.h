@@ -36,6 +36,8 @@
 #define PIN_FONT_CS          P0_6
 #define PIN_FONT_CLK         P0_7
 #define PIN_FONT_MOSI        P0_8
+#define PIN_RX               P0_9
+#define PIN_TX               P0_10
 #define SENSOR_FREQUENCY     60000
 #define HR_DURATION          30000
 #define THREAD_SIZE          2048
