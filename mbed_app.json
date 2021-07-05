@@ -9,10 +9,7 @@
                 "NRFX_GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS=8"
             ],
             "target.device_has_remove": [
-                "ITM",
-                "SERIAL",
-                "SERIAL_ASYNCH",
-                "SERIAL_FC"
+                "ITM"
             ],
             "platform.cpu-stats-enabled": true,
             "target.lse_available": true,
