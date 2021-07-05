@@ -10,8 +10,11 @@
 #define GT24L24A2Y_READER_H
 
 #include <mbed.h>
-#include <RawSerial.h>
-#include <events/mbed_events.h>
+
+#if DEVICE_SERIAL 
+    #include <RawSerial.h>
+    #include <events/mbed_events.h>
+#endif
 
 
 /**
@@ -88,16 +91,19 @@ class GT24L24A2Y_Reader
          */
         int read(const struct font_layout_t& font, uint16_t glyph_id, char* buffer, uint16_t* actual_width);
         
-        /**
-         * @brief Dumps the flash content to the serial interface
-         * 
-         * @param serial Serial interface to use
-         * @param watchdog Callback to reset the watchdog
-         * 
-         * @return int success = 0
-         */
-        void dump(RawSerial& serial, Callback<void()> watchdog = nullptr);
+        #if DEVICE_SERIAL 
 
+            /**
+             * @brief Dumps the flash content to the serial interface
+             * 
+             * @param serial Serial interface to use
+             * @param watchdog Callback to reset the watchdog
+             * 
+             * @return int success = 0
+             */
+            void dump(RawSerial& serial, Callback<void()> watchdog = nullptr);
+
+        #endif
 
     protected:
         SPI _spi; //!< SPI device interface

@@ -64,31 +64,35 @@ int GT24L24A2Y_Reader::read_raw(uint32_t offset, uint16_t size, char* buffer)
     return (res == max((uint16_t)4, size))? 0 : 2;
 }
 
-void GT24L24A2Y_Reader::dump(RawSerial& serial, Callback<void()> watchdog)
-{
-    while(true)
-    {
-        // Wait for "d" command
-        while(serial.getc() != 0x64) 
-        {
-            if(watchdog != nullptr) watchdog();
-            ThisThread::sleep_for(100);
-        }
+#if DEVICE_SERIAL
 
-        // Dump whole 2MB
-        uint32_t offset;
-        char buffer[255];
-        for(offset = 0; offset < 0x1FFFFF; offset += 255)
+    void GT24L24A2Y_Reader::dump(RawSerial& serial, Callback<void()> watchdog)
+    {
+        while(true)
         {
-            // 255 byte chunks
-            read_raw(offset, 255, buffer);
-            for(uint8_t j = 0; j < 255; j++) serial.putc(buffer[j]);
+            // Wait for "d" command
+            while(serial.getc() != 0x64) 
+            {
+                if(watchdog != nullptr) watchdog();
+                ThisThread::sleep_for(100);
+            }
+
+            // Dump whole 2MB
+            uint32_t offset;
+            char buffer[255];
+            for(offset = 0; offset < 0x1FFFFF; offset += 255)
+            {
+                // 255 byte chunks
+                read_raw(offset, 255, buffer);
+                for(uint8_t j = 0; j < 255; j++) serial.putc(buffer[j]);
+                if(watchdog != nullptr) watchdog();
+            }
+            // The rest
+            uint32_t rest_size = 0x1FFFFF - offset;
+            read_raw(offset, rest_size, buffer);
+            for(uint8_t j = 0; j < rest_size; j++) serial.putc(buffer[j]);
             if(watchdog != nullptr) watchdog();
         }
-        // The rest
-        uint32_t rest_size = 0x1FFFFF - offset;
-        read_raw(offset, rest_size, buffer);
-        for(uint8_t j = 0; j < rest_size; j++) serial.putc(buffer[j]);
-        if(watchdog != nullptr) watchdog();
     }
-}
+
+#endif

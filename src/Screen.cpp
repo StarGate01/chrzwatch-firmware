@@ -18,8 +18,8 @@ Screen::Screen():
     bleStatus(false),
     bleEncStatus(false),
     lcd(PIN_LCD_SDA, NC, PIN_LCD_SCL, PIN_LCD_CS, PIN_LCD_DC, PIN_LCD_RESET),
-    _display_guard(1),
-    _font_reader(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_FONT_CS)
+    _display_guard(1)
+    // _font_reader(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_FONT_CS)
 {
     _display_guard.acquire();
 

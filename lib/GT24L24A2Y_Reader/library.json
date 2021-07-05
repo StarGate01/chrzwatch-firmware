@@ -1,6 +1,6 @@
 {
     "name": "GT24L24A2Y_Reader",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "keywords": "GT24L24A2Y, font, rom, spi, flash",
     "description": "Standard dot matrix Chinese and foreign languages chip GT24L24A2Y read-only driver.",
     "authors":

@@ -16,7 +16,7 @@
 #include <rtos.h>
 
 #include <Adafruit_ST7735_Mini.h>
-#include <GT24L24A2Y_Reader.h>
+// #include <GT24L24A2Y_Reader.h>
 
 #include "HardwareConfiguration.h"
 #include "CurrentTimeService.h"
@@ -60,7 +60,7 @@ class Screen
 
     protected:
         Semaphore _display_guard; //!< Serialize display bus access
-        GT24L24A2Y_Reader _font_reader; //!< Font ROM interface
+        // GT24L24A2Y_Reader _font_reader; //!< Font ROM interface
 
 };
 
