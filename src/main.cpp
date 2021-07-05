@@ -7,8 +7,6 @@
  */
 
 #include <mbed.h>
-
-
 #include <events/mbed_events.h>
 #include "CoreService.h"
 
@@ -18,7 +16,6 @@
 #else
     #include "ble/BLE.h"
 #endif
-
 
 
 #if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
@@ -48,12 +45,18 @@
 
 static events::EventQueue event_queue(16 * EVENTS_EVENT_SIZE); //!< The main event queue for dispatching events
 
+
 #if defined(FLASHDUMP)
 
     static GT24L24A2Y_Reader flash(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_FONT_CS); //!< Font rom interface
 
-    static RawSerial serial(PIN_TX, PIN_RX, 115200); //!< Serial port interface
+    static RawSerial serial(PIN_TX, PIN_RX, 921600); //!< Serial port interface
 
+    /**
+     * @brief Main entrypoint for flash dumping
+     * 
+     * @return int Return error code
+     */
     int main()
     {
         CoreService::initWatchdog();
@@ -62,7 +65,6 @@ static events::EventQueue event_queue(16 * EVENTS_EVENT_SIZE); //!< The main eve
     }
 
 #else
-
    
     /**
      * @brief Dispatches BLE events to non-interrupt space

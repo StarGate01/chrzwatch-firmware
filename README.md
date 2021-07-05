@@ -117,7 +117,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 - General: https://lcsc.com/product-detail/_Gotop-GT24L24A2Y_C124690.html
 - Datasheet: https://datasheet.lcsc.com/szlcsc/1912111436_Gotop-GT24L24A2Y_C124690.pdf
 - Map: https://github.com/RichardBsolut/GT24L24A2Y
-- Driver: Mbed SPI and Mbed GPIO
+- Driver: Mbed SPI and Mbed GPIO (But currently unused)
 
 </details>
 
@@ -257,12 +257,6 @@ $ nrfjprog -f nrf52 ...
 
 The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (default: CMSIS-DAP) to program the chip. This can be changed in the `platformio.ini` file.
 
-### Dumping the Font ROM
-
-Disassemble your watch and connect the `TX` and `RX` testpoints to the corresponding pins of a Serial-to-USB converter. Connect power and ground of the USB plug to the `5V` and `GND` pins of the converter.
-
-Next, remove `"SERIAL", "SERIAL_ASYNCH", "SERIAL_FC"` from `mbed_app.json` and compile and upload the firmware using the `i6hrc_flashdump` environment. Then, launch the script `tools/flash.dump.py`. The content of the flash will be downloaded to `dump.bin`. However, on some models I noticed the flash memory to be empty.
-
 #### Troubleshooting
 
 Unfortunatly, the SWD `RESET` line is not easily accessible. However, shorting `SWDCLK` to `VCC` triggers a debug init halt as well.
@@ -272,6 +266,12 @@ If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop
 The script `tools/reset.sh` or the task "Reset Target" automates this spamming, waiting for you to press the reset button.
 
 Optionally, append `-c "reset halt"` to the OpenOCD command. The chip then halts at the first instruction, which may be good for debugging.
+
+### Dumping the Font ROM
+
+Disassemble your watch and connect the `TX` and `RX` testpoints to the corresponding pins of a Serial-to-USB converter. Connect power and ground of the USB plug to the `5V` and `GND` pins of the converter.
+
+Next, remove `"SERIAL", "SERIAL_ASYNCH", "SERIAL_FC"` from `mbed_app.json` and compile and upload the firmware using the `i6hrc_flashdump` environment. Then, launch the script `tools/flash.dump.py`. The content of the flash will be downloaded to `dump.bin`. However, on some models I noticed the flash memory to be empty.
 
 ## Connecting to a phone
 
@@ -315,7 +315,7 @@ Please note that while most code in this repository may be licensed under the te
    - Added an explicit dependency to `Adafruit_GFX` port, see above
  - The `UnsafeI2C` library (https://platformio.org/lib/show/12500/UnsafeI2C) is a wrapper for the existing Mbed I2C library
    - Removed threadsafe mutex
- - The `GT24L24A2Y` library (TBA) is a driver for the font chip of the same name
+ - The `GT24L24A2Y` library (Unpublished, unfinished) is a driver for the font chip of the same name
    - Initial implementation
  - The `Heartrate3_AFE4404` library (https://platformio.org/lib/show/11099/Heartrate3_AFE4404) is based on the library and example code of `Click_Heartrate3_AFE4404` by *MikroElektronika* / *Corey Lakey*: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
    - Added Mbed integration
