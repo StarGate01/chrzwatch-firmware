@@ -27,7 +27,7 @@
 #define ALERT_VIBRATION_LENGTH  200 
 
 #define ACC_MOTION_TRESHOLD_16  8  //!< Motion detection threshold in 1/16 g
-#define ACC_MOTION_DURATION_50  10  //!< Motion detection time window in 1/50 s
+#define ACC_MOTION_DURATION_50  25  //!< Motion detection time window in 1/50 s
 #define STEP_LENGTH_CM          75  //!< Step distance used for speed estimate
 #define CADENCE_RUNNING_TRESH   120 //!< Minimum step cadence for running
 

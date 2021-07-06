@@ -48,7 +48,7 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     _acc_kx123.set_int1_interrupt_reason(KX122_MOTION_INTERRUPT); // Route interrupt source
     _acc_irq.fall(callback(this, &SensorService::_handleAccIRQ)); // Attach interrupt handler
     _acc_kx123.start_measurement_mode();
-    rsc_measurement.instantaneous_stride_length = STEP_LENGTH_CM; // Fixed value for now. TODO: make user configurable
+    rsc_measurement.instantaneous_stride_length = STEP_LENGTH_CM * 2; // Fixed value for now. TODO: make user configurable
 
     // Handle dispatching events
     _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::_poll);
@@ -140,6 +140,7 @@ void SensorService::_handleAccIRQ()
     _acc_kx123.get_interrupt_reason(&reason);
     if(reason == e_interrupt_reason::KX122_MOTION_INTERRUPT) 
     {
+        // TODO: Ignore when vibration is on
         _motion_count++;
         rsc_measurement.total_steps++;
     }
