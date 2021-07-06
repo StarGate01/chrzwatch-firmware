@@ -8,6 +8,7 @@
 
 #include "CoreService.h"
 
+#define RSCFF RunningSpeedAndCadenceService::RSCFeatureFlags
 CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _event_queue(event_queue),
     _connected(false),
@@ -18,6 +19,9 @@ CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _ble_bat_service(ble, 0),
     _ble_time_service(ble, event_queue),
     _ble_alert_service(ble),
+    _ble_rsc_service(ble, (RSCFF)(
+        RSCFF::INSTANTANEOUS_STRIDE_LENGTH_MEASUREMENT_SUPPORTED | 
+        RSCFF::TOTAL_DISTANCE_MEASUREMENT_SUPPORTED)),
     _display_service(_sensor_service, _ble_time_service, event_queue),
     _sensor_service(_display_service, event_queue)
 { 
@@ -41,7 +45,10 @@ void CoreService::start()
 
     // Setup and start ble and watchdog queue
     _event_queue.call_every(SENSOR_FREQUENCY, this, &CoreService::doUpdateGATT);
-    _event_queue.call_every(15000, CoreService::kickWatchdog);
+    _event_queue.call_every(15000, CoreService::kickWatchdog); // 15 sec kick leaves 5 sec headroom
+
+    // Sensor service measures once in constructor, so update gatt at start
+    doUpdateGATT();
 }
 
 void CoreService::initWatchdog()

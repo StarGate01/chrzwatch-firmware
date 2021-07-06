@@ -15,7 +15,8 @@ ImmediateAlertService::ImmediateAlertService(BLE &ble):
         _valueBytes, UUID_ALERT_LEVEL_CHAR_VALUE_SIZE, UUID_ALERT_LEVEL_CHAR_VALUE_SIZE,
             GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE_WITHOUT_RESPONSE)
 {
-    memset(_valueBytes, 0, sizeof(uint8_t)*UUID_ALERT_LEVEL_CHAR_VALUE_SIZE);
+    // Setup buffers
+    memset(_valueBytes, 0, UUID_ALERT_LEVEL_CHAR_VALUE_SIZE);
 
     // Setup BLE service definition
     GattCharacteristic *charsTable[] = { &_immediateAlertCharacteristic };

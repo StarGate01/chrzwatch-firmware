@@ -23,6 +23,7 @@
 
 #include <CurrentTimeService.h>
 #include <ImmediateAlertService.h>
+#include <RunningSpeedAndCadence.h>
 
 #include "HardwareConfiguration.h"
 #include "SensorService.h"
@@ -84,6 +85,7 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
         BatteryService _ble_bat_service; //!< BLE battery service
         CurrentTimeService _ble_time_service; //!< BLE current time service
         ImmediateAlertService _ble_alert_service; //!< BLE immediate alert service
+        RunningSpeedAndCadenceService _ble_rsc_service; //!< BLE running speed and cadence service
 
         DisplayService _display_service; //!< Display subsystem
         SensorService _sensor_service; //!< Sensor subsystem

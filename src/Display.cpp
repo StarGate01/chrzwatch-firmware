@@ -82,8 +82,8 @@ void DisplayService::render()
         screen.batteryRaw = _sensor_service.getBatteryRaw();
         screen.batteryCharging = _sensor_service.getBatteryCharging();
         screen.heartrate = _sensor_service.getHRValue();
-        screen.stepsCadence = _sensor_service.getStepsCadence();
-        screen.stepsTotal = _sensor_service.getStepsTotal();
+        screen.stepsCadence = _sensor_service.rsc_measurement.instantaneous_cadence;
+        screen.stepsTotal = _sensor_service.rsc_measurement.total_steps;
         screen.render();
     }
 }

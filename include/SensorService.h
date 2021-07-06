@@ -18,14 +18,18 @@
 #include <UnsafeI2C.h>
 
 #include <Heartrate3_AFE4404.h>
+#include <RunningSpeedAndCadence.h>
 
 
 #define POLL_FREQUENCY          100
 #define BUTTON_VIBRATION_LENGTH 75
 #define BUTTON_DEBOUNCE         200
 #define ALERT_VIBRATION_LENGTH  200 
-#define ACC_MOTION_TRESHOLD_16  24  //!< Motion detection threshold in 1/16 g
+
+#define ACC_MOTION_TRESHOLD_16  8  //!< Motion detection threshold in 1/16 g
 #define ACC_MOTION_DURATION_50  10  //!< Motion detection time window in 1/50 s
+#define STEP_LENGTH_CM          75  //!< Step distance used for speed estimate
+#define CADENCE_RUNNING_TRESH   120 //!< Minimum step cadence for running
 
 
 // Forward decalarations
@@ -77,23 +81,11 @@ class SensorService
         bool getBatteryCharging();
 
         /**
-         * @brief Get the steps cadence
-         * 
-         * @return uint8_t The cadence of the steps
-         */
-        uint8_t getStepsCadence();
-
-        /**
          * @brief Reevaluate steps cadence
          */
         void reevaluateStepsCadence();
 
-        /**
-         * @brief Get the total step count
-         * 
-         * @return uint32_t Step count
-         */
-        uint32_t getStepsTotal();
+        RunningSpeedAndCadenceService::RSCMeasurement_t rsc_measurement; //!< Running speed and cadence measurement
 
     protected:
         events::EventQueue& _event_queue; //!< Eventqueue for dispatch timer for polling
@@ -107,8 +99,6 @@ class SensorService
         uint8_t _hr_value; //!< The internal heartrate value
         uint8_t _motion_count; //!< The internal count of motion events
         uint64_t _motion_count_age; //<! Age of the motion count buffer
-        uint8_t _steps_cadence; //!< Computed steps cadence over the last minute
-        uint32_t _motion_count_total; //!< Number of total motions since boot
 
         InterruptIn _button1; //!< Button 1 input
         InterruptIn _button2; //!< Button 2 input

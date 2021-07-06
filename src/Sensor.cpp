@@ -48,6 +48,7 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     _acc_kx123.set_int1_interrupt_reason(KX122_MOTION_INTERRUPT); // Route interrupt source
     _acc_irq.fall(callback(this, &SensorService::_handleAccIRQ)); // Attach interrupt handler
     _acc_kx123.start_measurement_mode();
+    rsc_measurement.instantaneous_stride_length = STEP_LENGTH_CM; // Fixed value for now. TODO: make user configurable
 
     // Handle dispatching events
     _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::_poll);
@@ -78,22 +79,22 @@ bool SensorService::getBatteryCharging()
     return _charging_value;
 }
 
-uint8_t SensorService::getStepsCadence()
-{
-    return _steps_cadence;
-}
-
-uint32_t SensorService::getStepsTotal()
-{
-    return _motion_count_total;
-}
-
 void SensorService::reevaluateStepsCadence()
 {
     uint64_t now = get_ms_count();
     if(now - _motion_count_age > 60000) // 1 minute
     {
-        _steps_cadence = _motion_count;
+        rsc_measurement.instantaneous_cadence = _motion_count;
+        // Convert cm/min to 1/256*m/s
+        rsc_measurement.instantaneous_speed = (uint16_t)round(((float)(_motion_count * STEP_LENGTH_CM) / 6000.f) * 256.f);
+        // Convert cm to dm
+        rsc_measurement.total_distance = (rsc_measurement.total_steps * STEP_LENGTH_CM) / 10;
+        // Clear running flag and set it if needed
+        #define RSCF RunningSpeedAndCadenceService::RSCMeasurementFlags
+        rsc_measurement.flags = (RSCF)(
+            RSCF::INSTANTANEOUS_STRIDE_LENGTH_PRESENT | 
+            RSCF::TOTAL_DISTANCE_PRESENT |
+            ((_motion_count >= CADENCE_RUNNING_TRESH)? RSCF::RUNNING_NOT_WALKING : 0));
         _motion_count = 0;
         _motion_count_age = now;
     }
@@ -140,7 +141,7 @@ void SensorService::_handleAccIRQ()
     if(reason == e_interrupt_reason::KX122_MOTION_INTERRUPT) 
     {
         _motion_count++;
-        _motion_count_total++;
+        rsc_measurement.total_steps++;
     }
 
     // Clear the interrupt latch register

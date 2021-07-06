@@ -12,10 +12,10 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 - [x] Battery GATT profile
 - [x] Heartrate GATT profile
 - [x] Current time GATT profile
-- [ ] Steps & cadence GATT profile
-- [x] Immediate alert GATT
-- [ ] Text message GATT
-- [ ] Activity / sleep monitor GATT
+- [x] Steps & cadence GATT profile
+- [x] Immediate alert GATT profile
+- [ ] Text message GATT profile
+- [ ] Health activity / sleep monitor GATT profile
 - [x] Proper bonding support
 
 </details>
@@ -80,7 +80,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 
 - General: https://www.nordicsemi.com/Products/Low-power-short-range-wireless/nRF52832/Getting-started
 - Datasheet: https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.0.pdf
-- RTOS: https://os.mbed.com/ (V6.51401.0)
+- RTOS: https://os.mbed.com/ (V5.14.1)
 
 </details>
 

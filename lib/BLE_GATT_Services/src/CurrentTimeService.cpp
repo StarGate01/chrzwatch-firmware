@@ -23,7 +23,9 @@ CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue
     // rtc_init();
     // time_t now = rtc_read();
     // writeEpoch(now, false);
-    memset(_valueBytes, 0, sizeof(uint8_t)*BLE_CURRENT_TIME_CHAR_VALUE_SIZE);
+
+    // Setup buffers
+    memset(_valueBytes, 0, BLE_CURRENT_TIME_CHAR_VALUE_SIZE);
 
     // Setup BLE service definition
     GattCharacteristic *charsTable[] = { &_currentTimeCharacteristic };
