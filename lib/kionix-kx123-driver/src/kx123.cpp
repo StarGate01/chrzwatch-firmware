@@ -582,7 +582,7 @@ bool KX123::set_int2_interrupt_reason(uint8_t interrupt_reason)
 * Select axis that are monitored for motion detect interrupt.
 * @param xxyyzz combination of e_axis -values for enabling axis
 * @param wufc amount of ticks (in output data rate) condition has to be true before interrupt is raised
-* @param ath differential accelleration value in 1/16th g treshold before interrupt is raised
+* @param ath differential accelleration value in 1/16th g threshold before interrupt is raised
 * @param axis_and_combination_enabled true for AND or false for OR
 *
 * true for AND configuration = (XN || XP) && (YN || YP) && (ZN || ZP)
@@ -603,7 +603,7 @@ bool KX123::set_motion_detect_config(uint8_t xxyyzz, uint8_t wufc, uint8_t ath,
     //Set WUFC: Interrupt wake timer
     if(i2c_rw.write_register(_sad, KX122_WUFC, wufc)) return true;
 
-    //Set ATH: Wake-up treshold
+    //Set ATH: Wake-up threshold
     if(i2c_rw.write_register(_sad, KX122_ATH, ath)) return true;
 
     return false;
