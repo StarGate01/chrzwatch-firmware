@@ -127,7 +127,7 @@ public:
      * @param h Display height
      */
     Adafruit_ST7735_Mini(PinName mosi, PinName miso, PinName sck, PinName CS, PinName RS, PinName RST,
-                         int16_t w = ST7735_TFTWIDTH_80, int16_t h = ST7735_TFTHEIGHT_160);
+                        int frequency = 1000000, int16_t w = ST7735_TFTWIDTH_80, int16_t h = ST7735_TFTHEIGHT_160);
 
     /**
      * @brief Initializes a ST7735B type display

@@ -36,9 +36,10 @@ inline uint16_t swapcolor(uint16_t x)
 
 // Constructor
 Adafruit_ST7735_Mini::Adafruit_ST7735_Mini(PinName mosi, PinName miso, PinName sck, PinName cs, PinName rs, PinName rst,
-                                           int16_t w, int16_t h)
+                                           int frequency, int16_t w, int16_t h)
     : lcdPort(mosi, miso, sck), _cs(cs), _rs(rs), _rst(rst), Adafruit_GFX(w, h)
 {
+    lcdPort.frequency(frequency);
 }
 
 void Adafruit_ST7735_Mini::writecommand(uint8_t c)
