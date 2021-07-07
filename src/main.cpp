@@ -49,7 +49,6 @@ static events::EventQueue event_queue(16 * EVENTS_EVENT_SIZE); //!< The main eve
 #if defined(FLASHDUMP)
 
     static GT24L24A2Y_Reader flash(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_FONT_CS); //!< Font rom interface
-
     static RawSerial serial(PIN_TX, PIN_RX, 921600); //!< Serial port interface
 
     /**
@@ -66,12 +65,15 @@ static events::EventQueue event_queue(16 * EVENTS_EVENT_SIZE); //!< The main eve
 
 #else
    
+    static BLE& ble_handle = BLE::Instance(); // Get BLE Instance
+    static CoreService core(ble_handle, event_queue); // Setup core app
+
     /**
      * @brief Dispatches BLE events to non-interrupt space
      * 
      * @param context Callback context
      */
-    void schedule_ble_events(BLE::OnEventsToProcessCallbackContext *context) 
+    static void schedule_ble_events(BLE::OnEventsToProcessCallbackContext *context) 
     {
         event_queue.call(Callback<void()>(&context->ble, &BLE::processEvents));
     }
@@ -83,12 +85,8 @@ static events::EventQueue event_queue(16 * EVENTS_EVENT_SIZE); //!< The main eve
      */
     int main()
     {
-        // Get BLE Instance and setup BLE events to event queue handler
-        BLE &ble = BLE::Instance();
-        ble.onEventsToProcess(schedule_ble_events);
-
-        // Setup core app and start it
-        CoreService core(ble, event_queue);
+        // Setup BLE events to event queue handler and start core
+        ble_handle.onEventsToProcess(schedule_ble_events);
         core.start();
 
         // Dispatch events in main thread
