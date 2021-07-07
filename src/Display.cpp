@@ -95,6 +95,8 @@ void DisplayService::threadVibration()
         // Use mutex to collapse vibration requests
         _vibration_trigger.acquire();
         _vibrating = true;
+        // 10 ms grace buffer for other sensor
+        ThisThread::sleep_for(VIBRATION_GRACE_IN);
 #       if defined(PIN_VIBRATION_INVERT)
             _vibration = 0;
 #       else
@@ -106,6 +108,15 @@ void DisplayService::threadVibration()
 #       else
             _vibration = 0;
 #       endif
-        _vibrating = false;
+        // Wait for vibration to dampen, ensure 750 ms grace
+        if(_clearVibrationToken != 0) _event_queue.cancel(_clearVibrationToken);
+        _event_queue.call_in(VIBRATION_GRACE_OUT, this, &DisplayService::clearVibration);
+        
     }
+}
+
+void DisplayService::clearVibration()
+{
+    _vibrating = false;
+    _clearVibrationToken = 0;
 }

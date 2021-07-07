@@ -22,6 +22,10 @@
 #include "CurrentTimeService.h"
 
 
+#define LCD_TIMEOUT         5000 //!< LCD timeout in ms
+#define VIBRATION_GRACE_IN  10   //!< Sensor shutoff before vibration
+#define VIBRATION_GRACE_OUT 750  //!< Sensor restart grace after vibration
+
 // Forward decalarations
 class SensorService;
 
@@ -166,7 +170,8 @@ class DisplayService
         Thread _vibration_thread; //!< Thread for vibration duration
         Semaphore _vibration_trigger; //!< Interlock to trigger vibration
         uint16_t _vibration_duration; //!< Duration of the vibration in ms
-        bool _vibrating; //!< Indicates vibration state
+        volatile bool _vibrating; //!< Indicates vibration state - read in IRQ
+        int _clearVibrationToken; //!< Eventqueue token for indicator clearing timeout
 
         PwmOutLP _lcd_bl; //!< LCD backlight
         DigitalOut _lcd_pwr; //!< LCD power
@@ -178,6 +183,12 @@ class DisplayService
          * 
          */
         void threadVibration();
+
+        /**
+         * @brief Resets the vibration indicator
+         * 
+         */
+        void clearVibration();
 
 };
 

@@ -21,8 +21,7 @@
 #define PIN_LCD_PWR          P0_30
 #define LCD_COLSHIFT         0
 #define LCD_ROWSHIFT         0
-#define LCD_TIMEOUT          10000
-#define LCD_SPI_FREQ         8000000
+#define LCD_SPI_FREQ         8000000 //!< LCD SPI speed, 8Mhz is CPU max
 #define PIN_ACC_SDA          P0_3
 #define PIN_ACC_SCL          P0_2
 #define PIN_ACC_CS           P0_16
@@ -39,9 +38,7 @@
 #define PIN_FONT_MOSI        P0_8
 #define PIN_RX               P0_9
 #define PIN_TX               P0_10
-#define SENSOR_FREQUENCY     60000
-#define HR_DURATION          30000
-#define THREAD_SIZE          2048
+#define THREAD_SIZE          2048 //!< Child thread stack size in bytes
 
 #if defined(TARGET_VARIANT_I6HRC)
 #   define TARGET_VARIANT_NAME  u8"CHRZwatch I6HRC\0"

@@ -22,10 +22,11 @@
 #include <RunningSpeedAndCadence.h>
 
 
-#define POLL_FREQUENCY          100
-#define BUTTON_VIBRATION_LENGTH 75
-#define BUTTON_DEBOUNCE         200
-#define ALERT_VIBRATION_LENGTH  200 
+#define BUTTON_VIBRATION_LENGTH 75    //!< Button vibration feedback in ms
+#define BUTTON_DEBOUNCE         200   //!< Minimum time between button pressen in ms
+#define ALERT_VIBRATION_LENGTH  200   //!< Alert vibration length in ms
+#define SENSOR_FREQUENCY        60000 //!< Sensor measuring / reporting interval in ms
+#define HR_DURATION             30000 //!< Heartrate measurement interval in ms
 
 
 // Forward decalarations
