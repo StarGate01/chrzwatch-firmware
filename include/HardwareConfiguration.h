@@ -22,6 +22,7 @@
 #define LCD_COLSHIFT         0
 #define LCD_ROWSHIFT         0
 #define LCD_TIMEOUT          10000
+#define LCD_SPI_FREQ         8000000
 #define PIN_ACC_SDA          P0_3
 #define PIN_ACC_SCL          P0_2
 #define PIN_ACC_CS           P0_16
