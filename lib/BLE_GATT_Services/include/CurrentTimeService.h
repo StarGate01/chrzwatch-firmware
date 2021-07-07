@@ -61,7 +61,7 @@ class CurrentTimeService
          * 
          * @param second_notify The Notify callback
          */
-        void setMonotonicCallback(Callback<void(const time_t epoch)> second_notify);
+        void setMonotonicCallback(const Callback<void(const time_t epoch)>& second_notify);
 
         /**
          * @brief Sets the internal time using a date-time-stamp

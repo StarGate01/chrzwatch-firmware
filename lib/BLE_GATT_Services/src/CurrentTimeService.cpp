@@ -29,15 +29,15 @@ CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue
 
     // Setup BLE service definition
     GattCharacteristic *charsTable[] = { &_currentTimeCharacteristic };
-    GattService currentTimeService(GattService::UUID_CURRENT_TIME_SERVICE, charsTable, sizeof(charsTable)/sizeof(GattCharacteristic*));
+    GattService currentTimeGATT(GattService::UUID_CURRENT_TIME_SERVICE, charsTable, 1);
 
     // Attach GATT server and timer events
-    _ble.gattServer().addService(currentTimeService);
+    _ble.gattServer().addService(currentTimeGATT);
     _ble.gattServer().onDataWritten(this, &CurrentTimeService::onDataWritten);
     _ticker.attach(_event_queue.event(this, &CurrentTimeService::onTickerCallback), 1.0);
 }
 
-void CurrentTimeService::setMonotonicCallback(Callback<void(const time_t epoch)> second_notify)
+void CurrentTimeService::setMonotonicCallback(const Callback<void(const time_t epoch)>& second_notify)
 {
     _second_notify = second_notify;
 }
@@ -137,7 +137,7 @@ void CurrentTimeService::onDataWritten(const GattWriteCallbackParams* params)
     if (params->handle == _currentTimeCharacteristic.getValueHandle()) 
     {
         // Blit the received update into the buffer
-        memcpy((void*)&_valueBytes, params->data, params->len);
+        memcpy((void*)&_valueBytes, params->data, min(params->len, (uint16_t)BLE_CURRENT_TIME_CHAR_VALUE_SIZE));
         writeBuffer(true);
     }
 }

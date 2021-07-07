@@ -39,7 +39,7 @@ class ImmediateAlertService
          * 
          * @param alertCallback Alert event callback 
          */
-        void setCallback(Callback<void(int)> alertCallback);
+        void setCallback(const Callback<void(int)>& alert_callback);
 
     protected:
         BLE& _ble; //!< Reference to the BLE instance
