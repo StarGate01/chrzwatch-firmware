@@ -16,6 +16,7 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 - [x] Immediate alert GATT profile
 - [ ] Text message GATT profile
 - [ ] Health activity / sleep monitor GATT profile
+- [x] User configuration GATT profile
 - [x] Proper bonding support
 
 </details>
@@ -52,6 +53,7 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 - [x] Graceful reboot on error
 - [x] Step detection algorithm
 - [x] Heartrate detection algorithm
+- [x] User configurable settings
 - [ ] Sleep / rest detection algorithm
 - [x] Basic UI
 - [ ] Fancy UI
@@ -70,6 +72,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 - [x] Step logging
 - [x] Sleep state logging
 - [x] Immediate alert on messages
+- [ ] User settings editor
 
 </details>
 
@@ -309,10 +312,12 @@ Please note that while most code in this repository may be licensed under the te
    - Exposed monotonic timer callback
  - The `Adafruit_GFX` library (https://platformio.org/lib/show/12501/Adafruit_GFX) is based on the library of the same name by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which in turn is a port of https://github.com/adafruit/Adafruit-GFX-Library
    - Added convenience bitmap functions
+   - Move font to .text
  - The `Adafruit_ST7735_Mini` library (https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini) is based on the `Adafruit_ST7735` library by *Andrew Lindsay*: https://platformio.org/lib/show/2150/Adafruit_ST7735, which in turn is a port of a library by Adafruit: https://github.com/adafruit/Adafruit-ST7735-Library
    - Added support for the `R_MINI160x80` display type
    - Added documentation
    - Added an explicit dependency to `Adafruit_GFX` port, see above
+   - Added SPI speed configuration
  - The `UnsafeI2C` library (https://platformio.org/lib/show/12500/UnsafeI2C) is a wrapper for the existing Mbed I2C library
    - Removed threadsafe mutex
  - The `GT24L24A2Y` library (Unpublished, unfinished) is a driver for the font chip of the same name
