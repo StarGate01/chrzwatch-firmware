@@ -72,7 +72,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 - [x] Step logging
 - [x] Sleep state logging
 - [x] Immediate alert on messages
-- [ ] User settings editor
+- [x] User settings editor
 
 </details>
 
