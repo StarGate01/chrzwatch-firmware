@@ -28,11 +28,11 @@ RunningSpeedAndCadenceService::RunningSpeedAndCadenceService(BLE& ble, enum RSCF
 
     // Setup BLE service definition
     GattCharacteristic *charsTable[] = { &_RSCMeasurementCharacteristic, &_RSCFeatureCharacteristic, &_SensorLocationCharacteristic };
-    GattService RunningSpeedAndCadenceService(GattService::UUID_RUNNING_SPEED_AND_CADENCE, charsTable, 
+    GattService RunningSpeedAndCadenceGATT(GattService::UUID_RUNNING_SPEED_AND_CADENCE, charsTable, 
         (featureFlags & RSCFeatureFlags::MULTIPLE_SENSOR_LOCATIONS_SUPPORTED)? 3:2); // Only add sensor location if feature is enabled
 
     // Attach GATT server
-    _ble.gattServer().addService(RunningSpeedAndCadenceService);
+    _ble.gattServer().addService(RunningSpeedAndCadenceGATT);
 
 }
 
