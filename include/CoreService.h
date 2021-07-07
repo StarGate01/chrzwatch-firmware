@@ -24,8 +24,10 @@
 #include <CurrentTimeService.h>
 #include <ImmediateAlertService.h>
 #include <RunningSpeedAndCadence.h>
+#include <CustomSettings.h>
 
 #include "HardwareConfiguration.h"
+#include "UserSettings.h"
 #include "SensorService.h"
 #include "DisplayService.h"
 
@@ -80,12 +82,14 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
         BLE& _ble; //!< Reference to the BLE instance
         uint8_t _adv_buffer[ble::LEGACY_ADVERTISING_MAX_SIZE]; //!< BLE GAP advertising buffer
         ble::AdvertisingDataBuilder _adv_data_builder; //!< BLE GAP factory
+        struct user_settings_t _settings; //!< User settings
 
         HeartRateService _ble_hr_service; //!< BLE heartrate service
         BatteryService _ble_bat_service; //!< BLE battery service
         CurrentTimeService _ble_time_service; //!< BLE current time service
         ImmediateAlertService _ble_alert_service; //!< BLE immediate alert service
         RunningSpeedAndCadenceService _ble_rsc_service; //!< BLE running speed and cadence service
+        CustomSettingsService<user_settings_t> _ble_settings_service; //!< BLE custom settings service
 
         DisplayService _display_service; //!< Display subsystem
         SensorService _sensor_service; //!< Sensor subsystem
@@ -139,13 +143,19 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
          */
         void onAlert(int level);
 
-
         /**
          * @brief Callback handler for monotonic time events
          * 
          * @param epoch Current time
          */
         void onMonotonic(const time_t epoch);
+
+        /**
+         * @brief Callback handler for settings update
+         * 
+         * @param settings New settings
+         */
+        void onUpdateSettings(const struct user_settings_t& settings);
 
 };
 

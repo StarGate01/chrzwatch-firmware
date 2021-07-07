@@ -12,6 +12,7 @@
 #include <mbed.h>
 #include <events/mbed_events.h>
 #include "HardwareConfiguration.h"
+#include "UserSettings.h"
 
 #include <RegisterWriter.h>
 #include <kx123.h>
@@ -25,11 +26,6 @@
 #define BUTTON_VIBRATION_LENGTH 75
 #define BUTTON_DEBOUNCE         200
 #define ALERT_VIBRATION_LENGTH  200 
-
-#define ACC_MOTION_TRESHOLD_16  8  //!< Motion detection threshold in 1/16 g
-#define ACC_MOTION_DURATION_50  25  //!< Motion detection time window in 1/50 s
-#define STEP_LENGTH_CM          75  //!< Step distance used for speed estimate
-#define CADENCE_RUNNING_TRESH   120 //!< Minimum step cadence for running
 
 
 // Forward decalarations
@@ -85,6 +81,13 @@ class SensorService
          */
         void reevaluateStepsCadence();
 
+        /**
+         * @brief Updates the sensor user settings
+         * 
+         * @param settings New settings
+         */
+        void updateUserSettings(const struct user_sensor_settings_t& settings);
+
         RunningSpeedAndCadenceService::RSCMeasurement_t rsc_measurement; //!< Running speed and cadence measurement
 
     protected:
@@ -99,6 +102,7 @@ class SensorService
         uint8_t _hr_value; //!< The internal heartrate value
         uint8_t _motion_count; //!< The internal count of motion events
         uint64_t _motion_count_age; //<! Age of the motion count buffer
+        struct user_sensor_settings_t _settings; //!< User settings cache
 
         InterruptIn _button1; //!< Button 1 input
         InterruptIn _button2; //!< Button 2 input
@@ -115,6 +119,7 @@ class SensorService
         Heartrate3_AFE4404 _hr; //!< Access to heartrate sensor
         DigitalOut _hr_pwr; //!< Power pin of the heartrate sensor
 
+        void _setupAccellerationSensor(); //!< Initializes the accelleration sensor
         void _poll(); //!< Begin to read all sensors
         void _finishPoll(); //!< Called after sensor reading is complete
 

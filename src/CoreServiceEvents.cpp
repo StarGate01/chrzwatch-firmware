@@ -51,12 +51,20 @@ void CoreService::onAlert(int level)
 {
     if(level > 0)
     {
-        _display_service.vibrate(ALERT_VIBRATION_LENGTH);
+        _display_service.vibrate(ALERT_VIBRATION_LENGTH * level);
     }
 }
 
 void CoreService::onMonotonic(const time_t epoch)
 {
     _sensor_service.reevaluateStepsCadence();
-    _display_service.render(); // Only renders if display is on
+    _display_service.render();
+}
+
+void CoreService::onUpdateSettings(const struct user_settings_t& settings)
+{
+    _settings = settings;
+    _sensor_service.updateUserSettings(_settings.sensor);
+    _display_service.render();
+    _display_service.vibrate(ALERT_VIBRATION_LENGTH);
 }

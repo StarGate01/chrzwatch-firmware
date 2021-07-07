@@ -22,6 +22,7 @@ CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _ble_rsc_service(ble, (RSCFF)(
         RSCFF::INSTANTANEOUS_STRIDE_LENGTH_MEASUREMENT_SUPPORTED | 
         RSCFF::TOTAL_DISTANCE_MEASUREMENT_SUPPORTED)),
+    _ble_settings_service(ble),
     _display_service(_sensor_service, _ble_time_service, event_queue),
     _sensor_service(_display_service, event_queue)
 { 
@@ -29,6 +30,8 @@ CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _display_service.setBLEEncStatusPtr(&_encrypted);
     _ble_alert_service.setCallback(callback(this, &CoreService::onAlert));
     _ble_time_service.setMonotonicCallback(callback(this, &CoreService::onMonotonic));
+    _ble_settings_service.setCallback(callback(this, &CoreService::onUpdateSettings));
+    _ble_settings_service.updateSettings(_settings);
 }
 
 CoreService::~CoreService()

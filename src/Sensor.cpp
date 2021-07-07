@@ -40,15 +40,8 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     // Setup acceleration sensor
     _acc_addr.write(1);
     _acc_cs.write(1);
-    _acc_kx123.soft_reset();
-    _acc_kx123.set_config(KX122_ODCNTL_OSA_50, KX122_CNTL1_GSEL_2G, true, false, true); // 50Hz data rate default output, 2g range
-    _acc_kx123.set_cntl3_odrs(0xff, 0xff, KX122_CNTL3_OWUF_50); // 50Hz data rate for motion engine
-    _acc_kx123.set_motion_detect_config(KX122_INC2_WUE_MASK, ACC_MOTION_DURATION_50, ACC_MOTION_TRESHOLD_16); // All axes
-    _acc_kx123.int1_setup(0, true, false, false, false, false); // Latch interrupt 1, active low
-    _acc_kx123.set_int1_interrupt_reason(KX122_MOTION_INTERRUPT); // Route interrupt source
     _acc_irq.fall(callback(this, &SensorService::_handleAccIRQ)); // Attach interrupt handler
-    _acc_kx123.start_measurement_mode();
-    rsc_measurement.instantaneous_stride_length = STEP_LENGTH_CM * 2; // Fixed value for now. TODO: make user configurable
+    _setupAccellerationSensor();
 
     // Handle dispatching events
     _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::_poll);
@@ -86,18 +79,36 @@ void SensorService::reevaluateStepsCadence()
     {
         rsc_measurement.instantaneous_cadence = _motion_count;
         // Convert cm/min to 1/256*m/s
-        rsc_measurement.instantaneous_speed = (uint16_t)round(((float)(_motion_count * STEP_LENGTH_CM) / 6000.f) * 256.f);
+        rsc_measurement.instantaneous_speed = (uint16_t)round(((float)(_motion_count * _settings.step_length) / 6000.f) * 256.f);
         // Convert cm to dm
-        rsc_measurement.total_distance = (rsc_measurement.total_steps * STEP_LENGTH_CM) / 10;
+        rsc_measurement.total_distance = (rsc_measurement.total_steps * _settings.step_length) / 10;
         // Clear running flag and set it if needed
         #define RSCF RunningSpeedAndCadenceService::RSCMeasurementFlags
         rsc_measurement.flags = (RSCF)(
             RSCF::INSTANTANEOUS_STRIDE_LENGTH_PRESENT | 
             RSCF::TOTAL_DISTANCE_PRESENT |
-            ((_motion_count >= CADENCE_RUNNING_TRESH)? RSCF::RUNNING_NOT_WALKING : 0));
+            ((_motion_count >= _settings.cadence_running_thresh)? RSCF::RUNNING_NOT_WALKING : 0));
         _motion_count = 0;
         _motion_count_age = now;
     }
+}
+
+void SensorService::updateUserSettings(const struct user_sensor_settings_t& settings)
+{
+    _settings = settings;
+    _setupAccellerationSensor();
+    rsc_measurement.instantaneous_stride_length = _settings.step_length * 2;
+}
+
+void SensorService::_setupAccellerationSensor()
+{   
+    _acc_kx123.soft_reset();
+    _acc_kx123.set_config(KX122_ODCNTL_OSA_50, KX122_CNTL1_GSEL_2G, true, false, true); // 50Hz data rate default output, 2g range
+    _acc_kx123.set_cntl3_odrs(0xff, 0xff, KX122_CNTL3_OWUF_50); // 50Hz data rate for motion engine
+    _acc_kx123.set_motion_detect_config(KX122_INC2_WUE_MASK, _settings.motion_duration, _settings.motion_threshold); // All axes
+    _acc_kx123.int1_setup(0, true, false, false, false, false); // Latch interrupt 1, active low
+    _acc_kx123.set_int1_interrupt_reason(KX122_MOTION_INTERRUPT); // Route interrupt source
+    _acc_kx123.start_measurement_mode();
 }
 
 void SensorService::_poll()
@@ -140,9 +151,12 @@ void SensorService::_handleAccIRQ()
     _acc_kx123.get_interrupt_reason(&reason);
     if(reason == e_interrupt_reason::KX122_MOTION_INTERRUPT) 
     {
-        // TODO: Ignore when vibration is on
-        _motion_count++;
-        rsc_measurement.total_steps++;
+        // Dont count any vibration induced events
+        if(!_display_service.getVibration())
+        {
+            _motion_count++;
+            rsc_measurement.total_steps++;
+        }
     }
 
     // Clear the interrupt latch register

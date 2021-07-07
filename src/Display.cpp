@@ -66,9 +66,9 @@ void DisplayService::vibrate(uint16_t duration)
     _vibration_trigger.release(); // Returns even if token is already released
 }
 
-uint16_t DisplayService::getVibrationDuration()
+bool DisplayService::getVibration()
 {
-    return _vibration_duration;
+    return _vibrating;
 }
 
 void DisplayService::render()
@@ -94,6 +94,7 @@ void DisplayService::threadVibration()
     {
         // Use mutex to collapse vibration requests
         _vibration_trigger.acquire();
+        _vibrating = true;
 #       if defined(PIN_VIBRATION_INVERT)
             _vibration = 0;
 #       else
@@ -105,5 +106,6 @@ void DisplayService::threadVibration()
 #       else
             _vibration = 0;
 #       endif
+        _vibrating = false;
     }
 }

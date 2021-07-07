@@ -113,11 +113,11 @@ class DisplayService
         void vibrate(uint16_t duration);
 
         /**
-         * @brief Get the Vibration Duration
+         * @brief Get the Vibration
          * 
-         * @return uint16_t duration of the last vibration or zero if not vibrating
+         * @return bool true if vibrating
          */
-        uint16_t getVibrationDuration();
+        bool getVibration();
 
         /**
          * @brief Render the internal state to the LCD display
@@ -166,6 +166,7 @@ class DisplayService
         Thread _vibration_thread; //!< Thread for vibration duration
         Semaphore _vibration_trigger; //!< Interlock to trigger vibration
         uint16_t _vibration_duration; //!< Duration of the vibration in ms
+        bool _vibrating; //!< Indicates vibration state
 
         PwmOutLP _lcd_bl; //!< LCD backlight
         DigitalOut _lcd_pwr; //!< LCD power
