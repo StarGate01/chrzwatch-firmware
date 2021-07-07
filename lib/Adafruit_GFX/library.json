@@ -1,6 +1,6 @@
 {
     "name": "Adafruit_GFX",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "keywords": "gfx, lcd, tft",
     "description": "A first port of the excellent Adafruit GFX library, with some tweaks for font ROM data",
     "authors":
