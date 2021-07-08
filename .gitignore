@@ -20,9 +20,6 @@ fp-info-cache
 *.dsn
 *.ses
 
-# Exported BOM files
-*.xml
-
 # PlatformIO 
 .pio
 .vscode/.browse.c_cpp.db*
