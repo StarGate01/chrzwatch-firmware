@@ -116,7 +116,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 </details>
 
 <details>
-<summary>Font ROM: GT24L24A2Y</summary>
+<summary>Font Flash: GT24L24A2Y, 2MB storage, top 4KB user writeable</summary>
 
 - General: https://lcsc.com/product-detail/_Gotop-GT24L24A2Y_C124690.html
 - Datasheet: https://datasheet.lcsc.com/szlcsc/1912111436_Gotop-GT24L24A2Y_C124690.pdf
@@ -179,9 +179,9 @@ Install or compile **Fontedit** (https://github.com/ayoy/fontedit) to edit the b
 
 Disassemble the watch and solder the `SWCLK` and `SWDIO` testpoints to the unused inner two USB data lines like shown in this video: https://www.youtube.com/watch?v=0Fu-VSuKHEg . Verify that the PCB actually contains a `NRF52832` IC, and not an off-brand `HS6620D` IC.
 
-You might want to fabricate a custom SWD via USB to ISP adapter, link shown in the schematic below (KiCAD schematic is available in `schematics/swd-usb-adapter`). You can still charge the watch using any USB A compliant charger or port.
+You might want to fabricate a custom SWD via USB to ISP adapter, link shown in the schematic below (KiCAD schematic is available in `doc/schematics/swd-usb-adapter`). You can still charge the watch using any USB A compliant charger or port.
 
-<img src="https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/schematics/swd-usb-adapter/swd-usb-adapter_schematic2.jpg" height="400">
+<img src="https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/docs/schematics/swd-usb-adapter/swd-usb-adapter_schematic2.jpg" height="400">
 
 ### Dumping the stock firmware
 
@@ -362,6 +362,7 @@ All modified libraries have been or will be published to https://platformio.org 
    - Added interrupt configuration functionality
    - Added motion detecting functionality
    - Fixed include paths
+   - Add tilt detecting feature
    - *License: Apache 2.0*
  - The `RegisterWriter` library (https://platformio.org/lib/show/11100/RegisterWriter) is based on the library of the same name by *Rohm* / *Mikko Koivunen*: https://platformio.org/lib/show/10695/RegisterWriter
    - Adapted to Mbed 5
