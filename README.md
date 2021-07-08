@@ -54,6 +54,7 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 - [x] Step detection algorithm
 - [x] Heartrate detection algorithm
 - [x] User configurable settings
+- [x] High-speed LCD drawing
 - [ ] Sleep / rest detection algorithm
 - [x] Basic UI
 - [ ] Fancy UI
@@ -88,7 +89,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 </details>
 
 <details>
-<summary>Display: 0.96 inch LCD with ST7735 driver IC</summary>
+<summary>Display: 0.96 inch, 80x160 pixel LCD with ST7735 driver IC</summary>
 
 - Datasheet: https://www.displayfuture.com/Display/datasheet/controller/ST7735.pdf
 - Driver: https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini via Mbed SPI
@@ -170,7 +171,9 @@ Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i
 
 Install the `patch` command line utility, this might ship with `git`, depending on your distribution.
 
-Install and use `doxygen` or the "Build Documentation" task to generate documentation.
+Install and use **Doxygen** or the "Build Documentation" task to generate documentation.
+
+Install or compile **Fontedit** (https://github.com/ayoy/fontedit) to edit the bitmap fonts (MSB first).
 
 ### Modifying an I6HRC watch
 
@@ -293,47 +296,72 @@ Thanks to *Aaron Christophel* for providing instructions on how to modify the ha
  - https://www.mikrocontroller.net/topic/467136
  - https://www.youtube.com/watch?v=0Fu-VSuKHEg
 
-## Library credits, modifications and licensing
+## Third-party credits, modifications and licensing
 
-Hot-patches can be found in this repository under `/patch`.
+
+Please note that while most code in this repository is licensed under the terms of the GPL3 license, this explicitly does not apply to the libraries contained in `/lib`, fonts in `/res/fonts`, and patches in `/patch`. All these documents have their own license attached.
+
+### Fonts
+
+Fonts can be found in `/res/fonts`.
+
+ - Adafruit standard ascii 5x7 (https://platformio.org/lib/show/12501/Adafruit_GFX) 
+   - *License: Apache 2.0*
+ - Google Roboto Mono Bold 48pt (https://fonts.google.com/specimen/Roboto)
+   - Selected subset of glyphs
+   - *License: Apache 2.0*
+
+### Patches
+
+Patches to Mbed can be found in `/patch`.
 
 - ARM Mbed RTOS and API: https://os.mbed.com/
-   - Hot-patch Nordic BLE driver to support deep sleep
-   - Hot-patch NRF52 linker memory map to support crash dump retention
+  - Hot-patch Nordic BLE driver to support deep sleep
+  - Hot-patch NRF52 linker memory map to support crash dump retention
+  - *License: Custom - see https://github.com/ARMmbed/mbed-os/blob/master/LICENSE.md*
 
-All modified libraries have been or will be published to https://platformio.org , their source code can be found in this repository under `/lib`.
+### Libraries
 
-Please note that while most code in this repository may be licensed under the term of the GPL3 license, this explicitly does not apply to the libraries contained in `/lib`. All these libraries have their own license attached.
+All modified libraries have been or will be published to https://platformio.org , their source code can be found in `/lib`.
 
  - The `CurrentTimeService` module of the `BLE_GATT_Services` library (https://platformio.org/lib/show/7372/BLE_GATT_Services) is based on `BLE_CurrentTimeService` by *Takehisa Oneta*: https://os.mbed.com/users/ohneta/code/BLE_CurrentTimeService/
    - Deferred calls in ISR context to EventQueue
    - Added documentation
    - Added LOW_POWER macro (default 1) to use a low-power ticker.
    - Exposed monotonic timer callback
+   - *License: GPLv3*
  - The `Adafruit_GFX` library (https://platformio.org/lib/show/12501/Adafruit_GFX) is based on the library of the same name by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which in turn is a port of https://github.com/adafruit/Adafruit-GFX-Library
-   - Added convenience bitmap functions
+   - Added buffered high-speed drawing functions
    - Move font to .text
+   - *License: Apache 2.0*
  - The `Adafruit_ST7735_Mini` library (https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini) is based on the `Adafruit_ST7735` library by *Andrew Lindsay*: https://platformio.org/lib/show/2150/Adafruit_ST7735, which in turn is a port of a library by Adafruit: https://github.com/adafruit/Adafruit-ST7735-Library
    - Added support for the `R_MINI160x80` display type
    - Added documentation
    - Added an explicit dependency to `Adafruit_GFX` port, see above
    - Added SPI speed configuration
+   - Added high-speed buffered drawing functions
+   - *License: Apache 2.0*
  - The `UnsafeI2C` library (https://platformio.org/lib/show/12500/UnsafeI2C) is a wrapper for the existing Mbed I2C library
    - Removed threadsafe mutex
- - The `GT24L24A2Y` library (Unpublished, unfinished) is a driver for the font chip of the same name
+   - *License: Apache 2.0*
+ - The `GT24L24A2Y_Reader` library (Unpublished, unfinished) is a driver for the font chip of the same name
    - Initial implementation
+   - *License: GPLv3*
  - The `Heartrate3_AFE4404` library (https://platformio.org/lib/show/11099/Heartrate3_AFE4404) is based on the library and example code of `Click_Heartrate3_AFE4404` by *MikroElektronika* / *Corey Lakey*: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
    - Added Mbed integration
    - Added interrupt handling
    - Added power down/up functionality
    - Added an explicit dependency to `UnsafeI2C`, see above
+   - *License: GPLv2*
  - The `kionix-kx123-driver` library (https://platformio.org/lib/show/11101/kionix-kx123-driver) is based on the library of the same name by *Rohm*: https://platformio.org/lib/show/3975/kionix-kx123-driver
    - Adapted to Mbed 5
    - Added interrupt configuration functionality
    - Added motion detecting functionality
    - Fixed include paths
+   - *License: Apache 2.0*
  - The `RegisterWriter` library (https://platformio.org/lib/show/11100/RegisterWriter) is based on the library of the same name by *Rohm* / *Mikko Koivunen*: https://platformio.org/lib/show/10695/RegisterWriter
    - Adapted to Mbed 5
    - Fixed include paths
    - Fixed default pins
    - Added an explicit dependency to `UnsafeI2C`, see above
+   - *License: Apache 2.0*
