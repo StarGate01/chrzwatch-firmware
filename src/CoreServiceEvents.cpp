@@ -58,13 +58,19 @@ void CoreService::onAlert(int level)
 void CoreService::onMonotonic(const time_t epoch)
 {
     _sensor_service.reevaluateStepsCadence();
-    _display_service.render();
+    if(_display_service.screen.getState() == Screen::ScreenState::STATE_CLOCK)
+    {
+        _display_service.render();
+    }
 }
 
 void CoreService::onUpdateSettings(const struct user_settings_t& settings)
 {
     _settings = settings;
     _sensor_service.updateUserSettings(_settings.sensor);
-    _display_service.render();
     _display_service.vibrate(ALERT_VIBRATION_LENGTH);
+    if(_display_service.screen.getState() == Screen::ScreenState::STATE_SETTINGS)
+    {
+        _display_service.render();
+    }
 }

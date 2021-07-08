@@ -26,6 +26,7 @@ DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService
 {
     _vibration_thread.start(callback(this, &DisplayService::threadVibration));
     setPower(true);
+    render();
 }
 
 void DisplayService::setBLEStatusPtr(bool* bleStatus)
@@ -49,6 +50,9 @@ void DisplayService::setPower(bool on)
     }
     else
     {
+        // Prepare cache for next turn on
+        _lcd_bl.write(0.f);
+        render();
         // Disable LCD power
         _lcd_pwr.write(0);
     }

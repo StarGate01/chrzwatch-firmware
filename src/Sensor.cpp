@@ -59,7 +59,13 @@ uint8_t SensorService::getHRValue()
 
 uint8_t SensorService::getBatteryPercent()
 {
-    return (uint8_t)max(min(round((_battery_value - 0.3f) * 1000.0f), 100.0f), 0.0f);
+    // Map battery from battery min - max to 0 - 100 %
+    return (uint8_t)
+        max(min(
+            (int)round(
+                ((_battery_value - BATTERY_MIN) * 100.f) / 
+                (BATTERY_MAX - BATTERY_MIN)), 
+        100), 0);
 }
 
 float SensorService::getBatteryRaw()
@@ -90,6 +96,14 @@ void SensorService::reevaluateStepsCadence()
             ((_motion_count >= _settings.cadence_running_thresh)? RSCF::RUNNING_NOT_WALKING : 0));
         _motion_count = 0;
         _motion_count_age = now;
+
+        // Refresh display if needed
+        if(_display_service.screen.getState() == Screen::ScreenState::STATE_STEPS ||
+            _display_service.screen.getState() == Screen::ScreenState::STATE_CADENCE ||
+            _display_service.screen.getState() == Screen::ScreenState::STATE_DISTANCE)
+        {
+            _display_service.render();
+        }
     }
 }
 
@@ -98,6 +112,12 @@ void SensorService::updateUserSettings(const struct user_sensor_settings_t& sett
     _settings = settings;
     _setupAccellerationSensor();
     rsc_measurement.instantaneous_stride_length = _settings.step_length * 2;
+
+    // Refresh display if needed
+    if(_display_service.screen.getState() == Screen::ScreenState::STATE_SETTINGS)
+    {
+        _display_service.render();
+    }
 }
 
 void SensorService::_setupAccellerationSensor()
@@ -120,6 +140,12 @@ void SensorService::_poll()
     // Begin HR measuring interval
     _hr.setPower(true);
     _event_queue.call_in(HR_DURATION, callback(this, &SensorService::_finishPoll));
+
+    // Refresh display if needed
+    if(_display_service.screen.getState() == Screen::ScreenState::STATE_SETTINGS)
+    {
+        _display_service.render();
+    }
 }
 
 void SensorService::_finishPoll()
@@ -127,22 +153,39 @@ void SensorService::_finishPoll()
     // End HR sensor interval
     _hr_value = _hr.getHeartrate();
     _hr.setPower(false);
+
+    // Refresh display if needed
+    if(_display_service.screen.getState() == Screen::ScreenState::STATE_HEART)
+    {
+        _display_service.render();
+    }
 }
 
 void SensorService::_handleButtonIRQ()
 {
     // Ensure last button press is a fixed time ago, for debouncing
-    if(get_ms_count() - _last_button < BUTTON_DEBOUNCE) return;
-
-    // Trigger a display render, a vibration and then power on the display
-    _event_queue.call(callback(&_display_service, &DisplayService::render));
-    _display_service.vibrate(BUTTON_VIBRATION_LENGTH);
+    uint64_t now = get_ms_count();
+    if(now - _last_button < BUTTON_DEBOUNCE) return;
+    _last_button = now;
     _cancel_timeout = true;
-    _display_service.setPower(true);
 
-    _last_button = get_ms_count();
+    // Trigger vibration
+    _display_service.vibrate(BUTTON_VIBRATION_LENGTH);
+
+    // Trigger display wakeup or state change
+    if(!_display_service.getPower()) _display_service.setPower(true);
+    else
+    {
+        // Advance to next screen state
+        Screen::ScreenState current_state = _display_service.screen.getState();
+        (*(int*)&current_state)++;
+        if(current_state == Screen::ScreenState::STATE_LOOP) current_state = Screen::ScreenState::STATE_CLOCK;
+        _display_service.screen.setState(current_state);
+
+        // Defer from IRQ context
+        _event_queue.call(&_display_service, &DisplayService::render);
+    }
 }
-
 
 void SensorService::_handleAccIRQ()
 {
@@ -156,6 +199,13 @@ void SensorService::_handleAccIRQ()
         {
             _motion_count++;
             rsc_measurement.total_steps++;
+
+            // Refresh display if needed
+            if(_display_service.screen.getState() == Screen::ScreenState::STATE_HEART)
+            {
+                // Defer from IRQ context
+                _event_queue.call(&_display_service, &DisplayService::render);
+            }
         }
     }
 
@@ -167,6 +217,7 @@ void SensorService::_handleDisplayTimeout()
 {
     if(!_cancel_timeout)
     {
+        _display_service.screen.setState(Screen::ScreenState::STATE_CLOCK);
         _display_service.setPower(false);
     }
     _cancel_timeout = false;

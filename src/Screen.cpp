@@ -9,6 +9,8 @@
 #include "DisplayService.h"
 #include "mbed_stats.h"
 
+#include <roboto_bold_48_minimal.h>
+
 
 Screen::Screen():
     epochTime(0),
@@ -33,9 +35,9 @@ Screen::Screen():
     lcd.setCursor(0, 0);
     lcd.setTextSize(1);
     lcd.setTextWrap(false);
-    lcd.setTextColor(ST7735_CYAN, ST7735_BLACK);
-    lcd.fillScreen(ST7735_BLACK);
-    lcd.printf("CHRZ Watch\n\nTime:\n\n\n\n\nBattery:\n\n\n\nCharging:\n");
+    // lcd.setTextColor(ST7735_CYAN, ST7735_BLACK);
+    // lcd.fillScreen(ST7735_BLACK);
+    // lcd.printf("CHRZ Watch\n\nTime:\n\n\n\n\nBattery:\n\n\n\nCharging:\n");
 
     // struct font_layout_t font = FONT(CLOCK4_32);
     // char buffer[FONT_CLOCK4_32_BSIZE];
@@ -47,44 +49,119 @@ Screen::Screen():
     _display_guard.release();
 }
 
+void Screen::setState(enum Screen::ScreenState state)
+{
+    _prev_state = _state;
+    _state = state;
+}
+
+enum Screen::ScreenState Screen::getState()
+{
+    return _state;
+}
+
 void Screen::render()
 {
-    bool sem = _display_guard.try_acquire();
-    if(!sem) return; // Cancel if a rendering is already in progress
+    _display_guard.acquire(); // Wait for lcd to be available
 
-    // Decode timestamp to string
-    char time_buff[20];
-    strftime(time_buff, 20, "%H:%M:%S\n%d.%m.%Y", localtime(&epochTime));
+    if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_BLACK, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
 
-    lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
-    lcd.setCursor(0, 30);
-    lcd.printf(time_buff);
-    lcd.setCursor(0, 70);
-    lcd.printf("%u%% (%f)", batteryPercent, batteryRaw);
-    lcd.setCursor(0, 100);
-    lcd.printf(batteryCharging? "Yes, HR: %u  " : "No, HR: %u  ", heartrate);
-    lcd.setCursor(0, 115);
-    if(bleStatus)
+    switch(_state)
     {
-        lcd.setTextColor(ST7735_GREEN, ST7735_BLACK);
-        if(bleEncStatus)
+        case ScreenState::STATE_CLOCK:
         {
-            lcd.printf("BLE: [x, E]");
+            // Decode timestamp
+            tm now;
+            localtime_r(&epochTime, &now);
+
+            // Compute digits
+            uint8_t clock_digits[4] = {
+                now.tm_min / 10,
+                now.tm_min % 10,
+                now.tm_sec / 10,
+                now.tm_sec % 10
+            };
+
+            for(uint8_t i = 0; i < 4; i++)
+            {
+                //Check cache
+                if(_prev_state != _state || _clock_digit_cache[i] != clock_digits[i])
+                {
+                    lcd.drawFastBitmap(_clock_digit_pos[i][0], _clock_digit_pos[i][1],
+                        roboto_bold_48_minimal + (roboto_bold_48_minimal_bs * clock_digits[i]), 
+                        roboto_bold_48_minimal_w, roboto_bold_48_minimal_h, LCD_COLOR_WHITE, LCD_COLOR_RED, 
+                        lcd_bitmap_buffer, LCD_BUFFER_SIZE, true);
+                }
+
+                // Update cache
+                _clock_digit_cache[i] = clock_digits[i];
+            }
+            break;
         }
-        else
+        case ScreenState::STATE_HEART:
         {
-            lcd.printf("BLE: [x, N]");
+            if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_RED, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            break;
         }
-    }
-    else
-    {
-        lcd.setTextColor(ST7735_RED, ST7735_BLACK);
-        lcd.printf("BLE: [ ]   ");
+        case ScreenState::STATE_CADENCE:
+        {
+            if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_BLUE, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            break;
+        }
+        case ScreenState::STATE_STEPS:
+        {
+            if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_GREEN, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            break;
+        }
+        case ScreenState::STATE_DISTANCE:
+        {
+            if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_BLUE, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            break;
+        }
+        case ScreenState::STATE_SETTINGS:
+        {
+            if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_GREEN, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            break;
+        }    
+        default: break;
     }
 
-    lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
-    lcd.setCursor(0, 130);
-    lcd.printf("ST: %u\nSC: %u", stepsTotal, stepsCadence);
+    // Update state
+    _prev_state = _state;
+
+    // // Decode timestamp to string
+    // char time_buff[20];
+    // strftime(time_buff, 20, "%H:%M:%S\n%d.%m.%Y", localtime(&epochTime));
+
+    // lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
+    // lcd.setCursor(0, 30);
+    // lcd.printf(time_buff);
+    // lcd.setCursor(0, 70);
+    // lcd.printf("%u%% (%f)", batteryPercent, batteryRaw);
+    // lcd.setCursor(0, 100);
+    // lcd.printf(batteryCharging? "Yes, HR: %u  " : "No, HR: %u  ", heartrate);
+    // lcd.setCursor(0, 115);
+    // if(bleStatus)
+    // {
+    //     lcd.setTextColor(ST7735_GREEN, ST7735_BLACK);
+    //     if(bleEncStatus)
+    //     {
+    //         lcd.printf("BLE: [x, E]");
+    //     }
+    //     else
+    //     {
+    //         lcd.printf("BLE: [x, N]");
+    //     }
+    // }
+    // else
+    // {
+    //     lcd.setTextColor(ST7735_RED, ST7735_BLACK);
+    //     lcd.printf("BLE: [ ]   ");
+    // }
+
+    // lcd.setTextColor(ST7735_WHITE, ST7735_BLACK);
+    // lcd.setCursor(0, 130);
+    // lcd.printf("ST: %u\nSC: %u", stepsTotal, stepsCadence);
 
     // mbed_stats_cpu_t stats;
     // mbed_stats_cpu_get(&stats);

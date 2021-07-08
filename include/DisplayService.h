@@ -23,8 +23,15 @@
 
 
 #define LCD_TIMEOUT         5000 //!< LCD timeout in ms
+#define LCD_BUFFER_SIZE     200  //!< LCD buffer in bytes
 #define VIBRATION_GRACE_IN  10   //!< Sensor shutoff before vibration
 #define VIBRATION_GRACE_OUT 750  //!< Sensor restart grace after vibration
+
+#define LCD_COLOR_BLACK     0x0000
+#define LCD_COLOR_WHITE     0xFFFF
+#define LCD_COLOR_RED       0x001F
+#define LCD_COLOR_GREEN     0x7E00
+#define LCD_COLOR_BLUE      0xF800
 
 // Forward decalarations
 class SensorService;
@@ -37,7 +44,22 @@ class SensorService;
 class Screen
 {
 
-    public: 
+    public:
+        /**
+         * @brief State possibilities of the screen state machine
+         * 
+         */
+        enum ScreenState : int
+        {
+            STATE_CLOCK = 0, //!< Home screen, shows clock
+            STATE_HEART, //!< Heartrate screen
+            STATE_CADENCE, //!< Step cadence screen
+            STATE_STEPS, //!< Amount of steps screen
+            STATE_DISTANCE, //!< Distance walked screen
+            STATE_SETTINGS, //!< Info and settings screen
+            STATE_LOOP //!< Back to home
+        };
+
         /**
          * @brief Construct a new Screen Model object
          * 
@@ -49,7 +71,23 @@ class Screen
          */
         void render();
 
+        /**
+         * @brief Sets the screen state
+         * 
+         * @param state The new state
+         */
+        void setState(enum ScreenState state);
+
+        /**
+         * @brief Get the state
+         * 
+         * @return enum ScreenState current screen state
+         */
+        enum ScreenState getState();
+
+
         Adafruit_ST7735_Mini lcd; //!< LCD output
+        char lcd_bitmap_buffer[LCD_BUFFER_SIZE]; //!< Buffer for fast bitmap drawing
         time_t epochTime; //!< Current time
         uint8_t batteryPercent; //!< Battery remaining in percent
         uint8_t heartrate; //!< Heartrate
@@ -63,9 +101,13 @@ class Screen
         int test2;
 
     protected:
+        enum ScreenState _state = ScreenState::STATE_CLOCK; //!< Stores screen state
+        enum ScreenState _prev_state = ScreenState::STATE_LOOP; //!< Previous screen state
         Semaphore _display_guard; //!< Serialize display bus access
         // GT24L24A2Y_Reader _font_reader; //!< Font ROM interface
-
+        uint8_t _clock_digit_cache[4]; //!< Cache for the clock digits
+        const uint8_t _clock_digit_pos[4][2] = { 
+            {0, 0}, {40, 0}, {0, 80}, {40, 80} }; //!< Pixel positions of the clock digits
 };
 
 /**
