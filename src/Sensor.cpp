@@ -8,6 +8,7 @@
 
 #include "SensorService.h"
 #include "DisplayService.h"
+#include "UserSettings.h"
 
 SensorService::SensorService(DisplayService &display_service):
     _display_service(display_service),
@@ -84,15 +85,15 @@ void SensorService::reevaluateStepsCadence()
     {
         rsc_measurement.instantaneous_cadence = _motion_count;
         // Convert cm/min to 1/256*m/s
-        rsc_measurement.instantaneous_speed = (uint16_t)round(((float)(_motion_count * _settings.step_length) / 6000.f) * 256.f);
+        rsc_measurement.instantaneous_speed = (uint16_t)round(((float)(_motion_count * user_settings.sensor.step_length) / 6000.f) * 256.f);
         // Convert cm to dm
-        rsc_measurement.total_distance = (rsc_measurement.total_steps * _settings.step_length) / 10;
+        rsc_measurement.total_distance = (rsc_measurement.total_steps * user_settings.sensor.step_length) / 10;
         // Clear running flag and set it if needed
         #define RSCF RunningSpeedAndCadenceService::RSCMeasurementFlags
         rsc_measurement.flags = (RSCF)(
             RSCF::INSTANTANEOUS_STRIDE_LENGTH_PRESENT | 
             RSCF::TOTAL_DISTANCE_PRESENT |
-            ((_motion_count >= _settings.cadence_running_thresh)? RSCF::RUNNING_NOT_WALKING : 0));
+            ((_motion_count >= user_settings.sensor.cadence_running_thresh)? RSCF::RUNNING_NOT_WALKING : 0));
         _motion_count = 0;
         _motion_count_age = now;
 
@@ -106,11 +107,10 @@ void SensorService::reevaluateStepsCadence()
     }
 }
 
-void SensorService::updateUserSettings(const struct user_sensor_settings_t& settings)
+void SensorService::updateUserSettings()
 {
-    _settings = settings;
     setupAccellerationSensor();
-    rsc_measurement.instantaneous_stride_length = _settings.step_length * 2;
+    rsc_measurement.instantaneous_stride_length = user_settings.sensor.step_length * 2;
 
     // Refresh display if needed
     if(_display_service.screen.getState() == Screen::ScreenState::STATE_SETTINGS)
@@ -124,7 +124,7 @@ void SensorService::setupAccellerationSensor()
     _acc_kx123.soft_reset();
     _acc_kx123.set_config(KX122_ODCNTL_OSA_50, KX122_CNTL1_GSEL_2G, true, false, true); // 50Hz data rate default output, 2g range
     _acc_kx123.set_cntl3_odrs(0xff, 0xff, KX122_CNTL3_OWUF_50); // 50Hz data rate for motion engine
-    _acc_kx123.set_motion_detect_config(KX122_INC2_WUE_MASK, _settings.motion_duration, _settings.motion_threshold); // All axes
+    _acc_kx123.set_motion_detect_config(KX122_INC2_WUE_MASK, user_settings.sensor.motion_duration, user_settings.sensor.motion_threshold); // All axes
     _acc_kx123.int1_setup(0, true, false, false, false, false); // Latch interrupt 1, active low
     _acc_kx123.set_int1_interrupt_reason(KX122_MOTION_INTERRUPT); // Route interrupt source
     _acc_kx123.start_measurement_mode();
@@ -169,7 +169,7 @@ void SensorService::handleButtonIRQ()
     _cancel_timeout = true;
 
     // Trigger vibration
-    _display_service.vibrate(BUTTON_VIBRATION_LENGTH);
+    // _display_service.vibrate(BUTTON_VIBRATION_LENGTH);
 
     // Trigger display wakeup or state change
     if(!_display_service.getPower()) _display_service.setPower(true);

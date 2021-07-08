@@ -1,7 +1,7 @@
 // Roboto Bold 48pt minimal
 
-#ifndef FONT5X7_H
-#define FONT5X7_H
+#ifndef ROBOTO_BOLD_48_MINIMAL_H
+#define ROBOTO_BOLD_48_MINIMAL_H
 
 #include <mbed.h>
 

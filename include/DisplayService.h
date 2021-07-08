@@ -100,8 +100,6 @@ class Screen
         bool bleEncStatus; //!< Bluetooth Enc status
         uint8_t stepsCadence; //!< Steps cadence
         uint32_t stepsTotal; //!< Steps total
-        uint32_t test;
-        int test2;
 
     protected:
         enum ScreenState _state = ScreenState::STATE_CLOCK; //!< Stores screen state
@@ -109,8 +107,11 @@ class Screen
         Semaphore _display_guard; //!< Serialize display bus access
         // GT24L24A2Y_Reader _font_reader; //!< Font ROM interface
         uint8_t _clock_digit_cache[4]; //!< Cache for the clock digits
+        uint8_t _clock_indicator_cache; //!< Cache for the clock format, 0 = 24h (empty), 1 = AM, 2 = PM
         const uint8_t _clock_digit_pos[4][2] = { 
             {3, 0}, {39, 0}, {3, 55}, {39, 55} }; //!< Pixel positions of the clock digits
+        const uint8_t _clock_indicator_pos[2][2] = { 
+            {6, 115}, {44, 115} }; //!< Pixel positions of the clock AM/PM indicator
 };
 
 /**

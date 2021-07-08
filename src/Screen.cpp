@@ -8,8 +8,10 @@
 
 #include "DisplayService.h"
 #include "mbed_stats.h"
+#include "UserSettings.h"
 
 #include <roboto_bold_48_minimal.h>
+#include <roboto_bold_36_minimal.h>
 
 
 Screen::Screen():
@@ -22,7 +24,6 @@ Screen::Screen():
     lcd(PIN_LCD_SDA, NC, PIN_LCD_SCL, PIN_LCD_CS, 
         PIN_LCD_DC, PIN_LCD_RESET, LCD_SPI_FREQ),
     _display_guard(1)
-    // _font_reader(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_FONT_CS)
 {
     _display_guard.acquire();
 
@@ -35,16 +36,6 @@ Screen::Screen():
     lcd.setCursor(0, 0);
     lcd.setTextSize(1);
     lcd.setTextWrap(false);
-    // lcd.setTextColor(ST7735_CYAN, ST7735_BLACK);
-    // lcd.fillScreen(ST7735_BLACK);
-    // lcd.printf("CHRZ Watch\n\nTime:\n\n\n\n\nBattery:\n\n\n\nCharging:\n");
-
-    // struct font_layout_t font = FONT(CLOCK4_32);
-    // char buffer[FONT_CLOCK4_32_BSIZE];
-    // uint16_t actual_width;
-    // test = _font_reader.read(font, 0, buffer, &actual_width);
-    // test2 = actual_width;
-    // lcd.drawBitmap(0, 0, (uint8_t*)buffer, 22, 32, ST7735_CYAN, true, 2);
 
     _display_guard.release();
 }
@@ -74,18 +65,31 @@ void Screen::render()
             tm now;
             localtime_r(&epochTime, &now);
 
+            // Handle hour format
+            int hour = now.tm_hour;
+            uint8_t clock_indicator = hour > 12? 2 : 1; // PM : AM
+            if (user_settings.time_format == 0) clock_indicator = 0;
+            if (hour > 12 && user_settings.time_format == 1) hour -= 12;
+
             // Compute digits
             uint8_t clock_digits[4] = {
-                now.tm_hour / 10,
-                now.tm_hour % 10,
+                hour / 10,
+                hour % 10,
                 now.tm_min / 10,
                 now.tm_min % 10
             };
 
+            // Re-layout if cache is invalid
+            bool re_layout = _prev_state != _state
+                || (_clock_indicator_cache > 0 && user_settings.time_format == 0)
+                || (_clock_indicator_cache == 0 && user_settings.time_format == 1);
+            if (re_layout) lcd.fillFastScreen(LCD_COLOR_BLACK, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+
+            // Draw digits
             for(uint8_t i = 0; i < 4; i++)
             {
-                //Check cache
-                if(_prev_state != _state 
+                // Check cache
+                if(re_layout
                     || _clock_digit_cache[i] != clock_digits[i]
                     || (i == 2 && _clock_digit_cache[0] != clock_digits[0]) // Minutes have to rendered again after hours
                     || (i == 3 && _clock_digit_cache[1] != clock_digits[1])) // Due to font overlap
@@ -94,11 +98,44 @@ void Screen::render()
                         roboto_bold_48_minimal + (roboto_bold_48_minimal_bs * clock_digits[i]), 
                         roboto_bold_48_minimal_w, roboto_bold_48_minimal_h, LCD_COLOR_WHITE, LCD_COLOR_BLACK, 
                         lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+                    
+                    // Subsequent digits and indicator have to be redrawn
+                    re_layout = true;
                 }
 
                 // Update cache
                 _clock_digit_cache[i] = clock_digits[i];
             }
+
+            // Draw indicator field
+            if(re_layout || (clock_indicator != _clock_indicator_cache))
+            {
+                if(user_settings.time_format == 0)
+                {
+                    // Clear indicator
+                    for(int i = 0; i < 2; i++)
+                    {
+                        lcd.fillFastRect(_clock_indicator_pos[i][0], _clock_indicator_pos[i][1], 
+                        roboto_bold_36_minimal_w, roboto_bold_36_minimal_h, LCD_COLOR_BLACK,
+                        lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+                    }
+                }
+                else
+                {
+                    // Draw AM / PM
+                    lcd.drawFastBitmap(_clock_indicator_pos[0][0], _clock_indicator_pos[0][1],
+                        roboto_bold_36_minimal + (roboto_bold_36_minimal_bs * clock_indicator), 
+                        roboto_bold_36_minimal_w, roboto_bold_36_minimal_h, LCD_COLOR_WHITE, LCD_COLOR_BLACK, 
+                        lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+                    lcd.drawFastBitmap(_clock_indicator_pos[1][0], _clock_indicator_pos[1][1], roboto_bold_36_minimal, 
+                        roboto_bold_36_minimal_w, roboto_bold_36_minimal_h, LCD_COLOR_WHITE, LCD_COLOR_BLACK, 
+                        lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+                }
+            }
+
+            // Update cache
+            _clock_indicator_cache = clock_indicator;
+
             break;
         }
         case ScreenState::STATE_HEART:

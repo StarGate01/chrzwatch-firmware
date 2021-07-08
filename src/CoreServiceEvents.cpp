@@ -66,10 +66,11 @@ void CoreService::onMonotonic(const time_t epoch)
 
 void CoreService::onUpdateSettings(const struct user_settings_t& settings)
 {
-    _settings = settings;
-    _sensor_service.updateUserSettings(_settings.sensor);
+    user_settings = settings;
+    _sensor_service.updateUserSettings();
     _display_service.vibrate(ALERT_VIBRATION_LENGTH);
-    if(_display_service.screen.getState() == Screen::ScreenState::STATE_SETTINGS)
+    if(_display_service.screen.getState() == Screen::ScreenState::STATE_CLOCK ||
+        _display_service.screen.getState() == Screen::ScreenState::STATE_SETTINGS)
     {
         _display_service.render();
     }

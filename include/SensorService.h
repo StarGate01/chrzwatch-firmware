@@ -83,11 +83,9 @@ class SensorService
         void reevaluateStepsCadence();
 
         /**
-         * @brief Updates the sensor user settings
-         * 
-         * @param settings New settings
+         * @brief Updates the sensor from user settings
          */
-        void updateUserSettings(const struct user_sensor_settings_t& settings);
+        void updateUserSettings();
 
         RunningSpeedAndCadenceService::RSCMeasurement_t rsc_measurement; //!< Running speed and cadence measurement
 
@@ -103,7 +101,6 @@ class SensorService
         uint8_t _hr_value; //!< The internal heartrate value
         uint8_t _motion_count; //!< The internal count of motion events
         uint64_t _motion_count_age; //<! Age of the motion count buffer
-        struct user_sensor_settings_t _settings; //!< User settings cache
 
         InterruptIn _button1; //!< Button 1 input
         InterruptIn _button2; //!< Button 2 input

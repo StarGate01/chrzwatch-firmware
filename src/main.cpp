@@ -15,6 +15,7 @@
     #include <GT24L24A2Y_Reader.h>
 #else
     #include "ble/BLE.h"
+    #include "UserSettings.h"
 #endif
 
 
@@ -42,10 +43,6 @@
 
 #endif
 
-
-static events::EventQueue event_queue(16 * EVENTS_EVENT_SIZE); //!< The main event queue for dispatching events
-
-
 #if defined(FLASHDUMP)
 
     static GT24L24A2Y_Reader flash(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_FONT_CS); //!< Font rom interface
@@ -65,8 +62,10 @@ static events::EventQueue event_queue(16 * EVENTS_EVENT_SIZE); //!< The main eve
 
 #else
    
-    static BLE& ble_handle = BLE::Instance(); // Get BLE Instance
-    static CoreService core(ble_handle, event_queue); // Setup core app
+    static events::EventQueue event_queue(16 * EVENTS_EVENT_SIZE); //!< The main event queue for dispatching events
+    static BLE& ble_handle = BLE::Instance(); //!< BLE hardware instance
+    static CoreService core(ble_handle, event_queue); //!< App logic
+    struct user_settings_t user_settings; //!< User settings singleton
 
     /**
      * @brief Dispatches BLE events to non-interrupt space
@@ -75,6 +74,7 @@ static events::EventQueue event_queue(16 * EVENTS_EVENT_SIZE); //!< The main eve
      */
     static void schedule_ble_events(BLE::OnEventsToProcessCallbackContext *context) 
     {
+        // Defer from IRQ
         event_queue.call(Callback<void()>(&context->ble, &BLE::processEvents));
     }
 

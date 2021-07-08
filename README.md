@@ -311,7 +311,7 @@ Fonts can be found in `/res/fonts`.
 
  - Adafruit standard ascii 5x7 (https://platformio.org/lib/show/12501/Adafruit_GFX) 
    - *License: Apache 2.0*
- - Google Roboto Mono Bold 48pt (https://fonts.google.com/specimen/Roboto)
+ - Google Roboto Mono Bold [24pt, 36pt,48pt] (https://fonts.google.com/specimen/Roboto)
    - Selected subset of glyphs
    - *License: Apache 2.0*
 
