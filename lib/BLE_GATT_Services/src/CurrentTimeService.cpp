@@ -64,14 +64,15 @@ void CurrentTimeService::writeDateTime(const BLE_DateTime& dateTime, const bool 
 void CurrentTimeService::writeEpoch(const time_t& epochTime, const bool writeRtc)
 {
     // Populate buffer from UNIX timestamp
-    struct tm *tmPtr = localtime(&epochTime);
-    *(uint16_t *)&_valueBytes[0] = tmPtr->tm_year + 1900;
-    _valueBytes[2] = tmPtr->tm_mon + 1;
-    _valueBytes[3] = tmPtr->tm_mday;
-    _valueBytes[4] = tmPtr->tm_hour;
-    _valueBytes[5] = tmPtr->tm_min;
-    _valueBytes[6] = tmPtr->tm_sec;
-    _valueBytes[7] = (tmPtr->tm_wday == 0)? 7:(tmPtr->tm_wday);
+    struct tm tmv;
+    localtime_r(&epochTime, &tmv);
+    *(uint16_t *)&_valueBytes[0] = tmv.tm_year + 1900;
+    _valueBytes[2] = tmv.tm_mon + 1;
+    _valueBytes[3] = tmv.tm_mday;
+    _valueBytes[4] = tmv.tm_hour;
+    _valueBytes[5] = tmv.tm_min;
+    _valueBytes[6] = tmv.tm_sec;
+    _valueBytes[7] = (tmv.tm_wday == 0)? 7:(tmv.tm_wday);
     _valueBytes[8] = 0;
     _valueBytes[9] = 0;
 
