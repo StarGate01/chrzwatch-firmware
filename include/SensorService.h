@@ -27,7 +27,7 @@
 #define ALERT_VIBRATION_LENGTH  200   //!< Alert vibration length in ms
 #define SENSOR_FREQUENCY        60000 //!< Sensor measuring / reporting interval in ms
 #define HR_DURATION             30000 //!< Heartrate measurement interval in ms
-
+#define TILT_DURATION_THRESH    8     //!< Time treshold for tilt detection in 1/12.5 s
 
 // Forward decalarations
 class DisplayService;

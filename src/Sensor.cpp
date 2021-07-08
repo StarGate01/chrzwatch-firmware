@@ -122,11 +122,12 @@ void SensorService::updateUserSettings()
 void SensorService::setupAccellerationSensor()
 {   
     _acc_kx123.soft_reset();
-    _acc_kx123.set_config(KX122_ODCNTL_OSA_50, KX122_CNTL1_GSEL_2G, true, false, true); // 50Hz data rate default output, 2g range
-    _acc_kx123.set_cntl3_odrs(0xff, 0xff, KX122_CNTL3_OWUF_50); // 50Hz data rate for motion engine
-    _acc_kx123.set_motion_detect_config(KX122_INC2_WUE_MASK, user_settings.sensor.motion_duration, user_settings.sensor.motion_threshold); // All axes
+    _acc_kx123.set_config(KX122_ODCNTL_OSA_50, KX122_CNTL1_GSEL_2G, true, false, true); // 50Hz data rate default output, 2g range, enable motion and tilt engine
+    _acc_kx123.set_cntl3_odrs(KX122_CNTL3_OTP_12P5, 0xff, KX122_CNTL3_OWUF_50); // 12.5Hz for tilt engine, 50Hz data rate for motion engine
+    _acc_kx123.set_motion_detect_config(KX123_AXIS_MASK, user_settings.sensor.motion_duration, user_settings.sensor.motion_threshold); // All axes, user tresholds
+    _acc_kx123.set_tilt_detect_config(KX123_AXIS_MASK, 1); // X+, 0.64 s treshold
     _acc_kx123.int1_setup(0, true, false, false, false, false); // Latch interrupt 1, active low
-    _acc_kx123.set_int1_interrupt_reason(KX122_MOTION_INTERRUPT); // Route interrupt source
+    _acc_kx123.set_int1_interrupt_reason(KX122_MOTION_INTERRUPT | KX122_TILT_CHANGED); // Route interrupt source
     _acc_kx123.start_measurement_mode();
 }
 
@@ -206,6 +207,11 @@ void SensorService::handleAccIRQ()
                 _event_queue.call(&_display_service, &DisplayService::render);
             }
         }
+    }
+    else if(reason == e_interrupt_reason::KX122_TILT_CHANGED)
+    {
+        // Trigger display wakeup
+        if(!_display_service.getPower()) _display_service.setPower(true);
     }
 
     // Clear the interrupt latch register

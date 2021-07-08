@@ -160,15 +160,26 @@ bool KX123::set_config(uint8_t odcntl_odr_osa, uint8_t cntl1_gsel, bool cntl1_re
 /**
 * Setup default settings for a tilt position
 **/
-void KX123::set_tilt_position_defaults()
+
+
+/**
+* Set axis of triggered motion detect interrupt from CNTL2
+* @param xxyyzz Orred e_axis values for axes directions to cause interrupt
+* @param tilt_timer Amount of ticks a tilt has to persist
+* @return true on error or setup mode off
+*/
+bool KX123::set_tilt_detect_config(uint8_t xxyyzz, uint8_t tilt_timer)
 {
     if (setup_mode_on == false)
-        return;
-    //CNTL3: Tilt position control, directional tap control and motion wakeup control
-    i2c_rw.write_register(_sad, KX122_CNTL3, (KX122_CNTL3_OTP_50 | KX122_CNTL3_OTDT_400));
+        return true;
+
+    // Axis MSb 00 == no_action
+    if(i2c_rw.write_register(_sad, KX122_CNTL2, (xxyyzz & KX123_AXIS_MASK)))
+    {
+        return true;
+    }
     //TILT_TIMER: Setup tilt position timer (~=filter)
-    i2c_rw.write_register(_sad, KX122_TILT_TIMER, 0x01);
-    return;
+    return i2c_rw.write_register(_sad, KX122_TILT_TIMER, tilt_timer);
 }
 
 /**
@@ -304,19 +315,6 @@ bool KX123::get_detected_motion_axis(enum e_axis *axis)
     read_bytes = i2c_rw.read_register(_sad, KX122_INS3, (uint8_t *)axis, GET_MOTION_READ_LEN);
 
     return (read_bytes != GET_MOTION_READ_LEN);
-}
-
-/**
-* Set axis of triggered motion detect interrupt from CNTL2
-* @param cnltl2_tilt_mask Orred e_axis values for axes directions to cause interrupt
-* @return true on error or setup mode off
-*/
-bool KX123::set_tilt_axis_mask(uint8_t cnltl2_tilt_mask)
-{
-    if (setup_mode_on == false)
-        return true;
-    //MSb 00 == no_action
-    return i2c_rw.write_register(_sad, KX122_CNTL2, (cnltl2_tilt_mask & KX123_AXIS_MASK));
 }
 
 /**

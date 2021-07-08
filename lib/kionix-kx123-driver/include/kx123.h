@@ -46,7 +46,7 @@ class KX123
         bool get_tilt(enum e_axis *current_previous);
         bool get_tap_interrupt_axis(enum e_axis *axis);
         bool get_detected_motion_axis(enum e_axis *axis);
-        bool set_tilt_axis_mask(uint8_t cnltl2_tilt_mask);
+        bool set_tilt_detect_config(uint8_t xxyyzz, uint8_t tilt_timer);
 
         bool get_interrupt_reason(enum e_interrupt_reason *int_reason);
 
@@ -75,8 +75,6 @@ class KX123
 
     private:
         bool setup_mode_on;
-        void set_tilt_position_defaults();
-
         RegisterWriter i2c_rw;
         uint16_t resolution_divider;
         uint8_t _sad;
