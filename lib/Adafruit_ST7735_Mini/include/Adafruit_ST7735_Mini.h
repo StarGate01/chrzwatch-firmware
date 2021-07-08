@@ -245,7 +245,7 @@ public:
      * @param antialias Antialias the image
      */
     virtual void drawFastBitmap(int16_t x, int16_t y, const uint8_t *bitmap, 
-        int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size, bool antialias = false);
+        int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size);
 
     /**
      * @brief Inverts the display
@@ -322,14 +322,14 @@ private:
      * @param x Pixel x position
      * @param y Pixel y position
      * @param bitmap Bitmap buffer
-     * @param w Bitmap width byte aligned
+     * @param w Bitmap width
      * @param h Bitmap height
      * @param color Pixel color
      * @param bg_color Pixel background color
      * @return uint16_t New pixel color
      */
     uint16_t sample_antialias(int16_t x, int16_t y, const uint8_t *bitmap, 
-        int16_t w_ba, int16_t h, uint16_t color, uint16_t bg_color, uint8_t radius);
+        int16_t w, int16_t h, uint16_t color, uint16_t bg_color, uint16_t radius);
 };
 
 #endif

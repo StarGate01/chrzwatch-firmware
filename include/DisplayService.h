@@ -23,7 +23,7 @@
 
 
 #define LCD_TIMEOUT         5000 //!< LCD timeout in ms
-#define LCD_BUFFER_SIZE     200  //!< LCD buffer in bytes
+#define LCD_BUFFER_SIZE     320  //!< LCD buffer in bytes
 #define VIBRATION_GRACE_IN  10   //!< Sensor shutoff before vibration
 #define VIBRATION_GRACE_OUT 750  //!< Sensor restart grace after vibration
 
@@ -32,6 +32,9 @@
 #define LCD_COLOR_RED       0x001F
 #define LCD_COLOR_GREEN     0x7E00
 #define LCD_COLOR_BLUE      0xF800
+#define LCD_COLOR_YELLOW    0x7E1F
+#define LCD_COLOR_GOLD      0x67F0
+#define LCD_COLOR_LIGHTRED  0x38FF
 
 // Forward decalarations
 class SensorService;
@@ -107,7 +110,7 @@ class Screen
         // GT24L24A2Y_Reader _font_reader; //!< Font ROM interface
         uint8_t _clock_digit_cache[4]; //!< Cache for the clock digits
         const uint8_t _clock_digit_pos[4][2] = { 
-            {0, 0}, {40, 0}, {0, 80}, {40, 80} }; //!< Pixel positions of the clock digits
+            {3, 0}, {39, 0}, {3, 55}, {39, 55} }; //!< Pixel positions of the clock digits
 };
 
 /**

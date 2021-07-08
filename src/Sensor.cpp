@@ -9,8 +9,7 @@
 #include "SensorService.h"
 #include "DisplayService.h"
 
-SensorService::SensorService(DisplayService &display_service, events::EventQueue &event_queue):
-    _event_queue(event_queue),
+SensorService::SensorService(DisplayService &display_service):
     _display_service(display_service),
     _battery(PIN_BATTERY),
     _charging(PIN_CHARGE),
@@ -30,8 +29,8 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     _acc_cs(PIN_ACC_CS)
 { 
     // Setup button interrupts
-    _button1.fall(callback(this, &SensorService::_handleButtonIRQ));
-    _button2.fall(callback(this, &SensorService::_handleButtonIRQ));
+    _button1.fall(callback(this, &SensorService::handleButtonIRQ));
+    _button2.fall(callback(this, &SensorService::handleButtonIRQ));
 
     // Setup heartrate sensor
     _hr_pwr.write(1);
@@ -40,16 +39,16 @@ SensorService::SensorService(DisplayService &display_service, events::EventQueue
     // Setup acceleration sensor
     _acc_addr.write(1);
     _acc_cs.write(1);
-    _acc_irq.fall(callback(this, &SensorService::_handleAccIRQ)); // Attach interrupt handler
-    _setupAccellerationSensor();
+    _acc_irq.fall(callback(this, &SensorService::handleAccIRQ)); // Attach interrupt handler
+    setupAccellerationSensor();
 
     // Handle dispatching events
-    _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::_poll);
-    _event_queue.call_every(LCD_TIMEOUT, this, &SensorService::_handleDisplayTimeout);
+    _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::poll);
+    _event_queue.call_every(LCD_TIMEOUT, this, &SensorService::handleDisplayTimeout);
     _event_thread.start(callback(&_event_queue, &EventQueue::dispatch_forever));
 
     // Poll once at start
-    _poll();
+    poll();
 }
 
 uint8_t SensorService::getHRValue()
@@ -110,7 +109,7 @@ void SensorService::reevaluateStepsCadence()
 void SensorService::updateUserSettings(const struct user_sensor_settings_t& settings)
 {
     _settings = settings;
-    _setupAccellerationSensor();
+    setupAccellerationSensor();
     rsc_measurement.instantaneous_stride_length = _settings.step_length * 2;
 
     // Refresh display if needed
@@ -120,7 +119,7 @@ void SensorService::updateUserSettings(const struct user_sensor_settings_t& sett
     }
 }
 
-void SensorService::_setupAccellerationSensor()
+void SensorService::setupAccellerationSensor()
 {   
     _acc_kx123.soft_reset();
     _acc_kx123.set_config(KX122_ODCNTL_OSA_50, KX122_CNTL1_GSEL_2G, true, false, true); // 50Hz data rate default output, 2g range
@@ -131,7 +130,7 @@ void SensorService::_setupAccellerationSensor()
     _acc_kx123.start_measurement_mode();
 }
 
-void SensorService::_poll()
+void SensorService::poll()
 {
     // Update battery
     _battery_value = _battery.read();
@@ -139,7 +138,7 @@ void SensorService::_poll()
 
     // Begin HR measuring interval
     _hr.setPower(true);
-    _event_queue.call_in(HR_DURATION, callback(this, &SensorService::_finishPoll));
+    _event_queue.call_in(HR_DURATION, callback(this, &SensorService::finishPoll));
 
     // Refresh display if needed
     if(_display_service.screen.getState() == Screen::ScreenState::STATE_SETTINGS)
@@ -148,7 +147,7 @@ void SensorService::_poll()
     }
 }
 
-void SensorService::_finishPoll()
+void SensorService::finishPoll()
 {
     // End HR sensor interval
     _hr_value = _hr.getHeartrate();
@@ -161,7 +160,7 @@ void SensorService::_finishPoll()
     }
 }
 
-void SensorService::_handleButtonIRQ()
+void SensorService::handleButtonIRQ()
 {
     // Ensure last button press is a fixed time ago, for debouncing
     uint64_t now = get_ms_count();
@@ -187,7 +186,7 @@ void SensorService::_handleButtonIRQ()
     }
 }
 
-void SensorService::_handleAccIRQ()
+void SensorService::handleAccIRQ()
 {
     // Check reason
     enum e_interrupt_reason reason;
@@ -213,7 +212,7 @@ void SensorService::_handleAccIRQ()
     _acc_kx123.clear_interrupt();
 }
 
-void SensorService::_handleDisplayTimeout()
+void SensorService::handleDisplayTimeout()
 {
     if(!_cancel_timeout)
     {

@@ -378,7 +378,7 @@ void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
 }
 
 void Adafruit_GFX::drawFastBitmap(int16_t x, int16_t y,
-  const uint8_t* bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size, bool antialias) {
+  const uint8_t* bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size) {
     // stupidest version - update in subclasses if desired!
     drawBitmap(x, y, bitmap, w, h, color);
 }

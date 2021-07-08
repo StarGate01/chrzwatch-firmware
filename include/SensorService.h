@@ -46,7 +46,7 @@ class SensorService
          * 
          * @param display_service Reference to the display service for button vibration
          */
-        SensorService(DisplayService& display_service, events::EventQueue& event_queue);
+        SensorService(DisplayService& display_service);
 
         /**
          * @brief Get the heartrate (BPM) value
@@ -92,7 +92,7 @@ class SensorService
         RunningSpeedAndCadenceService::RSCMeasurement_t rsc_measurement; //!< Running speed and cadence measurement
 
     protected:
-        events::EventQueue& _event_queue; //!< Eventqueue for dispatch timer for polling
+        events::EventQueue _event_queue; //!< Eventqueue for dispatch timer for polling
         Thread _event_thread; //!< Thread for polling
         DisplayService& _display_service; //!< Reference to the display service for button vibration
 
@@ -120,13 +120,13 @@ class SensorService
         Heartrate3_AFE4404 _hr; //!< Access to heartrate sensor
         DigitalOut _hr_pwr; //!< Power pin of the heartrate sensor
 
-        void _setupAccellerationSensor(); //!< Initializes the accelleration sensor
-        void _poll(); //!< Begin to read all sensors
-        void _finishPoll(); //!< Called after sensor reading is complete
+        void setupAccellerationSensor(); //!< Initializes the accelleration sensor
+        void poll(); //!< Begin to read all sensors
+        void finishPoll(); //!< Called after sensor reading is complete
 
-        void _handleButtonIRQ(); //!< Handle press of buttons interrupt request
-        void _handleAccIRQ(); //!< Handle accelleration sensor interrupt request
-        void _handleDisplayTimeout(); //!< Handle display timeout
+        void handleButtonIRQ(); //!< Handle press of buttons interrupt request
+        void handleAccIRQ(); //!< Handle accelleration sensor interrupt request
+        void handleDisplayTimeout(); //!< Handle display timeout
 
 };
 

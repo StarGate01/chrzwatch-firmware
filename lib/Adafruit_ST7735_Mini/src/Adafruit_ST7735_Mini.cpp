@@ -244,7 +244,6 @@ void Adafruit_ST7735_Mini::commonInit(uint8_t *cmdList)
 
     // use default SPI format
     lcdPort.format(8, 0);
-    lcdPort.frequency(4000000); // Lets try 4MHz
 
     // toggle RST low to reset; CS low so it'll listen to us
     _cs = 0;
@@ -486,13 +485,13 @@ void Adafruit_ST7735_Mini::fillFastRect(int16_t x, int16_t y, int16_t w, int16_t
 
 // display a bitmap
 void Adafruit_ST7735_Mini::drawFastBitmap(int16_t x, int16_t y,
-    const uint8_t* bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size, bool antialias)
+    const uint8_t* bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size)
 {
     // rudimentary clipping (drawChar w/big text requires this)
     if ((x >= _width) || (y >= _height)) return;
     // Keep original width for bitmap clipping
     int16_t og_w = w;
-    int16_t byteWidth = (og_w + 7) / 8; 
+    int16_t byte_width = (og_w + 7) / 8; 
     if ((x + w - 1) >= _width) w = _width - x;
     // Bitmap scanline pad = whole byte
     if ((y + h - 1) >= _height) h = _height - y;
@@ -510,7 +509,7 @@ void Adafruit_ST7735_Mini::drawFastBitmap(int16_t x, int16_t y,
         int buffer_index = 0;
         for(int16_t j = s; j < s + buffer_height; j++) for(int16_t i = 0; i < og_w; i++) 
         {
-            uint16_t current_color = sample_antialias(i, j, bitmap, byteWidth, h, color, bg_color);
+            uint16_t current_color = (bitmap[(j * byte_width) + (i / 8)] & (1 << (7 - (i & 7))))? color : bg_color;
             if(i < w)
             {
                 buffer[buffer_index] = current_color >> 8;
@@ -531,7 +530,7 @@ void Adafruit_ST7735_Mini::drawFastBitmap(int16_t x, int16_t y,
     int buffer_index = 0;
     for(int16_t j = s; j < h; j++) for(int16_t i = 0; i < og_w; i++) 
     {
-        uint16_t current_color = sample_antialias(i, j, bitmap, byteWidth, h, color, bg_color);
+        uint16_t current_color = (bitmap[(j * byte_width) + (i / 8)] & (1 << (7 - (i & 7))))? color : bg_color;
         if(i < w)
         {
             buffer[buffer_index] = current_color >> 8;
@@ -547,13 +546,6 @@ void Adafruit_ST7735_Mini::drawFastBitmap(int16_t x, int16_t y,
     lcdPort.write(buffer, (h - s) * w * 2, 0, 0);
     _cs = 1;
 }
-
-uint16_t Adafruit_ST7735_Mini::sample_antialias(int16_t x, int16_t y, const uint8_t *bitmap, 
-    int16_t w_ba, int16_t h, uint16_t color, uint16_t bg_color, uint8_t radius)
-{
-    return (bitmap[(y * w_ba) + (x / 8)] & (1 << (7 - (x & 7))))? color : bg_color;
-}
-
 
 // Pass 8-bit (each) R,G,B, get back 16-bit packed color
 uint16_t Adafruit_ST7735_Mini::Color565(uint8_t r, uint8_t g, uint8_t b)

@@ -76,21 +76,24 @@ void Screen::render()
 
             // Compute digits
             uint8_t clock_digits[4] = {
+                now.tm_hour / 10,
+                now.tm_hour % 10,
                 now.tm_min / 10,
-                now.tm_min % 10,
-                now.tm_sec / 10,
-                now.tm_sec % 10
+                now.tm_min % 10
             };
 
             for(uint8_t i = 0; i < 4; i++)
             {
                 //Check cache
-                if(_prev_state != _state || _clock_digit_cache[i] != clock_digits[i])
+                if(_prev_state != _state 
+                    || _clock_digit_cache[i] != clock_digits[i]
+                    || (i == 2 && _clock_digit_cache[0] != clock_digits[0]) // Minutes have to rendered again after hours
+                    || (i == 3 && _clock_digit_cache[1] != clock_digits[1])) // Due to font overlap
                 {
                     lcd.drawFastBitmap(_clock_digit_pos[i][0], _clock_digit_pos[i][1],
                         roboto_bold_48_minimal + (roboto_bold_48_minimal_bs * clock_digits[i]), 
-                        roboto_bold_48_minimal_w, roboto_bold_48_minimal_h, LCD_COLOR_WHITE, LCD_COLOR_RED, 
-                        lcd_bitmap_buffer, LCD_BUFFER_SIZE, true);
+                        roboto_bold_48_minimal_w, roboto_bold_48_minimal_h, LCD_COLOR_WHITE, LCD_COLOR_BLACK, 
+                        lcd_bitmap_buffer, LCD_BUFFER_SIZE);
                 }
 
                 // Update cache

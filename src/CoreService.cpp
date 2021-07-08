@@ -24,7 +24,7 @@ CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
         RSCFF::TOTAL_DISTANCE_MEASUREMENT_SUPPORTED)),
     _ble_settings_service(ble),
     _display_service(_sensor_service, _ble_time_service, event_queue),
-    _sensor_service(_display_service, event_queue)
+    _sensor_service(_display_service)
 { 
     _display_service.setBLEStatusPtr(&_connected);
     _display_service.setBLEEncStatusPtr(&_encrypted);

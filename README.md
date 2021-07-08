@@ -167,7 +167,7 @@ See `doc/pinout.png` for the pin mapping by *Aaron Christophel*. Please note tha
 
 It is recommended to use Linux, however Windows should work as well, provided all the command line tools, compilers and interface drivers are installed.
 
-Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i6hrc` env for deployment, or the `nrf52_dk` env for debugging on a NRF52-DK board.
+Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
 
 Install the `patch` command line utility, this might ship with `git`, depending on your distribution.
 
@@ -261,7 +261,11 @@ Lower level SWD access using a *J-Link* (not recommended):
 $ nrfjprog -f nrf52 ...
 ```
 
-The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (default: CMSIS-DAP) to program the chip. This can be changed in the `platformio.ini` file.
+The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (default: CMSIS-DAP) to program the chip. This can be changed in the `platformio.ini` file. For the watch, use the `i6hrc` configuration.
+
+#### Debugging
+
+The PlatformIO IDE is able to use either a *CMSIS-DAP* or *J-Link* adapter for interactive debugging. The `i6hrc_debug` and `nrf52_dk_debug` configurations provide debugging support. Do note that the watchdog timer might kill your debugging session.
 
 #### Troubleshooting
 

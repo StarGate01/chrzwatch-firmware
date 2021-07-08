@@ -52,7 +52,6 @@ void DisplayService::setPower(bool on)
     {
         // Prepare cache for next turn on
         _lcd_bl.write(0.f);
-        render();
         // Disable LCD power
         _lcd_pwr.write(0);
     }
