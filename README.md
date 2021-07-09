@@ -168,11 +168,15 @@ See `doc/pinout.png` for the pin mapping by *Aaron Christophel*. Please note tha
 
 It is recommended to use Linux, however Windows should work as well, provided all the command line tools, compilers and interface drivers are installed.
 
- - *(Required)* Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
+ - *(Required)* Install **Visual Studio Code** (https://code.visualstudio.com/) and the **PlatformIO** (https://platformio.org/) extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
 
  - *(Required)* Install the `patch` command line utility, this might ship with `git`, depending on your distribution.
 
- - *(Optional)* Install **Doxygen** and use the "Build Documentation" task to generate documentation.
+ - *(Required)* Install **OpenOCD** (http://http://openocd.org/), this is probably available via your package manager
+
+ - *(Optional)* Install the **nRF command line tools** (https://www.nordicsemi.com/Products/Development-tools/nrf-command-line-tools) for J-Link support
+
+ - *(Optional)* Install **Doxygen** (https://www.doxygen.nl/index.html, also via package manager) and use the "Build Documentation" task to generate documentation.
 
  - *(Optional)* Install or compile **Fontedit** (https://github.com/ayoy/fontedit) to edit the bitmap fonts (MSB first).
 
@@ -188,23 +192,50 @@ You might want to fabricate a custom SWD via USB to ISP adapter, link shown in t
 
 ### Dumping the stock firmware
 
-The watch does not use read-back-protection. To dump the stock ROM and RAM, you need to use a genuine J-Link programmer and the official Nordic dev tools (`nrfjprog`). Then, disassemble the watch to expose the internal testpoints. Connect the `VDD`, `SWDIO` and `SWCLK` testpoints and also the ground terminal. Then, dump the data like this:
-
-```
-$ nrfjprog -f nrf52 --readcode i6hrc_code.bin
-$ nrfjprog -f nrf52 --readram i6hrc_ram.bin
-```
-
-These files can also be found at `doc/dump` (armv7le) for decompiling (e.g. using **Ghidra**: https://ghidra-sre.org/) or restoring the watch (untested).
-
-### Unlocking the flash memory
-
-First of all, the flash memory has to be reset in oder for the chip to accept new firmware and debug instructions. This requires *lower level* SWD access (`SWD`), and thus cant be performed by the cheap ST-Link V2 clones because these only provide *high level* access (`SWD_HLA`).
+The watch does not use read-back-protection. If it ever does, you might be able to use dirty hacks like https://github.com/StarGate01/nRF51822-siphon (untested, also probably incompatible).
 
 <details>
 <summary>Using a J-Link</summary>
 
-Buy any genuine **J-Link** adapter, and connect it like in the paragraph above. This is annoying, since the internal `VDD` testpoint has to be tapped, requiring the watch to be disassembled. Hence, one of the other methods is recommended.
+To dump the stock ROM and RAM,  use any **J-Link** adapter and the official Nordic dev tools (`nrfjprog`). Then, disassemble the watch to expose the internal testpoints. Connect the `VDD`, `SWDIO` and `SWCLK` testpoints and also the ground terminal. Then, dump the data like this:
+
+```
+$ nrfjprog -f nrf52 --readcode i6hrc_code.bin
+```
+
+You can also dump the contents of the RAM:
+
+```
+$ nrfjprog -f nrf52 --readram i6hrc_ram.bin
+```
+
+</details>
+
+<details>
+<summary>Using a CMSIS-DAP</summary>
+
+For more info on the *CMSIS-DAP*, see below.
+
+**OpenOCD** is able to to read the flash data as well, e.g. using a **CMSIS-DAP** adapter:
+
+```
+$ openocd -f interface/cmsis-dap.cfg -c "transport select swd" -f target/nrf52.cfg -c "init; reset halt; flash read_bank 0 i6hrc_code.bin; reset; exit"
+```
+
+</details>
+
+Using other adapters should work as well, but is untested.
+
+The original firmware dumps can also be found at `doc/dump` (armv7le) for decompiling (e.g. using **Ghidra**: https://ghidra-sre.org/) or restoring the watch (untested).
+
+### Unlocking the flash memory
+
+The flash memory has to be reset in oder for the chip to accept new firmware and debug instructions. This requires *lower level* SWD access (`SWD`), and thus cant be performed by the cheap ST-Link V2 clones because these only provide *high level* access (`SWD_HLA`).
+
+<details>
+<summary>Using a J-Link</summary>
+
+Buy a **J-Link** adapter and connect it like in the paragraph above. This is annoying, since the internal `VDD` testpoint has to be tapped, requiring the watch to be disassembled. Hence, one of the other methods is recommended.
 
 ```
 $ nrfjprog -f nrf52 --eraseall
@@ -244,18 +275,18 @@ $ arm-none-eabi-gdb
 
 Flashing the unlocked chip should then work with any basic SWD capable programmer, like the **ST-Link V2** (the cheap clones work too). The **CMSIS-DAP** or the **Black Magic Probe** can be used as well.
 
-You can use **OpenOCD** (http://openocd.org/) to connect to the chip and manage its flash memory (... means subsequent commands or arguments):
+You can use **OpenOCD** to connect to the chip and manage its flash memory ("..." denote subsequent commands or arguments):
 
 High level SWD access using a *ST-Link V2* clone:
 
 ```
-$ openocd -d2 -f interface/stlink-v2.cfg -c "transport select hla_swd; ..." -f target/nrf52.cfg
+$ openocd -f interface/stlink-v2.cfg -c "transport select hla_swd" -f target/nrf52.cfg -c "init; reset halt; ...; reset; exit"
 ```
 
 Lower level SWD access using a *CMSIS-DAP* (recommended):
 
 ```
-$ openocd -f interface/cmsis-dap.cfg -c "transport select swd; ..." -f target/nrf52.cfg
+$ openocd -f interface/cmsis-dap.cfg -c "transport select swd" -f target/nrf52.cfg -c "init; reset halt; ...; reset; exit"
 ```
 
 Lower level SWD access using a *J-Link* (not recommended):
@@ -272,13 +303,15 @@ The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (defau
 
 The PlatformIO IDE is able to use either a *CMSIS-DAP* or *J-Link* adapter for interactive debugging. The `i6hrc_debug` and `nrf52_dk_debug` configurations provide debugging support. Do note that the watchdog timer might kill your debugging session. The host may use the *J-Link* debugger software (which is able to connect to a *CMSIS-DAP* as well) or the *CMSIS_DAP* debugger software by PlatformIO (default).
 
-Since the `RX`, `TX` and `SWO` pins are used for other peripherals, UART and SWO communication is not possible. The firmware thus implements a **SEGGER J-Link RTT interface** (https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/). To use this interface, the SEGGER RTT tools are required.
+Since the `RX`, `TX` and `SWO` pins are used for other peripherals, *UART* and *SWO* communication is not possible. The firmware thus implements a **SEGGER J-Link RTT interface** (https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/). To access this interface, the SEGGER RTT tools or J-Link tools are required.
 
 #### Troubleshooting
 
 Unfortunately, the SWD `RESET` line is not easily accessible. However, shorting `SWDCLK` to `VCC` triggers a debug init halt as well.
 
-If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using OpenOCD while spamming the reset button on your adapter. This should not be needed during normal flashing and execution. Sometimes, this condition occurs randomly when the `SWDCLK` pin is left floating due to EMI. On a successful connection OpenOCD displays something like "`Info : nrf52.cpu: hardware has 6 breakpoints, 4 watchpoints`". This means the chip was reset, caught and is now in debug mode. 
+If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using *OpenOCD* while spamming the reset button on your adapter - hoping the debugger attaches before the error state occures. This should not be needed during normal flashing and execution. Sometimes, this reset condition occurs randomly when the `SWDCLK` pin is left floating due to EMI and long wires. This is also the reason for the pulldown resistor in the schematic above.
+
+On a successful connection OpenOCD displays something like "`Info : nrf52.cpu: hardware has 6 breakpoints, 4 watchpoints`". This means the chip was reset, caught and is now in debug mode. 
 
 The script `tools/reset.sh` or the task "Reset Target" automates this spamming, waiting for you to press the reset button.
 
@@ -286,7 +319,13 @@ Optionally, append `-c "reset halt"` to the OpenOCD command. The chip then halts
 
 ### Accessing the Font ROM
 
-TBD
+The font rom is internally connected to the main CPU via SPI and implements a fairly standard flash command interface.
+
+Unfortunately, neither the NRF52832 nor the flash used support or use the *QSPI*interface, which would allow mapping the flash address range and accessing it via the *MMU*. This would enable remote reading and writing of the flash via the *SWD* connection.
+
+It is possible to write a **RamCode** (https://wiki.segger.com/Programming_External_SPI_Flashes) using the SEGGER **Open Flashloader** framework (https://wiki.segger.com/Open_Flashloader). Then, a tool like **J-Flash** would eb able to access the external flash via the RamCode on the CPU. This is however quite a bit of work, unfinished tests can be found in the branch `flash-test`.
+
+Instead, the *Open Flashloader* interface or any other suitable interface might be implemented directly into the main firmware. TBD.
 
 ## Connecting to a phone
 
