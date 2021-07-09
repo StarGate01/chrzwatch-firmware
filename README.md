@@ -168,15 +168,15 @@ See `doc/pinout.png` for the pin mapping by *Aaron Christophel*. Please note tha
 
 It is recommended to use Linux, however Windows should work as well, provided all the command line tools, compilers and interface drivers are installed.
 
-*(Required)* Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
+ - *(Required)* Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
 
-*(Required)* Install the `patch` command line utility, this might ship with `git`, depending on your distribution.
+ - *(Required)* Install the `patch` command line utility, this might ship with `git`, depending on your distribution.
 
-*(Optional)* Install **Doxygen** and use the "Build Documentation" task to generate documentation.
+ - *(Optional)* Install **Doxygen** and use the "Build Documentation" task to generate documentation.
 
-*(Optional)* Install or compile **Fontedit** (https://github.com/ayoy/fontedit) to edit the bitmap fonts (MSB first).
+ - *(Optional)* Install or compile **Fontedit** (https://github.com/ayoy/fontedit) to edit the bitmap fonts (MSB first).
 
-*(Optional)* Install the **SEGGER J-Link tools** (https://www.segger.com/downloads/jlink/) to connect to the RTT interface or to use a J-Link adapter.
+ - *(Optional)* Install the **SEGGER J-Link tools** (https://www.segger.com/downloads/jlink/) to connect to the RTT interface or to use a J-Link adapter.
 
 ### Modifying an I6HRC watch
 
@@ -264,17 +264,19 @@ Lower level SWD access using a *J-Link* (not recommended):
 $ nrfjprog -f nrf52 ...
 ```
 
+The *J-Link tools* are able to communicate with the *CMIS-DAP* interface as well.
+
 The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (default: CMSIS-DAP) to program the chip. This can be changed in the `platformio.ini` file. For the watch, use the `i6hrc` configuration.
 
 #### Debugging
 
-The PlatformIO IDE is able to use either a *CMSIS-DAP* or *J-Link* adapter for interactive debugging. The `i6hrc_debug` and `nrf52_dk_debug` configurations provide debugging support. Do note that the watchdog timer might kill your debugging session.
+The PlatformIO IDE is able to use either a *CMSIS-DAP* or *J-Link* adapter for interactive debugging. The `i6hrc_debug` and `nrf52_dk_debug` configurations provide debugging support. Do note that the watchdog timer might kill your debugging session. The host may use the *J-Link* debugger software (which is able to connect to a *CMSIS-DAP* as well) or the *CMSIS_DAP* debugger software by PlatformIO (default).
 
-Since the `RX`, `TX` and `SWO` pins are used for other peripherals, which rules out UART and SWO communication, the firmware implements a SEGGER J-Link RTT interface (https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/). To use this interface, the SEGGER RTT tools are required.
+Since the `RX`, `TX` and `SWO` pins are used for other peripherals, UART and SWO communication is not possible. The firmware thus implements a **SEGGER J-Link RTT interface** (https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/). To use this interface, the SEGGER RTT tools are required.
 
 #### Troubleshooting
 
-Unfortunatly, the SWD `RESET` line is not easily accessible. However, shorting `SWDCLK` to `VCC` triggers a debug init halt as well.
+Unfortunately, the SWD `RESET` line is not easily accessible. However, shorting `SWDCLK` to `VCC` triggers a debug init halt as well.
 
 If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using OpenOCD while spamming the reset button on your adapter. This should not be needed during normal flashing and execution. Sometimes, this condition occurs randomly when the `SWDCLK` pin is left floating due to EMI. On a successful connection OpenOCD displays something like "`Info : nrf52.cpu: hardware has 6 breakpoints, 4 watchpoints`". This means the chip was reset, caught and is now in debug mode. 
 
@@ -282,9 +284,9 @@ The script `tools/reset.sh` or the task "Reset Target" automates this spamming, 
 
 Optionally, append `-c "reset halt"` to the OpenOCD command. The chip then halts at the first instruction, which may be good for debugging.
 
-### Dumping the Font ROM
+### Accessing the Font ROM
 
-TBA
+TBD
 
 ## Connecting to a phone
 

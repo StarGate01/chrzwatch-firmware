@@ -17,21 +17,14 @@
         },
         {
             "name": "SEGGER Microcontroller GmbH",
-            "url": "https://www.segger.com "
+            "url": "https://www.segger.com"
         }
     ],
     "repository":
     {
         "type": "git",
         "url": "https://github.com/StarGate01/chrzwatch-firmware.git"
-    },
-    "examples": [
-        {
-            "name": "RTT_Console",
-            "base": "examples/rtt_console",
-            "files": ["rtt_console.cpp"]
-        }
-    ],    
+    }, 
     "export": {
         "include": [
             "lib/JLink_RTT"
