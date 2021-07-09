@@ -3,7 +3,7 @@
  * @author James Wang (woodsking2@hotmail.com)
  * @author Christoph Honal
  * @brief 使用rtt 作为stream 输出输入
- * @version 0.2
+ * @version 0.2.1
  * @date 2021-07-09
  *
  * @copyright Copyright (c) 2020-2021
@@ -17,6 +17,7 @@
 #define JLINK_RTT_H
 
 #include "mbed.h"
+#include "platform/Stream.h"
 #include "platform/NonCopyable.h"
 
 
@@ -24,7 +25,7 @@
  * @brief Provides a stream which writes to the SEGGER RTT interface
  * 
  */
-class JLink_RTT : public mbed::Stream, private NonCopyable<JLink_RTT>
+class JLink_RTT : public Stream, private NonCopyable<JLink_RTT>
 {
 
     public:
