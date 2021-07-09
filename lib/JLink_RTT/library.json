@@ -1,6 +1,6 @@
 {
     "name": "JLink_RTT",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "keywords": "segger, jlink, rtt, debug",
     "description": "SEGGER JLink RTT interface implementation using Mbed Streams. Based on JLink_V630D/Samples/RTT/SEGGER_RTT_V630d.zip.",
     "authors":

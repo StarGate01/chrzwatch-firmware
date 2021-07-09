@@ -55,6 +55,9 @@ void Screen::render()
 {
     _display_guard.acquire(); // Wait for lcd to be available
 
+    printf("Battery: %u%% (%f)\n", batteryPercent, batteryRaw);
+    printf("ST: %u\nSC: %u\n", stepsTotal, stepsCadence);
+
     if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_BLACK, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
 
     switch(_state)
