@@ -16,7 +16,7 @@
 #include <rtos.h>
 
 #include <Adafruit_ST7735_Mini.h>
-// #include <GT24L24A2Y_Reader.h>
+// #include <GT24L24A2Y.h>
 
 #include "HardwareConfiguration.h"
 #include "CurrentTimeService.h"
@@ -105,7 +105,7 @@ class Screen
         enum ScreenState _state = ScreenState::STATE_CLOCK; //!< Stores screen state
         enum ScreenState _prev_state = ScreenState::STATE_LOOP; //!< Previous screen state
         Semaphore _display_guard; //!< Serialize display bus access
-        // GT24L24A2Y_Reader _font_reader; //!< Font ROM interface
+        // GT24L24A2Y _font_reader; //!< Font ROM interface
         uint8_t _clock_digit_cache[4]; //!< Cache for the clock digits
         uint8_t _clock_indicator_cache; //!< Cache for the clock format, 0 = 24h (empty), 1 = AM, 2 = PM
         const uint8_t _clock_digit_pos[4][2] = { 

@@ -58,6 +58,7 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 - [ ] Sleep / rest detection algorithm
 - [x] Basic UI
 - [ ] Fancy UI
+- [x] SEGGER J-Link RTT serial interface
 
 </details>
 
@@ -121,7 +122,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 - General: https://lcsc.com/product-detail/_Gotop-GT24L24A2Y_C124690.html
 - Datasheet: https://datasheet.lcsc.com/szlcsc/1912111436_Gotop-GT24L24A2Y_C124690.pdf
 - Map: https://github.com/RichardBsolut/GT24L24A2Y
-- Driver: Mbed SPI and Mbed GPIO (But currently unused)
+- Driver: TBA via Mbed SPI and Mbed GPIO (Currently unused)
 
 </details>
 
@@ -267,6 +268,8 @@ The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (defau
 
 The PlatformIO IDE is able to use either a *CMSIS-DAP* or *J-Link* adapter for interactive debugging. The `i6hrc_debug` and `nrf52_dk_debug` configurations provide debugging support. Do note that the watchdog timer might kill your debugging session.
 
+Since the `RX` and `TX` pins are used for other peripherals, the firmware implements a SEGGER J-Link RTT interface (https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/) which can be used instead of the traditional UART interface. For this, the SEGGER RTT tools are required.
+
 #### Troubleshooting
 
 Unfortunatly, the SWD `RESET` line is not easily accessible. However, shorting `SWDCLK` to `VCC` triggers a debug init halt as well.
@@ -279,9 +282,7 @@ Optionally, append `-c "reset halt"` to the OpenOCD command. The chip then halts
 
 ### Dumping the Font ROM
 
-Disassemble your watch and connect the `TX` and `RX` testpoints to the corresponding pins of a Serial-to-USB converter. Connect power and ground of the USB plug to the `5V` and `GND` pins of the converter.
-
-Next, remove `"SERIAL", "SERIAL_ASYNCH", "SERIAL_FC"` from `mbed_app.json` and compile and upload the firmware using the `i6hrc_flashdump` environment. Then, launch the script `tools/flash.dump.py`. The content of the flash will be downloaded to `dump.bin`. However, on some models I noticed the flash memory to be empty.
+TBA
 
 ## Connecting to a phone
 
@@ -348,7 +349,7 @@ All modified libraries have been or will be published to https://platformio.org 
  - The `UnsafeI2C` library (https://platformio.org/lib/show/12500/UnsafeI2C) is a wrapper for the existing Mbed I2C library
    - Removed threadsafe mutex
    - *License: Apache 2.0*
- - The `GT24L24A2Y_Reader` library (Unpublished, unfinished) is a driver for the font chip of the same name
+ - The `GT24L24A2Y` library (Unpublished, unfinished) is a driver for the font chip of the same name
    - Initial implementation
    - *License: GPLv3*
  - The `Heartrate3_AFE4404` library (https://platformio.org/lib/show/11099/Heartrate3_AFE4404) is based on the library and example code of `Click_Heartrate3_AFE4404` by *MikroElektronika* / *Corey Lakey*: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
@@ -370,3 +371,9 @@ All modified libraries have been or will be published to https://platformio.org 
    - Fixed default pins
    - Added an explicit dependency to `UnsafeI2C`, see above
    - *License: Apache 2.0*
+ - The `JLink_RTT` library (TBA) is based on `jlink_real_time_transfer` by *James Wang*: https://github.com/woodsking2/sabomo_jlink_rtt, which in turn is based on `JLink_V630D/Samples/RTT/SEGGER_RTT_V630d.zip` by *SEGGER Microcontroller GmbH*: https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/
+   - Removed redundant printf implementation, use the one of Mbed
+   - Use Mutex instead of Thread_safe
+   - Add serial input
+   - Add example
+   - *License: GPLv3 / Custom*
