@@ -375,7 +375,7 @@ All modified libraries have been or will be published to https://platformio.org 
    - Fixed default pins
    - Added an explicit dependency to `UnsafeI2C`, see above
    - *License: Apache 2.0*
- - The `JLink_RTT` library (TBA) is based on `jlink_real_time_transfer` by *James Wang*: https://github.com/woodsking2/sabomo_jlink_rtt, which in turn is based on `JLink_V630D/Samples/RTT/SEGGER_RTT_V630d.zip` by *SEGGER Microcontroller GmbH*: https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/
+ - The `JLink_RTT` library (https://platformio.org/lib/show/12534/JLink_RTT) is based on `jlink_real_time_transfer` by *James Wang*: https://github.com/woodsking2/sabomo_jlink_rtt, which in turn is based on `JLink_V630D/Samples/RTT/SEGGER_RTT_V630d.zip` by *SEGGER Microcontroller GmbH*: https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/
    - Removed redundant printf implementation, use the one of Mbed
    - Use Mutex instead of Thread_safe
    - Add serial input
