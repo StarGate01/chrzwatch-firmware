@@ -168,13 +168,15 @@ See `doc/pinout.png` for the pin mapping by *Aaron Christophel*. Please note tha
 
 It is recommended to use Linux, however Windows should work as well, provided all the command line tools, compilers and interface drivers are installed.
 
-Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
+*(Required)* Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
 
-Install the `patch` command line utility, this might ship with `git`, depending on your distribution.
+*(Required)* Install the `patch` command line utility, this might ship with `git`, depending on your distribution.
 
-Install and use **Doxygen** or the "Build Documentation" task to generate documentation.
+*(Optional)* Install **Doxygen** and use the "Build Documentation" task to generate documentation.
 
-Install or compile **Fontedit** (https://github.com/ayoy/fontedit) to edit the bitmap fonts (MSB first).
+*(Optional)* Install or compile **Fontedit** (https://github.com/ayoy/fontedit) to edit the bitmap fonts (MSB first).
+
+*(Optional)* Install the **SEGGER J-Link tools** (https://www.segger.com/downloads/jlink/) to connect to the RTT interface or to use a J-Link adapter.
 
 ### Modifying an I6HRC watch
 
@@ -268,7 +270,7 @@ The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (defau
 
 The PlatformIO IDE is able to use either a *CMSIS-DAP* or *J-Link* adapter for interactive debugging. The `i6hrc_debug` and `nrf52_dk_debug` configurations provide debugging support. Do note that the watchdog timer might kill your debugging session.
 
-Since the `RX` and `TX` pins are used for other peripherals, the firmware implements a SEGGER J-Link RTT interface (https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/) which can be used instead of the traditional UART interface. For this, the SEGGER RTT tools are required.
+Since the `RX`, `TX` and `SWO` pins are used for other peripherals, which rules out UART and SWO communication, the firmware implements a SEGGER J-Link RTT interface (https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/). To use this interface, the SEGGER RTT tools are required.
 
 #### Troubleshooting
 
