@@ -79,10 +79,12 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 
 </details>
 
-## Hardware overview
+## Hardware
+
+The *I6HRC* smartwatch uses these components. You can also purchase then separately (on breakout boards) and connect them to a *NRF52-DK*`*.
 
 <details>
-<summary>CPU: NRF52832 with 512K ROM, 64K RAM</summary>
+<summary>CPU: NRF52832 with 512K ROM, 64K RAM, supports deep sleep</summary>
 
 - General: https://www.nordicsemi.com/Products/Low-power-short-range-wireless/nRF52832/Getting-started
 - Datasheet: https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.0.pdf
@@ -135,7 +137,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 </details>
 
 <details>
-<summary>Battery voltage sensor: Down-scaled battery voltage (0.3V - 0.4V)</summary>
+<summary>Battery voltage sensor: Down-scaled battery voltage (ca. 0.34V - 0.4V)</summary>
 
 - Driver: Mbed ADC
 
@@ -162,8 +164,66 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 
 </details>
 
+This project configures the `NRF52832` IC and the Mbed OS as follows.
 
-See `doc/pinout.png` for the pin mapping by *Aaron Christophel*. Please note that pins `P0_23` and `P0_24` are swapped.
+<details>
+<summary>Low-power PWM</summary>
+
+The Mbed `PwmOut` implementation locks the system out from deep sleep once a SPI peripheral is activated, even if its duty cycle is 0%. It only unlocks the deep sleep when the whole interface object is deconstructed. To use PWM while also allowing deep sleep when it shall be temporarily disabled, the `PwmOutLP` implementation is used. This implementation provides a function to lock / unlock deep sleep, and to simultaneously enable / disable the underlying *PWM* peripheral via the `NRF_PWM0->ENABLE` register. `PWM0` is hardcoded, but as only one instance is used this renders the code not portable, yet functional.
+
+</details>
+
+<details>
+<summary>SPI and I2C interfaces</summary>
+
+The `NRF52832` IC has 2 **I2C** and 3 **SPI** instances, which partly overlap. To avoid contention, the interfaces are assigned as follows:
+
+
+| Peripheral / Instance | Pin Mapping  | Instance 0 | Instance 1 | Instance 2 |
+| --------------------- | ------------ | ---------- | ---------- | ---------- |
+| LC Display            | `15, NC, 14` |            |            | `SPI2`     |
+| Acceleration Sensor   | `3, 2`       | `TWI0`     |            |            |
+| Heartrate Sensor      | `20, 21`     |            | `TWI1`     |            |
+| Font Flash            | `8, 5, 7`    |            |            | `SPI2`     |
+
+The reason for this particular configuration is a follows: Both the acceleration and heartrate sensor need to be able to access the I2C bus upon receiving an interrupt signal (to read a motion event upon occurrence and to read the ADC when it signals readiness, respectively). This means `UnsafeI2C`,  - an *I2C* implementation without bus access locking - has to be used, because the mutex used for locking cant be used in an interrupt context.
+
+Because these *I2C* access events may occur at any moment, a dedicated instance is allocated to each of them. The remaining instance does only support *SPI* anyways. To ensure no contention occurs between the LCD and the flash, the standard bus locking SPI functions are used. This means that all functions using these devices cant be called from an interrupt context. Specifically, this only concerns the `Screen::render` function. This function is intended to never be called directly, instead `DisplayService::render` has to be called, which defers the rendering call via the main `EventQueue` to the main thread.
+
+</details>
+
+<details>
+<summary>GPIO pins and interrupt memory</summary>
+
+The `NRF52832` IC has a few special functions which can be assigned to specific pins, eg. *NFC* and *Reset*. To use these pins as standard GPIO pins, the following macros are configured in `mbed_app.json`, in order to configure how Mbed is built: `CONFIG_GPIO_AS_PINRESET` is removed (enables p0.21 as GPIO)  and `CONFIG_NFCT_PINS_AS_GPIOS` is added (enables p0.9 and p0.10 as GPIO). Also, the `ITM` debug trace module, which uses the `SWO` pin, is removed (enables p0.18 as GPIO). The `ITM` module is already removed in the board configuration this project inherits from (`NRF52_DK`).
+
+To support more than one interrupt event on the GPIO pins (using the `GPIOTE` peripheral), more memory is allocated to the peripheral by defining `NRFX_GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS=8`. This supports a maximum of 8 separate interrupt pins.
+
+To conserve space, the `SERIAL`, `SERIAL_ASYNC` and `SERIAL_FC` devices are removed, as the serial connection is unavailable anyway (for more info, see below).
+
+</details>
+
+<details>
+<summary>Mbed configuration</summary>
+
+No proprietary softdevice by Nordic is used. Instead, Mbed supplies APIs like Bluetooth (https://os.mbed.com/docs/mbed-cordio/19.02/introduction/index.html), and also compiles the code to be able to run on bare-metal.
+
+The Bluetooth API is modified by a patch (`patch/mbed/ble_sleep.patch`), which removes the `sleep_manager_lock_deep_sleep` calls in `idle_hook` of the BLE implementation. This enables the chip to enter deep sleep mode when Bluetooth is used, but not doing anything. This modification might lead to some problems, but none have occurred so far.
+
+Mbed also provides various RTOS features, e.g. Threads. (Enabled by defining `PIO_FRAMEWORK_MBED_RTOS_PRESENT` in `platformio.ini`)
+
+Tho conserve energy, low-power timers are used. These are enabled by setting `"target.lse_available": true` and `"events.use-lowpower-timer-ticker": true` in `mbed_app.json`. 
+
+</details>
+
+<details>
+<summary>Crash behavior</summary>
+
+The system is configured to automatically reboot when a hard fault occurs (`"platform.fatal-error-auto-reboot-enabled": true,`). Although the number of these subsequent reboots is configured to be 3 (`"platform.error-reboot-max": 3`), this counter is set to 0 on each boot (`mbed_reset_reboot_count()`). This leads to an unlimited amount of reboots.
+
+The crash dump retention feature of Mbed is enabled, and on the next boot after a crash the stored error information is printed out (in `mbed_error_reboot_callback`). The storage of this crash information requires a seperate memory region (`.crash_data_ram`), which is configured in the custom linker script `patch/mbed/linker.ld`.
+
+</details>
 
 ## Development setup
 
@@ -278,23 +338,32 @@ Flashing the unlocked chip should then work with any basic SWD capable programme
 
 You can use **OpenOCD** to connect to the chip and manage its flash memory ("..." denote subsequent commands or arguments):
 
-High level SWD access using a *ST-Link V2* clone:
+<details>
+<summary>High level SWD access using a ST-Link V2 clone</summary>
 
 ```
 $ openocd -f interface/stlink-v2.cfg -c "transport select hla_swd" -f target/nrf52.cfg -c "init; reset halt; ...; reset; exit"
 ```
 
-Lower level SWD access using a *CMSIS-DAP* (recommended):
+</details>
+
+<details>
+<summary>Lower level SWD access using a CMSIS-DAP (recommended)</summary>
 
 ```
 $ openocd -f interface/cmsis-dap.cfg -c "transport select swd" -f target/nrf52.cfg -c "init; reset halt; ...; reset; exit"
 ```
 
-Lower level SWD access using a *J-Link* (not recommended):
+</details>
+
+<details>
+<summary>Lower level SWD access using a J-Link (not recommended)</summary>
 
 ```
 $ nrfjprog -f nrf52 ...
 ```
+
+</details>
 
 The *J-Link tools* are able to communicate with the *CMIS-DAP* interface as well.
 
@@ -339,9 +408,9 @@ Instead, the *Open Flashloader* interface or any other suitable interface might 
 
 A fork of the Android app **Gadgetbridge** (https://gadgetbridge.org/) with support for this firmware is available at *Codeberg*: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch .
 
-You can use the Android app "**nRF Connect**" (https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp&hl=en) to test the Bluetooth functions. Sometimes, connecting takes multiple tries.
+You can use the Android app "**nRF Connect**" (https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp) to test the Bluetooth functions. Sometimes, connecting takes multiple tries.
 
-Various other apps like e.g. **FitoTrack** (https://play.google.com/store/apps/details?id=de.tadris.fitness&hl=en&gl=US) are able to read the heartrate from this sensor. Update: The device has not to be bonded in the recent version.
+Various other apps like e.g. **FitoTrack** (https://play.google.com/store/apps/details?id=de.tadris.fitness) are able to read the heartrate from this sensor. Update: The device has not to be bonded in the recent version.
 
 ## Thanks to
 
@@ -373,7 +442,7 @@ Patches to Mbed can be found in `/patch`.
 
 - ARM Mbed RTOS and API: https://os.mbed.com/
   - Hot-patch Nordic BLE driver to support deep sleep
-  - Replace NRF52 linker memory map to support crash dump retention and SEGGER RTT
+  - Replace NRF52 linker memory map to support crash dump retention
   - *License: Custom - see https://github.com/ARMmbed/mbed-os/blob/master/LICENSE.md*
 
 ### Libraries
