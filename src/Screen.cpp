@@ -140,8 +140,12 @@ void Screen::render()
             {
                 _lcd.fillFastScreen(LCD_COLOR_RED, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
 
-                char buffer[1];
-                _flash.read_raw(0x0, 1, buffer);
+                // char buffer[90];
+                // _flash.read_raw(0x198dde, 90, buffer);
+
+                // printf("read: ");
+                // for (int i = 0; i < 90; i++) printf("%02X ", buffer[i]);
+                // printf("\n");
             }
             break;
         }
