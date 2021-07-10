@@ -14,7 +14,6 @@
 #include "JLink_RTT.h"
 #include "CoreService.h"
 #include "UserSettings.h"
-// #include "GT24L24A2Y.h"
 #include "HardwareConfiguration.h"
 
 
@@ -59,13 +58,15 @@ FileHandle* mbed::mbed_override_console(int fd)
 
 // I2C and SPI instance map
 
-const PinMapI2C PinMap_I2C[] = {
+const PinMapI2C PinMap_I2C[] = 
+{
     { PIN_ACC_SDA, PIN_ACC_SCL, 0 },
     { PIN_HR_SDA, PIN_HR_SCL, 1 },
     { NC, NC, NC }
 }; //!< I2C interface map
 
-const PinMapSPI PinMap_SPI[] = {
+const PinMapSPI PinMap_SPI[] = 
+{
     { PIN_LCD_MOSI, NC, PIN_LCD_CLK, 2 },
     { PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, 2 },
     { NC, NC, NC, NC }
@@ -90,8 +91,6 @@ static void schedule_ble_events(BLE::OnEventsToProcessCallbackContext *context)
     event_queue.call(Callback<void()>(&context->ble, &BLE::processEvents));
 }
 
-// GT24L24A2Y _flash(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_ACC_CS);
-
 /**
  * @brief Main entrypoint
  * 
@@ -102,11 +101,6 @@ int main()
     // Setup BLE events to event queue handler and start core
     ble_handle.onEventsToProcess(schedule_ble_events);
     core.start();
-
-
-    // char buffer[1] = { 42 };
-    // _flash.read_raw(0x0, 1, buffer);
-    // printf("%u\n", buffer[0]);
 
     // Dispatch events in main thread
     event_queue.dispatch_forever();
