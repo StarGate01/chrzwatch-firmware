@@ -81,7 +81,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 
 ## Hardware
 
-The *I6HRC* smartwatch uses these components. You can also purchase then separately (on breakout boards) and connect them to a *NRF52-DK*`*.
+The *I6HRC* smartwatch uses these components. You can also purchase then separately (on breakout boards) and connect them to a *NRF52-DK*.
 
 <details>
 <summary>CPU: NRF52832 with 512K ROM, 64K RAM, supports deep sleep</summary>
@@ -169,7 +169,7 @@ This project configures the `NRF52832` IC and the Mbed OS as follows.
 <details>
 <summary>Low-power PWM</summary>
 
-The Mbed `PwmOut` implementation locks the system out from deep sleep once a SPI peripheral is activated, even if its duty cycle is 0%. It only unlocks the deep sleep when the whole interface object is deconstructed. To use PWM while also allowing deep sleep when it shall be temporarily disabled, the `PwmOutLP` implementation is used. This implementation provides a function to lock / unlock deep sleep, and to simultaneously enable / disable the underlying *PWM* peripheral via the `NRF_PWM0->ENABLE` register. `PWM0` is hardcoded, but as only one instance is used this renders the code not portable, yet functional.
+The Mbed `PwmOut` implementation locks the system out from deep sleep once a **PWM** peripheral is activated, even if its duty cycle is `0%`. It only unlocks the deep sleep when the whole interface object is deconstructed. To use PWM while also allowing deep sleep when it shall be temporarily disabled, the `PwmOutLP` implementation is used. This implementation provides a function to lock / unlock deep sleep, and to simultaneously enable / disable the underlying *PWM* peripheral via the `NRF_PWM0->ENABLE` register. `PWM0` is hardcoded, but as only one instance is used this renders the code not portable, yet functional.
 
 </details>
 
@@ -195,7 +195,7 @@ Because these *I2C* access events may occur at any moment, a dedicated instance 
 <details>
 <summary>GPIO pins and interrupt memory</summary>
 
-The `NRF52832` IC has a few special functions which can be assigned to specific pins, eg. *NFC* and *Reset*. To use these pins as standard GPIO pins, the following macros are configured in `mbed_app.json`, in order to configure how Mbed is built: `CONFIG_GPIO_AS_PINRESET` is removed (enables p0.21 as GPIO)  and `CONFIG_NFCT_PINS_AS_GPIOS` is added (enables p0.9 and p0.10 as GPIO). Also, the `ITM` debug trace module, which uses the `SWO` pin, is removed (enables p0.18 as GPIO). The `ITM` module is already removed in the board configuration this project inherits from (`NRF52_DK`).
+The `NRF52832` IC has a few special functions which can be assigned to specific pins, eg. *NFC* and *Reset*. To use these pins as standard GPIO pins, the following macros are configured in `mbed_app.json`, in order to configure how Mbed is built: `CONFIG_GPIO_AS_PINRESET` is removed (enables `p0.21` as GPIO)  and `CONFIG_NFCT_PINS_AS_GPIOS` is added (enables `p0.9` and `p0.10` as GPIO). Also, the `ITM` debug trace module, which uses the `SWO` pin, is removed (enables `p0.18` as GPIO). The `ITM` module is already removed in the board configuration this project inherits from (`NRF52_DK`).
 
 To support more than one interrupt event on the GPIO pins (using the `GPIOTE` peripheral), more memory is allocated to the peripheral by defining `NRFX_GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS=8`. This supports a maximum of 8 separate interrupt pins.
 
@@ -412,19 +412,19 @@ You can use the Android app "**nRF Connect**" (https://play.google.com/store/app
 
 Various other apps like e.g. **FitoTrack** (https://play.google.com/store/apps/details?id=de.tadris.fitness) are able to read the heartrate from this sensor. Update: The device has not to be bonded in the recent version.
 
-## Thanks to
+## Thanks
 
 Thanks to *Aaron Christophel* for providing instructions on how to modify the hardware, mapping out the pins and providing some demo Arduino code.
 
  - https://github.com/atc1441
- - http://atcnetz.blogspot.com/2019/02/arduino-auf-dem-fitness-tracker-dank.html
+ - https://atcnetz.blogspot.com/2019/02/arduino-auf-dem-fitness-tracker-dank.html
  - https://www.mikrocontroller.net/topic/467136
  - https://www.youtube.com/watch?v=0Fu-VSuKHEg
 
-## Third-party credits, modifications and licensing
+## Licensing
 
 
-Please note that while most code in this repository is licensed under the terms of the GPL3 license, this explicitly does not apply to the libraries contained in `/lib`, fonts in `/res/fonts`, and patches in `/patch`. All these documents have their own license attached.
+Please note that while most code in this repository is licensed under the terms of the GPL3 license, this explicitly does not apply to the libraries contained in `/lib`, fonts in `/res/fonts`, patches in `/patch` and the file `doc/pinout.png`. All these documents have their own license attached.
 
 ### Fonts
 
@@ -497,3 +497,8 @@ All modified libraries have been or will be published to https://platformio.org 
    - Add serial input
    - Add example
    - *License: GPLv3 / Custom*
+
+### Other
+
+ - The file `doc/pinout.png` was made by *Aaron Christophel*: https://atcnetz.blogspot.com/2019/02/arduino-auf-dem-fitness-tracker-dank.html
+   - *License: All rights reserved, fair use*
