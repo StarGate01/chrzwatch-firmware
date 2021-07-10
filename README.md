@@ -424,7 +424,7 @@ Thanks to *Aaron Christophel* for providing instructions on how to modify the ha
 ## Licensing
 
 
-Please note that while most code in this repository is licensed under the terms of the GPL3 license, this explicitly does not apply to the libraries contained in `/lib`, fonts in `/res/fonts`, patches in `/patch` and the file `doc/pinout.png`. All these documents have their own license attached.
+Please note that while most code in this repository is licensed under the terms of the GPLv3 license, this explicitly does not apply to the libraries contained in `/lib`, fonts in `/res/fonts`, patches in `/patch` and the file `/doc/pinout.png`. All these documents have their own license attached.
 
 ### Fonts
 
