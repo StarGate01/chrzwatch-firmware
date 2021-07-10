@@ -223,6 +223,8 @@ The system is configured to automatically reboot when a hard fault occurs (`"pla
 
 The crash dump retention feature of Mbed is enabled, and on the next boot after a crash the stored error information is printed out (in `mbed_error_reboot_callback`). The storage of this crash information requires a seperate memory region (`.crash_data_ram`), which is configured in the custom linker script `patch/mbed/linker.ld`.
 
+If you have a RTT reader attached, you can receive the message printed at reboot.
+
 </details>
 
 ## Development setup
@@ -402,7 +404,7 @@ Unfortunately, neither the NRF52832 nor the flash used support or use the *QSPI*
 
 It is possible to write a **RamCode** (https://wiki.segger.com/Programming_External_SPI_Flashes) using the SEGGER **Open Flashloader** framework (https://wiki.segger.com/Open_Flashloader). Then, a tool like **J-Flash** would eb able to access the external flash via the RamCode on the CPU. This is however quite a bit of work, unfinished tests can be found in the branch `flash-test`.
 
-Instead, the *Open Flashloader* interface or any other suitable interface might be implemented directly into the main firmware. TBD.
+Instead some python scripts are used to communicate with the chip using the RTT interface. ?
 
 ## Connecting to a phone
 

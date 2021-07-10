@@ -42,8 +42,8 @@ SensorService::SensorService(DisplayService &display_service):
     setupAccelerationSensor();
 
     // Handle dispatching events
-    _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::poll);
-    _event_queue.call_every(LCD_TIMEOUT, this, &SensorService::handleDisplayTimeout);
+    // _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::poll);
+    // _event_queue.call_every(LCD_TIMEOUT, this, &SensorService::handleDisplayTimeout);
     _event_thread.start(callback(&_event_queue, &EventQueue::dispatch_forever));
 
     // Poll once at start

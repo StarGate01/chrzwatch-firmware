@@ -15,7 +15,7 @@ GT24L24A2Y::GT24L24A2Y(PinName mosi, PinName miso, PinName clk, PinName cs):
 {
     _cs.write(1);
     // _spi.format(8, 0); // 8bits, CPOL=0, CPHA=0
-    // _spi.frequency(125000); // 1MHz
+    _spi.frequency(125000); // 1MHz
 }
 
 int GT24L24A2Y::read(const struct font_layout_t& font, uint16_t glyph_id, char* buffer, uint16_t* actual_width)
@@ -64,35 +64,21 @@ int GT24L24A2Y::read_raw(uint32_t offset, uint16_t size, char* buffer)
     return (res == max((uint16_t)4, size))? 0 : 2;
 }
 
-// #if DEVICE_SERIAL
-
-//     void GT24L24A2Y::dump(RawSerial& serial, Callback<void()> watchdog)
-//     {
-//         while(true)
-//         {
-//             // Wait for "d" command
-//             while(serial.getc() != 0x64) 
-//             {
-//                 if(watchdog != nullptr) watchdog();
-//                 ThisThread::sleep_for(100);
-//             }
-
-//             // Dump whole 2MB
-//             uint32_t offset;
-//             char buffer[255];
-//             for(offset = 0; offset < 0x1FFFFF; offset += 255)
-//             {
-//                 // 255 byte chunks
-//                 read_raw(offset, 255, buffer);
-//                 for(uint8_t j = 0; j < 255; j++) serial.putc(buffer[j]);
-//                 if(watchdog != nullptr) watchdog();
-//             }
-//             // The rest
-//             uint32_t rest_size = 0x1FFFFF - offset;
-//             read_raw(offset, rest_size, buffer);
-//             for(uint8_t j = 0; j < rest_size; j++) serial.putc(buffer[j]);
-//             if(watchdog != nullptr) watchdog();
-//         }
-//     }
-
-// #endif
+void GT24L24A2Y::dump(void (*watchdog)())
+{
+    // Dump whole 2MB
+    uint32_t offset;
+    char buffer[255];
+    for(offset = 0; offset < 0x1FFFFF; offset += 255)
+    {
+        // 255 byte chunks
+        read_raw(offset, 255, buffer);
+        for(uint8_t j = 0; j < 255; j++) putc(buffer[j], stdout);
+        if(watchdog != nullptr) watchdog();
+    }
+    // The rest
+    uint32_t rest_size = 0x1FFFFF - offset;
+    read_raw(offset, rest_size, buffer);
+    for(uint8_t j = 0; j < rest_size; j++) putc(buffer[j], stdout);
+    if(watchdog != nullptr) watchdog();
+}

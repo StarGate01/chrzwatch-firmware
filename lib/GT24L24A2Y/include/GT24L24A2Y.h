@@ -107,19 +107,15 @@ class GT24L24A2Y
          */
         int read(const struct font_layout_t& font, uint16_t glyph_id, char* buffer, uint16_t* actual_width);
         
-        // #if DEVICE_SERIAL 
+        /**
+         * @brief Dumps the flash content to the serial interface
+         * 
+         * @param watchdog Callback to reset the watchdog
+         * 
+         * @return int success = 0
+         */
+        void dump(void (*watchdog)() = nullptr);
 
-        //     /**
-        //      * @brief Dumps the flash content to the serial interface
-        //      * 
-        //      * @param serial Serial interface to use
-        //      * @param watchdog Callback to reset the watchdog
-        //      * 
-        //      * @return int success = 0
-        //      */
-        //     void dump(RawSerial& serial, Callback<void()> watchdog = nullptr);
-
-        // #endif
 
         /**
          * @brief Reads bytes from the font ROM (max. 255)
