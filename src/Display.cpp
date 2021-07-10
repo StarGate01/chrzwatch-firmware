@@ -15,11 +15,8 @@ DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService
     _sensor_service(sensor_service),
     _current_time_service(current_time_service),
     _event_queue(event_queue),
-    _ble_connected(nullptr),
-    _ble_encrypted(nullptr),
     _vibration(PIN_VIBRATION),
     _vibration_trigger(1),
-    _vibration_duration(0),
     _lcd_bl(PIN_LCD_BL),
     _lcd_pwr(PIN_LCD_PWR),
     _vibration_thread(osPriorityNormal, THREAD_SIZE)
@@ -86,15 +83,15 @@ void DisplayService::render()
 void DisplayService::unsafeRender()
 {
     // Update screen variables
-    if(_ble_connected != nullptr) screen.bleStatus = *_ble_connected;
-    if(_ble_encrypted != nullptr) screen.bleEncStatus = *_ble_encrypted;
-    _current_time_service.readEpoch(screen.epochTime);
-    screen.batteryPercent = _sensor_service.getBatteryPercent();
-    screen.batteryRaw = _sensor_service.getBatteryRaw();
-    screen.batteryCharging = _sensor_service.getBatteryCharging();
-    screen.heartrate = _sensor_service.getHRValue();
-    screen.stepsCadence = _sensor_service.rsc_measurement.instantaneous_cadence;
-    screen.stepsTotal = _sensor_service.rsc_measurement.total_steps;
+    if(_ble_connected != nullptr) screen._bleStatus = *_ble_connected;
+    if(_ble_encrypted != nullptr) screen._bleEncStatus = *_ble_encrypted;
+    _current_time_service.readEpoch(screen._epochTime);
+    screen._batteryPercent = _sensor_service.getBatteryPercent();
+    screen._batteryRaw = _sensor_service.getBatteryRaw();
+    screen._batteryCharging = _sensor_service.getBatteryCharging();
+    screen._heartrate = _sensor_service.getHRValue();
+    screen._stepsCadence = _sensor_service.rsc_measurement.instantaneous_cadence;
+    screen._stepsTotal = _sensor_service.rsc_measurement.total_steps;
 
     // Render screen
     screen.render();
@@ -121,7 +118,7 @@ void DisplayService::threadVibration()
             _vibration = 0;
 #       endif
         // Wait for vibration to dampen, ensure 750 ms grace
-        if(_clearVibrationToken != 0) _event_queue.cancel(_clearVibrationToken);
+        if(_clearVibrationToken > 0) _event_queue.cancel(_clearVibrationToken);
         _event_queue.call_in(VIBRATION_GRACE_OUT, this, &DisplayService::clearVibration);
         
     }

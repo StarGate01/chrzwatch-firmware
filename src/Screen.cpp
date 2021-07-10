@@ -16,13 +16,7 @@
 
 
 Screen::Screen():
-    epochTime(0),
-    batteryPercent(0),
-    batteryRaw(0),
-    batteryCharging(true),
-    bleStatus(false),
-    bleEncStatus(false),
-    lcd(PIN_LCD_MOSI, NC, PIN_LCD_CLK, PIN_LCD_CS, 
+    _lcd(PIN_LCD_MOSI, NC, PIN_LCD_CLK, PIN_LCD_CS, 
         PIN_LCD_DC, PIN_LCD_RESET, LCD_SPI_FREQ),
     _display_guard(1),
     _flash(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_ACC_CS)
@@ -30,14 +24,14 @@ Screen::Screen():
     _display_guard.acquire();
 
     // Init display controller
-    lcd.initR(INITR_MINI160x80, LCD_COLSHIFT, LCD_ROWSHIFT);
+    _lcd.initR(INITR_MINI160x80, LCD_COLSHIFT, LCD_ROWSHIFT);
 #   if defined(LCD_INVERT)
-        lcd.invertDisplay(true);
+        _lcd.invertDisplay(true);
 #   endif
-    lcd.setRotation(2);
-    lcd.setCursor(0, 0);
-    lcd.setTextSize(1);
-    lcd.setTextWrap(false);
+    _lcd.setRotation(2);
+    _lcd.setCursor(0, 0);
+    _lcd.setTextSize(1);
+    _lcd.setTextWrap(false);
 
     _display_guard.release();
 }
@@ -57,7 +51,7 @@ void Screen::render()
 {
     _display_guard.acquire(); // Wait for lcd to be available
 
-    if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_BLACK, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+    if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
 
     switch(_state)
     {
@@ -65,7 +59,7 @@ void Screen::render()
         {
             // Decode timestamp
             tm now;
-            localtime_r(&epochTime, &now);
+            localtime_r(&_epochTime, &now);
 
             // Handle hour format
             int hour = now.tm_hour;
@@ -85,7 +79,7 @@ void Screen::render()
             bool re_layout = _prev_state != _state
                 || (_clock_indicator_cache > 0 && user_settings.time_format == 0)
                 || (_clock_indicator_cache == 0 && user_settings.time_format == 1);
-            if (re_layout) lcd.fillFastScreen(LCD_COLOR_BLACK, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            if (re_layout) _lcd.fillFastScreen(LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
 
             // Draw digits
             for(uint8_t i = 0; i < 4; i++)
@@ -96,10 +90,10 @@ void Screen::render()
                     || (i == 2 && _clock_digit_cache[0] != clock_digits[0]) // Minutes have to rendered again after hours
                     || (i == 3 && _clock_digit_cache[1] != clock_digits[1])) // Due to font overlap
                 {
-                    lcd.drawFastBitmap(_clock_digit_pos[i][0], _clock_digit_pos[i][1],
+                    _lcd.drawFastBitmap(_clock_digit_pos[i][0], _clock_digit_pos[i][1],
                         roboto_bold_48_minimal + (roboto_bold_48_minimal_bs * clock_digits[i]), 
                         roboto_bold_48_minimal_w, roboto_bold_48_minimal_h, LCD_COLOR_WHITE, LCD_COLOR_BLACK, 
-                        lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+                        _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
                     
                     // Subsequent digits and indicator have to be redrawn
                     re_layout = true;
@@ -117,21 +111,21 @@ void Screen::render()
                     // Clear indicator
                     for(int i = 0; i < 2; i++)
                     {
-                        lcd.fillFastRect(_clock_indicator_pos[i][0], _clock_indicator_pos[i][1], 
+                        _lcd.fillFastRect(_clock_indicator_pos[i][0], _clock_indicator_pos[i][1], 
                         roboto_bold_36_minimal_w, roboto_bold_36_minimal_h, LCD_COLOR_BLACK,
-                        lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+                        _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
                     }
                 }
                 else
                 {
                     // Draw AM / PM
-                    lcd.drawFastBitmap(_clock_indicator_pos[0][0], _clock_indicator_pos[0][1],
+                    _lcd.drawFastBitmap(_clock_indicator_pos[0][0], _clock_indicator_pos[0][1],
                         roboto_bold_36_minimal + (roboto_bold_36_minimal_bs * clock_indicator), 
                         roboto_bold_36_minimal_w, roboto_bold_36_minimal_h, LCD_COLOR_WHITE, LCD_COLOR_BLACK, 
-                        lcd_bitmap_buffer, LCD_BUFFER_SIZE);
-                    lcd.drawFastBitmap(_clock_indicator_pos[1][0], _clock_indicator_pos[1][1], roboto_bold_36_minimal, 
+                        _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+                    _lcd.drawFastBitmap(_clock_indicator_pos[1][0], _clock_indicator_pos[1][1], roboto_bold_36_minimal, 
                         roboto_bold_36_minimal_w, roboto_bold_36_minimal_h, LCD_COLOR_WHITE, LCD_COLOR_BLACK, 
-                        lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+                        _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
                 }
             }
 
@@ -144,31 +138,31 @@ void Screen::render()
         {
             if(_prev_state != _state) 
             {
-                lcd.fillFastScreen(LCD_COLOR_RED, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+                _lcd.fillFastScreen(LCD_COLOR_RED, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
 
-                // char buffer[1];
-                // _flash.read_raw(0x0, 1, buffer);
+                char buffer[1];
+                _flash.read_raw(0x0, 1, buffer);
             }
             break;
         }
         case ScreenState::STATE_CADENCE:
         {
-            if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_BLUE, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_BLUE, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
             break;
         }
         case ScreenState::STATE_STEPS:
         {
-            if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_GREEN, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_GREEN, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
             break;
         }
         case ScreenState::STATE_DISTANCE:
         {
-            if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_BLUE, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_BLUE, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
             break;
         }
         case ScreenState::STATE_SETTINGS:
         {
-            if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_GREEN, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_GREEN, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
             break;
         }    
         default: break;

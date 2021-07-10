@@ -38,6 +38,7 @@
 
 // Forward decalarations
 class SensorService;
+class DisplayService;
 
 
 /**
@@ -89,30 +90,33 @@ class Screen
         enum ScreenState getState();
 
 
-        Adafruit_ST7735_Mini lcd; //!< LCD output
-        char lcd_bitmap_buffer[LCD_BUFFER_SIZE]; //!< Buffer for fast bitmap drawing
-        time_t epochTime; //!< Current time
-        uint8_t batteryPercent; //!< Battery remaining in percent
-        uint8_t heartrate; //!< Heartrate
-        float batteryRaw; //!< Battery remaining raw (volts)
-        bool batteryCharging; //!< Battery charging state
-        bool bleStatus; //!< Bluetooth status
-        bool bleEncStatus; //!< Bluetooth Enc status
-        uint8_t stepsCadence; //!< Steps cadence
-        uint32_t stepsTotal; //!< Steps total
-
     protected:
+        Adafruit_ST7735_Mini _lcd; //!< LCD output
+        char _lcd_bitmap_buffer[LCD_BUFFER_SIZE]; //!< Buffer for fast bitmap drawing
+        GT24L24A2Y _flash; //!< Flash font interface
+
         enum ScreenState _state = ScreenState::STATE_CLOCK; //!< Stores screen state
         enum ScreenState _prev_state = ScreenState::STATE_LOOP; //!< Previous screen state
         Semaphore _display_guard; //!< Serialize display bus access
-        // GT24L24A2Y _font_reader; //!< Font ROM interface
+
         uint8_t _clock_digit_cache[4]; //!< Cache for the clock digits
         uint8_t _clock_indicator_cache; //!< Cache for the clock format, 0 = 24h (empty), 1 = AM, 2 = PM
         const uint8_t _clock_digit_pos[4][2] = { 
             {3, 0}, {39, 0}, {3, 55}, {39, 55} }; //!< Pixel positions of the clock digits
         const uint8_t _clock_indicator_pos[2][2] = { 
             {6, 115}, {44, 115} }; //!< Pixel positions of the clock AM/PM indicator
-        GT24L24A2Y _flash;
+      
+        time_t _epochTime = 0; //!< Current time
+        uint8_t _batteryPercent = 0; //!< Battery remaining in percent
+        uint8_t _heartrate = 0; //!< Heartrate
+        float _batteryRaw = 0.f; //!< Battery remaining raw (volts)
+        bool _batteryCharging = false; //!< Battery charging state
+        bool _bleStatus = false; //!< Bluetooth status
+        bool _bleEncStatus = false; //!< Bluetooth Enc status
+        uint8_t _stepsCadence = 0; //!< Steps cadence
+        uint32_t _stepsTotal = 0; //!< Steps total
+
+        friend class DisplayService; // Display may access internal screen variables
 };
 
 /**
@@ -211,19 +215,19 @@ class DisplayService
         SensorService& _sensor_service; //!< Sensor service reference
         CurrentTimeService& _current_time_service; //! Current time service
         events::EventQueue& _event_queue; //!< Event queue
-        bool* _ble_connected; //!< BLE status
-        bool* _ble_encrypted; //!< BLE enc status
+        bool* _ble_connected = nullptr; //!< BLE status
+        bool* _ble_encrypted = nullptr; //!< BLE enc status
         DigitalOut _vibration; //!< Vibration output
         Thread _vibration_thread; //!< Thread for vibration duration
         Semaphore _vibration_trigger; //!< Interlock to trigger vibration
-        uint16_t _vibration_duration; //!< Duration of the vibration in ms
-        volatile bool _vibrating; //!< Indicates vibration state - read in IRQ
-        int _clearVibrationToken; //!< Eventqueue token for indicator clearing timeout
+        uint16_t _vibration_duration = 0; //!< Duration of the vibration in ms
+        volatile bool _vibrating = false; //!< Indicates vibration state - read in IRQ
+        int _clearVibrationToken = -1; //!< Eventqueue token for indicator clearing timeout
 
         PwmOutLP _lcd_bl; //!< LCD backlight
         DigitalOut _lcd_pwr; //!< LCD power
 
-        bool _is_on; //!< Power state
+        bool _is_on = false; //!< Power state
 
         /**
          * @brief Waits for the vibration interlock and then vibrates the motor

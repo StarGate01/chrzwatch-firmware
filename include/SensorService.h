@@ -98,16 +98,16 @@ class SensorService
 
         AnalogIn _battery; //!< Battery voltage input
         DigitalIn _charging; //!< Is charging input
-        float _battery_value; //!< The internal battery value state (volts)
-        bool _charging_value; //!< The internal charging state
-        uint8_t _hr_value; //!< The internal heartrate value
-        uint8_t _motion_count; //!< The internal count of motion events
-        uint64_t _motion_count_age; //<! Age of the motion count buffer
+        float _battery_value = 0; //!< The internal battery value state (volts)
+        bool _charging_value = false; //!< The internal charging state
+        uint8_t _hr_value = 0; //!< The internal heartrate value
+        uint8_t _motion_count = 0; //!< The internal count of motion events
+        uint64_t _motion_count_age = 0; //<! Age of the motion count buffer
 
         InterruptIn _button1; //!< Button 1 input
         InterruptIn _button2; //!< Button 2 input
         uint64_t _last_button; //!< Time since button press for debouncing
-        bool _cancel_timeout; //!< Whether a button timeout is already running
+        bool _cancel_timeout = false; //!< Whether a button timeout is already running
 
         UnsafeI2C _acc_i2c; //!< I2C interface for the acceleration sensor
         RegisterWriter _acc_rw; //!< Register access to the acceleration sensor

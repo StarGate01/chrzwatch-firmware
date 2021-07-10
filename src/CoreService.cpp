@@ -11,8 +11,6 @@
 #define RSCFF RunningSpeedAndCadenceService::RSCFeatureFlags
 CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _event_queue(event_queue),
-    _connected(false),
-    _encrypted(false),
     _ble(ble),
     _adv_data_builder(_adv_buffer),
     _ble_hr_service(ble, 0, HeartRateService::LOCATION_WRIST),

@@ -77,8 +77,8 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
     protected:
         events::EventQueue& _event_queue; //!< Reference to the event queue for dispatching
 
-        bool _connected; //!< Connection state of the BLE system
-        bool _encrypted; //!< BLE link encryption state
+        bool _connected = false; //!< Connection state of the BLE system
+        bool _encrypted = false; //!< BLE link encryption state
         BLE& _ble; //!< Reference to the BLE instance
         uint8_t _adv_buffer[ble::LEGACY_ADVERTISING_MAX_SIZE]; //!< BLE GAP advertising buffer
         ble::AdvertisingDataBuilder _adv_data_builder; //!< BLE GAP factory

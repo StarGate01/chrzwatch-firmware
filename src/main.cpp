@@ -43,8 +43,14 @@ void mbed_error_reboot_callback(mbed_error_ctx *error_context)
 
 // SEGGER RTT 
 
-static JLink_RTT rtt;
+static JLink_RTT rtt; //!< Stream which exposes the RTT interface
 
+/**
+ * @brief Override the default console used for printf etc.
+ * 
+ * @param fd A file id (unused)
+ * @return FileHandle* A stream to perform IO on
+ */
 FileHandle* mbed::mbed_override_console(int fd)
 {
     return &rtt;
@@ -54,15 +60,17 @@ FileHandle* mbed::mbed_override_console(int fd)
 // I2C and SPI instance map
 
 const PinMapI2C PinMap_I2C[] = {
-    {p1, p2, 1},
-    {NC, NC, NC}
-};
+    { PIN_ACC_SDA, PIN_ACC_SCL, 0 },
+    { PIN_HR_SDA, PIN_HR_SCL, 1 },
+    { NC, NC, NC }
+}; //!< I2C interface map
 
 const PinMapSPI PinMap_SPI[] = {
-    {p3, p4, p5, 2},
-    {p6, p7, p8, 0},
-    {NC, NC, NC, NC}
-};
+    { PIN_LCD_MOSI, NC, PIN_LCD_CLK, 2 },
+    { PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, 2 },
+    { NC, NC, NC, NC }
+}; //!< SPI interface map
+
 
 // Main App
 
