@@ -15,16 +15,16 @@
 
 #include <mbed.h>
 #include <events/mbed_events.h>
-#include "ble/BLE.h"
-#include "ble/gap/Gap.h"
-#include "ble/services/HeartRateService.h"
-#include "ble/services/BatteryService.h"
-#include "ble/services/DeviceInformationService.h"
+#include <ble/BLE.h>
+#include <ble/gap/Gap.h>
+#include <ble/services/HeartRateService.h>
+#include <ble/services/BatteryService.h>
+#include <ble/services/DeviceInformationService.h>
 
-#include <CurrentTimeService.h>
-#include <ImmediateAlertService.h>
-#include <RunningSpeedAndCadence.h>
-#include <CustomSettings.h>
+#include "CurrentTimeService.h"
+#include "ImmediateAlertService.h"
+#include "RunningSpeedAndCadence.h"
+#include "CustomSettings.h"
 
 #include "HardwareConfiguration.h"
 #include "UserSettings.h"

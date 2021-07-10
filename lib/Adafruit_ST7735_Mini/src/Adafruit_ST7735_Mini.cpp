@@ -26,8 +26,10 @@
   MIT license, all text above must be included in any redistribution
  ****************************************************/
 
-#include "mbed.h"
+#include <mbed.h>
+
 #include "Adafruit_ST7735_Mini.h"
+
 
 inline uint16_t swapcolor(uint16_t x)
 {

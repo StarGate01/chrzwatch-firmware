@@ -6,8 +6,9 @@
  * @date 2021-07-06
  */
 
-#include "CustomSettings.h"
 #include <functional>
+
+#include "CustomSettings.h"
 
 
 template <class T>

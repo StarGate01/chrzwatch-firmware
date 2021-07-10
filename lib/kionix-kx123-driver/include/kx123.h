@@ -15,10 +15,11 @@
 #ifndef KX123_H
 #define KX123_H
 
-#include "rohm_hal2.h"
 #include "RegisterWriter.h"
+#include "rohm_hal2.h"
 
 #include "kx123_registers.h"
+
 
 /**
 * Kionix KX123 accelerometer i2c driver. For some extend can be used also with

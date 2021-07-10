@@ -14,10 +14,11 @@
 
 #include <mbed.h>
 #include <events/mbed_events.h>
-#include "ble/BLE.h"
+#include <ble/BLE.h>
 
 #define UUID_CUSTOM_SETTINGS_SERVICE 0x1901 // Spec goes up to 0x184D
 #define UUID_CUSTOM_SETTINGS_CHAR    0x2C01 // Spec goes up to 0x2BC3
+
 
 /**
  * @brief Provides a BLE service to read and write custom settings

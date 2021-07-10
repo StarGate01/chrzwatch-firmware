@@ -32,6 +32,7 @@
 #define FLASH_CMD_SLEEP_ENABLE  0xB9 // Deep sleep enable
 #define FLASH_CMD_SLEEP_DISABLE 0xAB // Deep sleep disable
 
+
 /**
  * @brief Describes the data layout of a font inside the ROM
  */

@@ -1,6 +1,6 @@
 {
     "name": "GT24L24A2Y",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "keywords": "GT24L24A2Y, font, rom, spi, flash",
     "description": "Standard dot matrix Chinese and foreign languages chip GT24L24A2Y driver.",
     "authors":

@@ -31,9 +31,11 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "mbed.h"
+#include <mbed.h>
+
 #include "Adafruit_GFX.h"
 #include "glcdfont.h"
+
 
 Adafruit_GFX::Adafruit_GFX(int16_t w, int16_t h): WIDTH(w), HEIGHT(h) {
  

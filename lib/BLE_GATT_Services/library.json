@@ -1,6 +1,6 @@
 {
     "name": "BLE_GATT_Services",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "keywords": "bluetooth, ble, gatt, service, currenttime, immediate, alert, running, speed, cadence, settings",
     "description": "Various Bluetooth LE GATT services: CurrentTime, ImmediateAlert, RunningSpeedAndCadence, CustomSettings.",
     "authors":

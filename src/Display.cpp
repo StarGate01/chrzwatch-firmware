@@ -78,19 +78,26 @@ void DisplayService::render()
 {
     if(_is_on)
     {
-        if(_ble_connected != nullptr) screen.bleStatus = *_ble_connected;
-        if(_ble_encrypted != nullptr) screen.bleEncStatus = *_ble_encrypted;
-        _current_time_service.readEpoch(screen.epochTime);
-        screen.batteryPercent = _sensor_service.getBatteryPercent();
-        screen.batteryRaw = _sensor_service.getBatteryRaw();
-        screen.batteryCharging = _sensor_service.getBatteryCharging();
-        screen.heartrate = _sensor_service.getHRValue();
-        screen.stepsCadence = _sensor_service.rsc_measurement.instantaneous_cadence;
-        screen.stepsTotal = _sensor_service.rsc_measurement.total_steps;
-
         // Defer if called from IRQ context
-        _event_queue.call(callback(&screen, &Screen::render));
+        _event_queue.call(callback(this, &DisplayService::unsafeRender));
     }
+}
+
+void DisplayService::unsafeRender()
+{
+    // Update screen variables
+    if(_ble_connected != nullptr) screen.bleStatus = *_ble_connected;
+    if(_ble_encrypted != nullptr) screen.bleEncStatus = *_ble_encrypted;
+    _current_time_service.readEpoch(screen.epochTime);
+    screen.batteryPercent = _sensor_service.getBatteryPercent();
+    screen.batteryRaw = _sensor_service.getBatteryRaw();
+    screen.batteryCharging = _sensor_service.getBatteryCharging();
+    screen.heartrate = _sensor_service.getHRValue();
+    screen.stepsCadence = _sensor_service.rsc_measurement.instantaneous_cadence;
+    screen.stepsTotal = _sensor_service.rsc_measurement.total_steps;
+
+    // Render screen
+    screen.render();
 }
 
 void DisplayService::threadVibration()

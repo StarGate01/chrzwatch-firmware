@@ -10,6 +10,7 @@
 #include "DisplayService.h"
 #include "UserSettings.h"
 
+
 SensorService::SensorService(DisplayService &display_service):
     _display_service(display_service),
     _battery(PIN_BATTERY),

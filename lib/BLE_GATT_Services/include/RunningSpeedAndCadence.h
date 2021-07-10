@@ -13,7 +13,7 @@
 #define BLE_ROLE_BROADCASTER 1
 
 #include <mbed.h>
-#include "ble/BLE.h"
+#include <ble/BLE.h>
 
 #define UUID_SENSOR_LOCATION_CHAR                 0x2A5D
 #define UUID_RSC_MEASUREMENT_MANDATORY_VALUE_SIZE 4
@@ -22,6 +22,7 @@
 #define UUID_RSC_MEASUREMENT_MAX_VALUE_SIZE       10
 #define UUID_RSC_FEATURE_FLAG_VALUE_SIZE          2
 #define UUID_RSC_SENSOR_LOCATION_VALUE_SIZE       1
+
 
 /**
  * @brief Provides a BLE service to broadcast running speed and cadence

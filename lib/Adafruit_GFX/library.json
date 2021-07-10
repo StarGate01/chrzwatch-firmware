@@ -1,6 +1,6 @@
 {
     "name": "Adafruit_GFX",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "keywords": "gfx, lcd, tft",
     "description": "A first port of the excellent Adafruit GFX library, with more fast drawing functions",
     "authors":

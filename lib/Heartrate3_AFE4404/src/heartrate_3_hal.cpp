@@ -6,10 +6,10 @@
  * @date 2020-08-30
  */
 
-#include "heartrate_3_hal.h"
-
 #include <mbed.h>
-#include <UnsafeI2C.h>
+
+#include "UnsafeI2C.h"
+#include "heartrate_3_hal.h"
 
 
 static UnsafeI2C* _hal_i2c = nullptr;

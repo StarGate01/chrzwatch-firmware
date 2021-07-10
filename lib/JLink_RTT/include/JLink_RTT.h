@@ -16,9 +16,9 @@
 #ifndef JLINK_RTT_H
 #define JLINK_RTT_H
 
-#include "mbed.h"
-#include "platform/Stream.h"
-#include "platform/NonCopyable.h"
+#include <mbed.h>
+#include <Stream.h>
+#include <NonCopyable.h>
 
 
 /**

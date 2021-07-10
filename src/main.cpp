@@ -8,11 +8,14 @@
 
 #include <mbed.h>
 #include <events/mbed_events.h>
-#include "ble/BLE.h"
+#include <ble/BLE.h>
+#include <pinmap_ex.h>
+
 #include "JLink_RTT.h"
 #include "CoreService.h"
 #include "UserSettings.h"
-#include "GT24L24A2Y.h"
+// #include "GT24L24A2Y.h"
+#include "HardwareConfiguration.h"
 
 
 // Crash dump retention
@@ -47,6 +50,19 @@ FileHandle* mbed::mbed_override_console(int fd)
     return &rtt;
 }
 
+
+// I2C and SPI instance map
+
+const PinMapI2C PinMap_I2C[] = {
+    {p1, p2, 1},
+    {NC, NC, NC}
+};
+
+const PinMapSPI PinMap_SPI[] = {
+    {p3, p4, p5, 2},
+    {p6, p7, p8, 0},
+    {NC, NC, NC, NC}
+};
 
 // Main App
 

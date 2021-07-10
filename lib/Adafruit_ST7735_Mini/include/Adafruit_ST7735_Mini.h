@@ -29,8 +29,10 @@
 #ifndef _ADAFRUIT_ST7735H_MINI_
 #define _ADAFRUIT_ST7735H_MINI_
 
-#include "mbed.h"
+#include <mbed.h>
+
 #include "Adafruit_GFX.h"
+
 
 #define boolean bool
 
@@ -105,6 +107,7 @@
 #define ST7735_MAGENTA 0xF81F
 #define ST7735_YELLOW 0xFFE0
 #define ST7735_WHITE 0xFFFF
+
 
 /**
  * @brief Provides an Adafruit_GFX object for the ST7735 (mini) display

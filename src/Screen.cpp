@@ -6,12 +6,13 @@
  * @date 2020-08-19
  */
 
+#include <mbed_stats.h>
+
 #include "DisplayService.h"
-#include "mbed_stats.h"
 #include "UserSettings.h"
 
-#include <roboto_bold_48_minimal.h>
-#include <roboto_bold_36_minimal.h>
+#include "roboto_bold_48_minimal.h"
+#include "roboto_bold_36_minimal.h"
 
 
 Screen::Screen():
@@ -143,7 +144,7 @@ void Screen::render()
         {
             if(_prev_state != _state) 
             {
-                // lcd.fillFastScreen(LCD_COLOR_RED, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+                lcd.fillFastScreen(LCD_COLOR_RED, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
 
                 // char buffer[1];
                 // _flash.read_raw(0x0, 1, buffer);

@@ -1,6 +1,6 @@
 {
     "name": "UnsafeSPI",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "keywords": "spi, thread, lock",
     "description": "Mbed SPI interface without locks, which makes it unsafe for parallel usage, but enables usage in interrupt handlers.",
     "authors":

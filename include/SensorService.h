@@ -9,17 +9,19 @@
 #ifndef SENSOR_H
 #define SENSOR_H
 
+#define MBED_CONF_RTOS_PRESENT 1
+
 #include <mbed.h>
 #include <events/mbed_events.h>
+
+#include "RegisterWriter.h"
+#include "kx123.h"
+#include "UnsafeI2C.h"
+#include "Heartrate3_AFE4404.h"
+#include "RunningSpeedAndCadence.h"
+
 #include "HardwareConfiguration.h"
 #include "UserSettings.h"
-
-#include <RegisterWriter.h>
-#include <kx123.h>
-#include <UnsafeI2C.h>
-
-#include <Heartrate3_AFE4404.h>
-#include <RunningSpeedAndCadence.h>
 
 
 #define BUTTON_VIBRATION_LENGTH 75    //!< Button vibration feedback in ms

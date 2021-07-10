@@ -18,6 +18,7 @@
 * Includes
 *******************************************************************************/
 #include <stdint.h>
+
 #include "heartrate_3_hal.h"
 #include "heartrate_3_hw.h"
 

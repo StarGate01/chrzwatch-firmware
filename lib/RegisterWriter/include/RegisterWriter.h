@@ -25,8 +25,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef i2c_common_pp_h
 #define i2c_common_pp_h
 
+#include "UnsafeI2C.h"
+
 #include "rohm_hal2.h" //types, DEBUG_print*, USE_*_HARDWARE_I2C
-#include <UnsafeI2C.h>
+
 
 /**
 * RegisterWriter class for writing sensor registers via I2C object

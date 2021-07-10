@@ -18,13 +18,14 @@
 #include <mbed.h>
 #include <events/mbed_events.h>
 #include <time.h>
-#include "ble/BLE.h"
+#include <ble/BLE.h>
 
 #define BLE_CURRENT_TIME_CHAR_VALUE_SIZE 10
 
 #ifndef LOW_POWER
-#define LOW_POWER 1
+    #define LOW_POWER 1
 #endif
+
 
 /**
  * @brief Provides symbols for the weekdays

@@ -7,7 +7,6 @@
  */
 
 #include "Heartrate3_AFE4404.h"
-
 #include "heartrate_3_hal.h"
 
 

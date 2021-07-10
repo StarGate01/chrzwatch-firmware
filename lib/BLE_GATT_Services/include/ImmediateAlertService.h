@@ -14,7 +14,7 @@
 
 #include <mbed.h>
 #include <events/mbed_events.h>
-#include "ble/BLE.h"
+#include <ble/BLE.h>
 
 #define UUID_ALERT_LEVEL_CHAR_VALUE_SIZE 1
 

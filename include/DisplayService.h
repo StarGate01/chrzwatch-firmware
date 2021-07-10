@@ -15,8 +15,8 @@
 #include <events/mbed_events.h>
 #include <rtos.h>
 
-#include <Adafruit_ST7735_Mini.h>
-#include <GT24L24A2Y.h>
+#include "Adafruit_ST7735_Mini.h"
+#include "GT24L24A2Y.h"
 
 #include "HardwareConfiguration.h"
 #include "CurrentTimeService.h"
@@ -236,6 +236,12 @@ class DisplayService
          * 
          */
         void clearVibration();
+
+        /**
+         * @brief Render the internal state to the LCD display, but is not IRQ safe
+         * 
+         */
+        void unsafeRender();
 
 };
 

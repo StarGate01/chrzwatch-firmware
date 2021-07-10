@@ -34,8 +34,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef _ADAFRUIT_GFX_H
 #define _ADAFRUIT_GFX_H
 
-#include "mbed.h"
-#include "Stream.h"
+#include <mbed.h>
+#include <Stream.h>
 
 
 #define aswap(a, b) { int16_t t = a; a = b; b = t; }
