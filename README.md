@@ -373,14 +373,14 @@ The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (defau
 
 The PlatformIO IDE is able to use either a *CMSIS-DAP* or *J-Link* adapter for interactive debugging. The `i6hrc_debug` and `nrf52_dk_debug` configurations provide debugging support. Do note that the watchdog timer might kill your debugging session. The host may use the *J-Link* debugger software (which is able to connect to a *CMSIS-DAP* as well) or the *CMSIS_DAP* debugger software by PlatformIO (default).
 
-Since the `RX`, `TX` and `SWO` pins are used for other peripherals, *UART* and *SWO* communication is not possible. The firmware thus implements a **SEGGER J-Link RTT interface** (https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/), which communicates via the `SWD` debug interface. To access this interface, either the SEGGER RTT tools or J-Link tools are required, either use *JLinkRTTViewer* or use the other tools to open a socket, then connect to it via a terminal at `socket://localhost:19021` (default).
+Since the `RX`, `TX` and `SWO` pins are used for other peripherals, *UART* and *SWO* communication is not possible. The firmware thus implements a **SEGGER J-Link RTT** interface (https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/), which communicates via the `SWD` debug interface. To access this interface, either the SEGGER RTT tools or J-Link tools are required. Use *JLinkRTTViewer* or the other tools to open a socket, then connect to it via a terminal at `socket://localhost:19021` (default port).
 
 ```
 $ JLinkExe -autoconnect 1 -device NRF52832_XXAA -if SWD -speed 4000 -RTTTelnetPort 19021 &
 $ telnet localhost 19021
 ```
 
-The task "StartMonitor Server" automates this connection.
+The task "Start Monitor Server" automates this connection.
 
 #### Troubleshooting
 
