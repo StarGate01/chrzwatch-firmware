@@ -430,75 +430,180 @@ Please note that while most code in this repository is licensed under the terms 
 
 Fonts can be found in `/res/fonts`.
 
- - Adafruit standard ascii 5x7 (https://platformio.org/lib/show/12501/Adafruit_GFX) 
-   - *License: Apache 2.0*
- - Google Roboto Mono Bold [24pt, 36pt,48pt] (https://fonts.google.com/specimen/Roboto)
-   - Selected subset of glyphs
-   - *License: Apache 2.0*
+<details>
+<summary>Standard ascii 5x7</summary>
+
+- Author: Adafruit
+- URL: https://platformio.org/lib/show/12501/Adafruit_GFX
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>Roboto Mono Bold [24pt, 36pt,48pt]</summary>
+
+- Author: Google
+- URL: https://fonts.google.com/specimen/Roboto
+- Selected subset of glyphs
+- *License: Apache 2.0*
+
+</details>
 
 ### Patches
 
 Patches to Mbed can be found in `/patch`.
 
-- ARM Mbed RTOS and API: https://os.mbed.com/
-  - Hot-patch Nordic BLE driver to support deep sleep
-  - Replace NRF52 linker memory map to support crash dump retention
-  - *License: Custom - see https://github.com/ARMmbed/mbed-os/blob/master/LICENSE.md*
+<details>
+<summary>ARM Mbed RTOS and API</summary>
+
+- URL: https://os.mbed.com/
+- Hot-patch Nordic BLE driver to support deep sleep
+- Replace NRF52 linker memory map to support crash dump retention
+- *License: Custom - see https://github.com/ARMmbed/mbed-os/blob/master/LICENSE.md*
+
+</details>
 
 ### Libraries
 
 All modified libraries have been or will be published to https://platformio.org , their source code can be found in `/lib`.
 
- - The `CurrentTimeService` module of the `BLE_GATT_Services` library (https://platformio.org/lib/show/7372/BLE_GATT_Services) is based on `BLE_CurrentTimeService` by *Takehisa Oneta*: https://os.mbed.com/users/ohneta/code/BLE_CurrentTimeService/
-   - Deferred calls in ISR context to EventQueue
-   - Added documentation
-   - Added LOW_POWER macro (default 1) to use a low-power ticker.
-   - Exposed monotonic timer callback
-   - *License: GPLv3*
- - The `Adafruit_GFX` library (https://platformio.org/lib/show/12501/Adafruit_GFX) is based on the library of the same name by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which in turn is a port of https://github.com/adafruit/Adafruit-GFX-Library
-   - Added buffered high-speed drawing functions
-   - Move font to .text
-   - *License: Apache 2.0*
- - The `Adafruit_ST7735_Mini` library (https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini) is based on the `Adafruit_ST7735` library by *Andrew Lindsay*: https://platformio.org/lib/show/2150/Adafruit_ST7735, which in turn is a port of a library by Adafruit: https://github.com/adafruit/Adafruit-ST7735-Library
-   - Added support for the `R_MINI160x80` display type
-   - Added documentation
-   - Added an explicit dependency to `Adafruit_GFX` port, see above
-   - Added SPI speed configuration
-   - Added high-speed buffered drawing functions
-   - *License: Apache 2.0*
- - The `UnsafeI2C` library (https://platformio.org/lib/show/12500/UnsafeI2C) is a wrapper for the existing Mbed I2C library
-   - Removed threadsafe mutex
-   - *License: Apache 2.0*
- - The `GT24L24A2Y` library (Unpublished, unfinished) is a driver for the font chip of the same name
-   - Initial implementation
-   - *License: GPLv3*
- - The `Heartrate3_AFE4404` library (https://platformio.org/lib/show/11099/Heartrate3_AFE4404) is based on the library and example code of `Click_Heartrate3_AFE4404` by *MikroElektronika* / *Corey Lakey*: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
-   - Added Mbed integration
-   - Added interrupt handling
-   - Added power down/up functionality
-   - Added an explicit dependency to `UnsafeI2C`, see above
-   - *License: GPLv2*
- - The `kionix-kx123-driver` library (https://platformio.org/lib/show/11101/kionix-kx123-driver) is based on the library of the same name by *Rohm*: https://platformio.org/lib/show/3975/kionix-kx123-driver
-   - Adapted to Mbed 5
-   - Added interrupt configuration functionality
-   - Added motion detecting functionality
-   - Fixed include paths
-   - Add tilt detecting feature
-   - *License: Apache 2.0*
- - The `RegisterWriter` library (https://platformio.org/lib/show/11100/RegisterWriter) is based on the library of the same name by *Rohm* / *Mikko Koivunen*: https://platformio.org/lib/show/10695/RegisterWriter
-   - Adapted to Mbed 5
-   - Fixed include paths
-   - Fixed default pins
-   - Added an explicit dependency to `UnsafeI2C`, see above
-   - *License: Apache 2.0*
- - The `JLink_RTT` library (https://platformio.org/lib/show/12534/JLink_RTT) is based on `jlink_real_time_transfer` by *James Wang*: https://github.com/woodsking2/sabomo_jlink_rtt, which in turn is based on `JLink_V630D/Samples/RTT/SEGGER_RTT_V630d.zip` by *SEGGER Microcontroller GmbH*: https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/
-   - Removed redundant printf implementation, use the one of Mbed
-   - Use Mutex instead of Thread_safe
-   - Add serial input
-   - Add example
-   - *License: GPLv3 / Custom*
+<details>
+<summary>CurrentTimeService</summary>
+
+- Original author: Takehisa Oneta
+- URL: https://os.mbed.com/users/ohneta/code/BLE_CurrentTimeService/
+- Modifications:
+  - URL: https://platformio.org/lib/show/7372/BLE_GATT_Services
+  - Deferred calls in ISR context to EventQueue
+  - Added documentation
+  - Added LOW_POWER macro (default 1) to use a low-power ticker.
+  - Exposed monotonic timer callback
+- *License: GPLv3*
+
+</details>
+
+<details>
+<summary>Adafruit_GFX</summary>
+
+- Original author: Adafruit
+- URL: https://github.com/adafruit/Adafruit-GFX-Library
+- Modifications:
+  - Original author: Andrew Lindsay
+  - URL: https://platformio.org/lib/show/2147/Adafruit_GFX
+  - Modifications:
+    - URL: https://platformio.org/lib/show/12501/Adafruit_GFX
+    - Added buffered high-speed drawing functions
+    - Move font to .text
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>Adafruit_ST7735_Mini</summary>
+
+- Original author: Adafruit
+- URL: https://github.com/adafruit/Adafruit-ST7735-Library
+- Modifications:
+  - Original author: Andrew Lindsay
+  - URL: https://platformio.org/lib/show/2150/Adafruit_ST7735
+  - Modifications:
+    - URL: https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini
+    - Added support for the `R_MINI160x80` display type
+    - Added documentation
+    - Added an explicit dependency to `Adafruit_GFX` port, see above
+    - Added SPI speed configuration
+    - Added high-speed buffered drawing functions
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>UnsafeI2C</summary>
+
+- URL: https://platformio.org/lib/show/12500/UnsafeI2C
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>GT24L24A2Y</summary>
+
+- URL: (Unpublished, unfinished)
+- *License: GPLv3*
+
+</details>
+
+<details>
+<summary>Heartrate3_AFE4404</summary> 
+
+- Original author: MikroElektronika / Corey Lakey: 
+- URL: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
+- Modifications:
+  - URL: https://platformio.org/lib/show/11099/Heartrate3_AFE4404
+  - Added Mbed integration
+  - Added interrupt handling
+  - Added power down/up functionality
+  - Added an explicit dependency to `UnsafeI2C`, see above
+- *License: GPLv2*
+
+</details>
+
+<details>
+<summary>kionix-kx123-driver</summary> 
+
+- Original author: Rohm
+- URL: https://platformio.org/lib/show/3975/kionix-kx123-driver
+- Modifications: 
+  - URL: https://platformio.org/lib/show/11101/kionix-kx123-driver
+  - Adapted to Mbed 5
+  - Added interrupt configuration functionality
+  - Added motion detecting functionality
+  - Fixed include paths
+  - Add tilt detecting feature
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>RegisterWriter</summary>
+
+- Original author: Rohm / Mikko Koivunen
+- URL: https://platformio.org/lib/show/10695/RegisterWriter
+- Modifications:
+  - URL: https://platformio.org/lib/show/11100/RegisterWriter
+  - Adapted to Mbed 5
+  - Fixed include paths
+  - Fixed default pins
+  - Added an explicit dependency to `UnsafeI2C`, see above
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>JLink_RTT</summary>
+
+- Original author: SEGGER
+- URL: https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/ (JLink_V630D/Samples/RTT/SEGGER_RTT_V630d.zip)
+- Modifications:
+  - Original author: James Wang
+  - URL: https://github.com/woodsking2/sabomo_jlink_rtt
+  - Modifications:
+    - URL: https://platformio.org/lib/show/12534/JLink_RTT
+    - Removed redundant printf implementation, use the one of Mbed
+    - Use Mutex instead of Thread_safe
+    - Add serial input
+    - Add example
+- *License: GPLv3 / Custom - see files*
+
+</details>
 
 ### Other
 
- - The file `doc/pinout.png` was made by *Aaron Christophel*: https://atcnetz.blogspot.com/2019/02/arduino-auf-dem-fitness-tracker-dank.html
-   - *License: All rights reserved, fair use*
+<details>
+<summary>File /doc/pinout.png</summary> 
+
+- Original author: Aaron Christophel
+- URL: https://atcnetz.blogspot.com/2019/02/arduino-auf-dem-fitness-tracker-dank.html
+- *License: All rights reserved, fair use*
+
+</details>
