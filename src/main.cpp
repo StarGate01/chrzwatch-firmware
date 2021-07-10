@@ -12,32 +12,33 @@
 #include "JLink_RTT.h"
 #include "CoreService.h"
 #include "UserSettings.h"
+#include "GT24L24A2Y.h"
 
 
-#if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
+// Crash dump retention
 
-    mbed_error_status_t err_status; //!< Stores crash info
+mbed_error_status_t err_status; //!< Stores crash info
 
-    /**
-     * @brief Reboot hook handler
-     * 
-     * @param error_context Additional error information
-     */
-    void mbed_error_reboot_callback(mbed_error_ctx *error_context)
-    {
-        err_status = error_context->error_status;
-        printf("\n\n(before main) mbed_error_reboot_callback invoked with the following error context:\n");
-        printf("    Status      : 0x%lX\n", (uint32_t)error_context->error_status);
-        printf("    Value       : 0x%lX\n", (uint32_t)error_context->error_value);
-        printf("    Address     : 0x%lX\n", (uint32_t)error_context->error_address);
-        printf("    Reboot count: 0x%lX\n", (uint32_t)error_context->error_reboot_count);
-        printf("    CRC         : 0x%lX\n", (uint32_t)error_context->crc_error_ctx);
-        mbed_reset_reboot_error_info();
-        mbed_reset_reboot_count();
-    }
+/**
+ * @brief Reboot hook handler
+ * 
+ * @param error_context Additional error information
+ */
+void mbed_error_reboot_callback(mbed_error_ctx *error_context)
+{
+    err_status = error_context->error_status;
+    printf("\n\n(before main) mbed_error_reboot_callback invoked with the following error context:\n");
+    printf("    Status      : 0x%lX\n", (uint32_t)error_context->error_status);
+    printf("    Value       : 0x%lX\n", (uint32_t)error_context->error_value);
+    printf("    Address     : 0x%lX\n", (uint32_t)error_context->error_address);
+    printf("    Reboot count: 0x%lX\n", (uint32_t)error_context->error_reboot_count);
+    printf("    CRC         : 0x%lX\n", (uint32_t)error_context->crc_error_ctx);
+    mbed_reset_reboot_error_info();
+    mbed_reset_reboot_count();
+}
 
-#endif
 
+// SEGGER RTT 
 
 static JLink_RTT rtt;
 
@@ -46,6 +47,8 @@ FileHandle* mbed::mbed_override_console(int fd)
     return &rtt;
 }
 
+
+// Main App
 
 static events::EventQueue event_queue(16 * EVENTS_EVENT_SIZE); //!< The main event queue for dispatching events
 static BLE& ble_handle = BLE::Instance(); //!< BLE hardware instance
@@ -63,6 +66,8 @@ static void schedule_ble_events(BLE::OnEventsToProcessCallbackContext *context)
     event_queue.call(Callback<void()>(&context->ble, &BLE::processEvents));
 }
 
+// GT24L24A2Y _flash(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_ACC_CS);
+
 /**
  * @brief Main entrypoint
  * 
@@ -73,6 +78,11 @@ int main()
     // Setup BLE events to event queue handler and start core
     ble_handle.onEventsToProcess(schedule_ble_events);
     core.start();
+
+
+    // char buffer[1] = { 42 };
+    // _flash.read_raw(0x0, 1, buffer);
+    // printf("%u\n", buffer[0]);
 
     // Dispatch events in main thread
     event_queue.dispatch_forever();

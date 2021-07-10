@@ -14,8 +14,8 @@ GT24L24A2Y::GT24L24A2Y(PinName mosi, PinName miso, PinName clk, PinName cs):
     _cs(cs)
 {
     _cs.write(1);
-    _spi.format(8, 0); // 8bits, CPOL=0, CPHA=0
-    _spi.frequency(1000000); // 1MHz
+    // _spi.format(8, 0); // 8bits, CPOL=0, CPHA=0
+    // _spi.frequency(125000); // 1MHz
 }
 
 int GT24L24A2Y::read(const struct font_layout_t& font, uint16_t glyph_id, char* buffer, uint16_t* actual_width)
@@ -49,7 +49,7 @@ int GT24L24A2Y::read_raw(uint32_t offset, uint16_t size, char* buffer)
 
     // Build command
     char command[4] = { 
-        0x03, // Read Opcode
+        FLASH_CMD_READ, // Read Opcode
         (offset >> 16) & 0xFF, // MSB
         (offset >> 8) & 0xFF,
         offset & 0xFF // LSB

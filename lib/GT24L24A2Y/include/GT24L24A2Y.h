@@ -11,10 +11,6 @@
 
 #include <mbed.h>
 
-#if DEVICE_SERIAL 
-    #include <RawSerial.h>
-    #include <events/mbed_events.h>
-#endif
 
 // Memory layout
 #define FLASH_SIZE              0x00200000 // 2 MB total
@@ -124,10 +120,6 @@ class GT24L24A2Y
 
         // #endif
 
-    protected:
-        SPI _spi; //!< SPI device interface
-        DigitalOut _cs; //!< Chip select pin
-
         /**
          * @brief Reads bytes from the font ROM (max. 255)
          * 
@@ -137,6 +129,12 @@ class GT24L24A2Y
          * @return int success = 0
          */
         int read_raw(uint32_t offset, uint16_t size, char* buffer);
+
+    protected:
+        SPI _spi; //!< SPI device interface
+        DigitalOut _cs; //!< Chip select pin
+
+  
 
 };
 

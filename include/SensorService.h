@@ -117,12 +117,12 @@ class SensorService
         Heartrate3_AFE4404 _hr; //!< Access to heartrate sensor
         DigitalOut _hr_pwr; //!< Power pin of the heartrate sensor
 
-        void setupAccellerationSensor(); //!< Initializes the accelleration sensor
+        void setupAccelerationSensor(); //!< Initializes the acceleration sensor
         void poll(); //!< Begin to read all sensors
         void finishPoll(); //!< Called after sensor reading is complete
 
         void handleButtonIRQ(); //!< Handle press of buttons interrupt request
-        void handleAccIRQ(); //!< Handle accelleration sensor interrupt request
+        void handleAccIRQ(); //!< Handle acceleration sensor interrupt request
         void handleDisplayTimeout(); //!< Handle display timeout
 
 };

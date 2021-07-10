@@ -21,9 +21,10 @@ Screen::Screen():
     batteryCharging(true),
     bleStatus(false),
     bleEncStatus(false),
-    lcd(PIN_LCD_SDA, NC, PIN_LCD_SCL, PIN_LCD_CS, 
+    lcd(PIN_LCD_MOSI, NC, PIN_LCD_CLK, PIN_LCD_CS, 
         PIN_LCD_DC, PIN_LCD_RESET, LCD_SPI_FREQ),
-    _display_guard(1)
+    _display_guard(1),
+    _flash(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_ACC_CS)
 {
     _display_guard.acquire();
 
@@ -54,9 +55,6 @@ enum Screen::ScreenState Screen::getState()
 void Screen::render()
 {
     _display_guard.acquire(); // Wait for lcd to be available
-
-    printf("Battery: %u%% (%f)\n", batteryPercent, batteryRaw);
-    printf("ST: %u\nSC: %u\n", stepsTotal, stepsCadence);
 
     if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_BLACK, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
 
@@ -143,7 +141,13 @@ void Screen::render()
         }
         case ScreenState::STATE_HEART:
         {
-            if(_prev_state != _state) lcd.fillFastScreen(LCD_COLOR_RED, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            if(_prev_state != _state) 
+            {
+                // lcd.fillFastScreen(LCD_COLOR_RED, lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+
+                // char buffer[1];
+                // _flash.read_raw(0x0, 1, buffer);
+            }
             break;
         }
         case ScreenState::STATE_CADENCE:

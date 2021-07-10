@@ -16,7 +16,7 @@
 #include <rtos.h>
 
 #include <Adafruit_ST7735_Mini.h>
-// #include <GT24L24A2Y.h>
+#include <GT24L24A2Y.h>
 
 #include "HardwareConfiguration.h"
 #include "CurrentTimeService.h"
@@ -112,6 +112,7 @@ class Screen
             {3, 0}, {39, 0}, {3, 55}, {39, 55} }; //!< Pixel positions of the clock digits
         const uint8_t _clock_indicator_pos[2][2] = { 
             {6, 115}, {44, 115} }; //!< Pixel positions of the clock AM/PM indicator
+        GT24L24A2Y _flash;
 };
 
 /**

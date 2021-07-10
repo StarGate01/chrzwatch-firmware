@@ -41,7 +41,7 @@ SensorService::SensorService(DisplayService &display_service):
     _acc_addr.write(1);
     _acc_cs.write(1);
     _acc_irq.fall(callback(this, &SensorService::handleAccIRQ)); // Attach interrupt handler
-    setupAccellerationSensor();
+    setupAccelerationSensor();
 
     // Handle dispatching events
     _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::poll);
@@ -109,7 +109,7 @@ void SensorService::reevaluateStepsCadence()
 
 void SensorService::updateUserSettings()
 {
-    setupAccellerationSensor();
+    setupAccelerationSensor();
     rsc_measurement.instantaneous_stride_length = user_settings.sensor.step_length * 2;
 
     // Refresh display if needed
@@ -119,7 +119,7 @@ void SensorService::updateUserSettings()
     }
 }
 
-void SensorService::setupAccellerationSensor()
+void SensorService::setupAccelerationSensor()
 {   
     _acc_kx123.soft_reset();
     _acc_kx123.set_config(KX122_ODCNTL_OSA_50, KX122_CNTL1_GSEL_2G, true, false, true); // 50Hz data rate default output, 2g range, enable motion and tilt engine
@@ -182,8 +182,7 @@ void SensorService::handleButtonIRQ()
         if(current_state == Screen::ScreenState::STATE_LOOP) current_state = Screen::ScreenState::STATE_CLOCK;
         _display_service.screen.setState(current_state);
 
-        // Defer from IRQ context
-        _event_queue.call(&_display_service, &DisplayService::render);
+        _display_service.render();
     }
 }
 
@@ -203,8 +202,7 @@ void SensorService::handleAccIRQ()
             // Refresh display if needed
             if(_display_service.screen.getState() == Screen::ScreenState::STATE_HEART)
             {
-                // Defer from IRQ context
-                _event_queue.call(&_display_service, &DisplayService::render);
+                _display_service.render();
             }
         }
     }

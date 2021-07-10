@@ -87,7 +87,9 @@ void DisplayService::render()
         screen.heartrate = _sensor_service.getHRValue();
         screen.stepsCadence = _sensor_service.rsc_measurement.instantaneous_cadence;
         screen.stepsTotal = _sensor_service.rsc_measurement.total_steps;
-        screen.render();
+
+        // Defer if called from IRQ context
+        _event_queue.call(callback(&screen, &Screen::render));
     }
 }
 
