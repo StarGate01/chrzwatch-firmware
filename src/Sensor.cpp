@@ -42,8 +42,8 @@ SensorService::SensorService(DisplayService &display_service):
     setupAccelerationSensor();
 
     // Handle dispatching events
-    // _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::poll);
-    // _event_queue.call_every(LCD_TIMEOUT, this, &SensorService::handleDisplayTimeout);
+    _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::poll);
+    _event_queue.call_every(LCD_TIMEOUT, this, &SensorService::handleDisplayTimeout);
     _event_thread.start(callback(&_event_queue, &EventQueue::dispatch_forever));
 
     // Poll once at start
@@ -55,15 +55,13 @@ uint8_t SensorService::getHRValue()
     return _hr_value;
 }
 
-uint8_t SensorService::getBatteryPercent()
+float SensorService::getBatteryPercent()
 {
     // Map battery from battery min - max to 0 - 100 %
-    return (uint8_t)
-        max(min(
-            (int)round(
-                ((_battery_value - BATTERY_MIN) * 100.f) / 
+    return max(min(
+            (((_battery_value - BATTERY_MIN) * 100.f) / 
                 (BATTERY_MAX - BATTERY_MIN)), 
-        100), 0);
+        100.f), 0.f);
 }
 
 float SensorService::getBatteryRaw()
@@ -168,7 +166,10 @@ void SensorService::handleButtonIRQ()
     _cancel_timeout = true;
 
     // Trigger vibration
-    // _display_service.vibrate(BUTTON_VIBRATION_LENGTH);
+    if(user_settings.button_feedback == 1) 
+    {
+        _display_service.vibrate(BUTTON_VIBRATION_LENGTH);
+    }
 
     // Trigger display wakeup or state change
     if(!_display_service.getPower()) _display_service.setPower(true);

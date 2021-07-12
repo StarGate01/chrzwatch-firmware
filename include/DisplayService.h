@@ -33,8 +33,8 @@
 #define LCD_COLOR_GREEN     0x7E00
 #define LCD_COLOR_BLUE      0xF800
 #define LCD_COLOR_YELLOW    0x7E1F
-#define LCD_COLOR_GOLD      0x67F0
-#define LCD_COLOR_LIGHTRED  0x38FF
+#define LCD_COLOR_GOLD      0x2BDB
+#define LCD_COLOR_FROG      0x5E8B
 
 // Forward decalarations
 class SensorService;
@@ -60,7 +60,8 @@ class Screen
             STATE_CADENCE, //!< Step cadence screen
             STATE_STEPS, //!< Amount of steps screen
             STATE_DISTANCE, //!< Distance walked screen
-            STATE_SETTINGS, //!< Info and settings screen
+            STATE_SETTINGS, //!< Settings screen
+            STATE_INFO, //!< Info screen
             STATE_LOOP //!< Back to home
         };
 
@@ -102,17 +103,20 @@ class Screen
         uint8_t _clock_digit_cache[4]; //!< Cache for the clock digits
         uint8_t _clock_indicator_cache; //!< Cache for the clock format, 0 = 24h (empty), 1 = AM, 2 = PM
         const uint8_t _clock_digit_pos[4][2] = { 
-            {3, 0}, {39, 0}, {3, 55}, {39, 55} }; //!< Pixel positions of the clock digits
+            {3, 5}, {39, 5}, {3, 60}, {39, 60} }; //!< Pixel positions of the clock digits
         const uint8_t _clock_indicator_pos[2][2] = { 
             {6, 115}, {44, 115} }; //!< Pixel positions of the clock AM/PM indicator
+        const uint8_t _clock_24_y_offset = 17; //!< How many pixels to move digits down in 24h mode
+        mbed_stats_cpu_t _cpu_stats; //!< Buffer for cpu stats
       
         time_t _epochTime = 0; //!< Current time
-        uint8_t _batteryPercent = 0; //!< Battery remaining in percent
+        float _batteryPercent = 0; //!< Battery remaining in percent
         uint8_t _heartrate = 0; //!< Heartrate
         float _batteryRaw = 0.f; //!< Battery remaining raw (volts)
         bool _batteryCharging = false; //!< Battery charging state
         bool _bleStatus = false; //!< Bluetooth status
         bool _bleEncStatus = false; //!< Bluetooth Enc status
+        char _bleAddress[19]; //< BLE address string
         uint8_t _stepsCadence = 0; //!< Steps cadence
         uint32_t _stepsTotal = 0; //!< Steps total
 
@@ -208,6 +212,13 @@ class DisplayService
          * @param ble__enc_status The pointer
          */
         void setBLEEncStatusPtr(bool* ble_enc_status);
+
+        /**
+         * @brief Sets the BLE address to display
+         * 
+         * @param address The BLE address
+         */
+        void setBLEAddress(const char address[6]);
 
         Screen screen; //!< The LCD screen model and controller
 

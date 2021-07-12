@@ -91,7 +91,8 @@ void Screen::render()
                     || (i == 2 && _clock_digit_cache[0] != clock_digits[0]) // Minutes have to rendered again after hours
                     || (i == 3 && _clock_digit_cache[1] != clock_digits[1])) // Due to font overlap
                 {
-                    _lcd.drawFastBitmap(_clock_digit_pos[i][0], _clock_digit_pos[i][1],
+                    _lcd.drawFastBitmap(_clock_digit_pos[i][0], _clock_digit_pos[i][1] + 
+                            ((user_settings.time_format == 0)? _clock_24_y_offset : 0),
                         roboto_bold_48_minimal + (roboto_bold_48_minimal_bs * clock_digits[i]), 
                         roboto_bold_48_minimal_w, roboto_bold_48_minimal_h, LCD_COLOR_WHITE, LCD_COLOR_BLACK, 
                         _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
@@ -107,17 +108,7 @@ void Screen::render()
             // Draw indicator field
             if(re_layout || (clock_indicator != _clock_indicator_cache))
             {
-                if(user_settings.time_format == 0)
-                {
-                    // Clear indicator
-                    for(int i = 0; i < 2; i++)
-                    {
-                        _lcd.fillFastRect(_clock_indicator_pos[i][0], _clock_indicator_pos[i][1], 
-                        roboto_bold_36_minimal_w, roboto_bold_36_minimal_h, LCD_COLOR_BLACK,
-                        _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
-                    }
-                }
-                else
+                if(user_settings.time_format == 1)
                 {
                     // Draw AM / PM
                     _lcd.drawFastBitmap(_clock_indicator_pos[0][0], _clock_indicator_pos[0][1],
@@ -142,12 +133,12 @@ void Screen::render()
         }
         case ScreenState::STATE_CADENCE:
         {
-            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_BLUE, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_GOLD, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
             break;
         }
         case ScreenState::STATE_STEPS:
         {
-            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_GREEN, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_FROG, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
             break;
         }
         case ScreenState::STATE_DISTANCE:
@@ -157,11 +148,53 @@ void Screen::render()
         }
         case ScreenState::STATE_SETTINGS:
         {
-            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_GREEN, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            // Display settings
+            _lcd.fillFastScreen(LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            _lcd.setCursor(0, 8);
+            _lcd.setTextColor(LCD_COLOR_YELLOW);
+            _lcd.printf("Settings\n\n");
+            _lcd.setTextColor(LCD_COLOR_WHITE);
+            _lcd.printf("[General]\n");
+            _lcd.printf("Time format\n %s\n", user_settings.time_format == 1? "12h":"24h");
+            _lcd.printf("Btn vibrate\n %s\n", user_settings.button_feedback? "Yes":"No");
+            _lcd.printf("\n[Sensor]\n");
+            _lcd.printf("Step length\n %u cm\n", user_settings.sensor.step_length);
+            _lcd.printf("Motion dur\n %u 1/50s\n", user_settings.sensor.motion_duration);
+            _lcd.printf("Motion thresh\n %u 1/16g\n", user_settings.sensor.motion_threshold);
+            _lcd.printf("Run cadence\n %u spm", user_settings.sensor.cadence_running_thresh);
+            break;
+        }    
+        case ScreenState::STATE_INFO:
+        {
+            // Gather CPU stats
+            mbed_stats_cpu_get(&_cpu_stats);
+
+            // Display info
+            _lcd.fillFastScreen(LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            _lcd.setCursor(0, 8);
+            _lcd.setTextColor(LCD_COLOR_YELLOW);
+            _lcd.printf("System Info\n\n");
+            _lcd.setTextColor(LCD_COLOR_WHITE);
+            _lcd.printf("[Bluetooth]\n");
+            _lcd.printf("Address\n %s\n", _bleAddress);
+            _lcd.printf("Connected\n %s\n", _bleStatus? "Yes":"No");
+            _lcd.printf("Bonded\n %s\n", _bleEncStatus? "Yes":"No");
+            _lcd.printf("\n[CPU]\n");
+            _lcd.printf("Uptime\n %llu s\n", _cpu_stats.uptime / 1000000);
+            _lcd.printf("Sleep\n %llu s\n", _cpu_stats.sleep_time / 1000000);
+            _lcd.printf("Deep sleep\n %llu s", _cpu_stats.deep_sleep_time / 1000000);
             break;
         }    
         default: break;
     }
+
+    // Draw battery bar
+    uint8_t bar_len = max((uint8_t)round(_batteryPercent * 0.8f), (uint8_t)80);
+    _lcd.fillFastRect(bar_len, 0, 80 - bar_len, 4, _batteryCharging? LCD_COLOR_BLUE : LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+    uint16_t bar_color = LCD_COLOR_FROG;
+    if(_batteryPercent < 25.f) bar_color = LCD_COLOR_RED;
+    else if(_batteryPercent < 50.f) bar_color = LCD_COLOR_GOLD;
+    _lcd.fillFastRect(0, 0, bar_len, 4, bar_color, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
 
     // Update state
     _prev_state = _state;
@@ -200,10 +233,7 @@ void Screen::render()
     // lcd.setCursor(0, 130);
     // lcd.printf("ST: %u\nSC: %u", stepsTotal, stepsCadence);
 
-    // mbed_stats_cpu_t stats;
-    // mbed_stats_cpu_get(&stats);
-    // lcd.printf("UP: %llu\nST: %llu\nDS: %llu", 
-    // stats.uptime / 1000, stats.sleep_time / 1000, stats.deep_sleep_time / 1000);
+    // 
 
     _display_guard.release();
 }

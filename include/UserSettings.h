@@ -30,8 +30,8 @@ struct __attribute__ ((packed)) user_sensor_settings_t
  */
 struct __attribute__ ((packed)) user_settings_t
 {
-    uint8_t time_format     = 1; //!< 0 = 24h, 1 = 12h
-    uint8_t button_feedback = 0; //!< 0 = No vibration on touch, 1 = yes
+    uint8_t time_format     = 0; //!< 0 = 24h, 1 = 12h
+    uint8_t button_feedback = 1; //!< 0 = No vibration on touch, 1 = yes
     user_sensor_settings_t sensor; //!< Sensor settings
 };
 

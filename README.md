@@ -404,9 +404,11 @@ The font rom is internally connected to the main CPU via SPI and implements a fa
 
 Unfortunately, neither the NRF52832 nor the flash used support or use the *QSPI* interface, which would allow mapping the flash address range and accessing it via the *MMU*. This would enable remote reading and writing of the flash via the *SWD* connection.
 
-It is possible to write a **RamCode** (https://wiki.segger.com/Programming_External_SPI_Flashes) using the SEGGER **Open Flashloader** framework (https://wiki.segger.com/Open_Flashloader). Then, a tool like **J-Flash** would be able to access the external flash via the RamCode on the CPU. This is however quite a bit of work, unfinished tests can be found in the branch `flash-test`.
+It is possible to write a **RamCode** (https://wiki.segger.com/Programming_External_SPI_Flashes) using the SEGGER **Open Flashloader** framework (https://wiki.segger.com/Open_Flashloader). Then, a tool like **J-Flash** would be able to access the external flash via the RamCode on the CPU. This is however quite trick to do. Instead, the **OpenOCD** "on chip flash loader" protocol by *Pavel Chromy* (http://openocd.org/doc/html/Flash-Commands.html) could be implemented.
 
-Instead some python scripts are used to communicate with the chip using the RTT interface. However, a proper SPI flash driver is still missing and yet to be fully implemented.
+Some python scripts are used to communicate with the chip using the RTT interface. However, a proper SPI flash driver is still missing and has yet to be fully implemented (#1).
+
+
 ## Connecting to a phone
 
 A fork of the Android app **Gadgetbridge** (https://gadgetbridge.org/) with support for this firmware is available at *Codeberg*: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch .

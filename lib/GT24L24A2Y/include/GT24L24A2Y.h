@@ -119,7 +119,7 @@ class GT24L24A2Y
         void dump(void (*watchdog)() = nullptr, void (*progress)(uint32_t offset) = nullptr);
 
         /**
-         * @brief Erases a sctor
+         * @brief Erases a sector
          * 
          * @param offset sector address
          * @return 0 = success

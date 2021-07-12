@@ -36,6 +36,13 @@ void DisplayService::setBLEEncStatusPtr(bool* bleEncStatus)
     _ble_encrypted = bleEncStatus;
 }
 
+void DisplayService::setBLEAddress(const char address[6])
+{
+    snprintf(screen._bleAddress, 19, "%02X:%02X:%02X\n %02X:%02X:%02X",
+        (int)address[5], (int)address[4], (int)address[3], 
+        (int)address[2], (int)address[1], (int)address[0]);
+}
+
 void DisplayService::setPower(bool on)
 {
     _lcd_bl.setPower(on);

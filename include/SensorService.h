@@ -60,9 +60,9 @@ class SensorService
         /**
          * @brief Get the Battery value in percent
          * 
-         * @return uint8_t The battery value
+         * @return float The battery value
          */
-        uint8_t getBatteryPercent();
+        float getBatteryPercent();
 
         /**
          * @brief Get the Battery value raw

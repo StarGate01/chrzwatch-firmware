@@ -16,6 +16,12 @@ void CoreService::onInitComplete(BLE::InitializationCompleteCallbackContext *par
         return;
     }
 
+    // Read BLE MAC
+    BLEProtocol::AddressType_t addr_type;
+    BLEProtocol::AddressBytes_t addr;
+    _ble.getAddress(&addr_type, addr);
+    _display_service.setBLEAddress((const char*)addr);
+
     // Init security bonding module
     ble_error_t error = _ble.securityManager().init(true, false, SecurityManager::IO_CAPS_NONE, NULL, false, NULL);
     if(error != BLE_ERROR_NONE) 
@@ -68,7 +74,7 @@ void CoreService::onUpdateSettings(const struct user_settings_t& settings)
 {
     user_settings = settings;
     _sensor_service.updateUserSettings();
-    _display_service.vibrate(ALERT_VIBRATION_LENGTH);
+    _display_service.vibrate(BUTTON_VIBRATION_LENGTH);
     if(_display_service.screen.getState() == Screen::ScreenState::STATE_CLOCK ||
         _display_service.screen.getState() == Screen::ScreenState::STATE_SETTINGS)
     {
