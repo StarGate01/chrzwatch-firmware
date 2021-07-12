@@ -23,11 +23,13 @@
 #define FLASH_USER_PAGE_NUM     0x00000010 // 16 user sectors total
 
 // Serial commands
+#define FLASH_CMD_READ_ID       0x83 // Read device id
 #define FLASH_CMD_READ          0x03 // Read
 #define FLASH_CMD_FAST_READ     0x0B // Fast read
 #define FLASH_CMD_WRITE_ENABLE  0x06 // Write enable
 #define FLASH_CMD_WRITE_DISABLE 0x04 // Write disable
 #define FLASH_CMD_PAGE_WRITE    0x02 // Write page
+// #define FLASH
 #define FLASH_CMD_SECTOR_ERASE  0x20 // Sector erase
 #define FLASH_CMD_SLEEP_ENABLE  0xB9 // Deep sleep enable
 #define FLASH_CMD_SLEEP_DISABLE 0xAB // Deep sleep disable
@@ -105,17 +107,32 @@ class GT24L24A2Y
          * @param actual_width Lattice width of the glyph or default width
          * @return int success = 0
          */
-        int read(const struct font_layout_t& font, uint16_t glyph_id, char* buffer, uint16_t* actual_width);
+        int read(const struct font_layout_t& font, uint16_t glyph_id, uint8_t* buffer, uint16_t* actual_width);
         
         /**
          * @brief Dumps the flash content to the serial interface
          * 
          * @param watchdog Callback to reset the watchdog
-         * 
+         * @param progress Callback to progress function
          * @return int success = 0
          */
-        void dump(void (*watchdog)() = nullptr);
+        void dump(void (*watchdog)() = nullptr, void (*progress)(uint32_t offset) = nullptr);
 
+        /**
+         * @brief Erases a sctor
+         * 
+         * @param offset sector address
+         * @return 0 = success
+         */
+        int erase(uint32_t offset);
+
+        /**
+         * @brief Reads the device ID
+         * 
+         * @param buffer device id buffer (16 bytes)
+         * @return int 0 = success
+         */
+        int read_deviceid(uint8_t* buffer);
 
         /**
          * @brief Reads bytes from the font ROM (max. 255)
@@ -125,14 +142,22 @@ class GT24L24A2Y
          * @param buffer Target buffer
          * @return int success = 0
          */
-        int read_raw(uint32_t offset, uint16_t size, char* buffer);
+        int read_raw(uint32_t offset, uint16_t size, uint8_t* buffer);
+
+        /**
+         * @brief Program a page
+         * 
+         * @param offset Page address
+         * @param buffer Page content 
+         * @param size Should be 256 bytes
+         * @return int success = 0
+         */
+        int write(uint32_t offset, const uint8_t* buffer, uint16_t size);
 
     protected:
         SPI _spi; //!< SPI device interface
         DigitalOut _cs; //!< Chip select pin
-
-  
-
+        
 };
 
 
