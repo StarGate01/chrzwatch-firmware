@@ -188,7 +188,9 @@ The `NRF52832` IC has 2 **I2C** and 3 **SPI** instances, which partly overlap. T
 
 The reason for this particular configuration is a follows: Both the acceleration and heartrate sensor need to be able to access the I2C bus upon receiving an interrupt signal (to read a motion event upon occurrence and to read the ADC when it signals readiness, respectively). This means `UnsafeI2C`,  - an *I2C* implementation without bus access locking - has to be used, because the mutex used for locking cant be used in an interrupt context.
 
-Because these *I2C* access events may occur at any moment, a dedicated instance is allocated to each of them. The remaining instance does only support *SPI* anyways. To ensure no contention occurs between the LCD and the flash, the standard bus locking SPI functions are used. Due to this locking, parallel access to the LCd and font flash is impossible, but also not needed by the app logic. Locking also means that all functions using these devices cant be called from an interrupt context. Specifically, this concerns the `Screen::render` function. This function is intended to never be called directly, instead `DisplayService::render` has to be called, which defers the rendering call via the main `EventQueue` to the main thread.
+Because these *I2C* access events may occur at any moment, a dedicated instance is allocated to each of them. The remaining instance does only support *SPI* anyways. To ensure no contention occurs between the LCD and the flash, the standard bus locking SPI functions are used. Due to this locking, parallel access to the LCD and font flash is impossible, but also not needed by the app logic. Locking also means that all functions using these devices cant be called from an interrupt context. Specifically, this concerns the `Screen::render` function. This function is intended to never be called directly, instead `DisplayService::render` has to be called, which defers the rendering call via the main `EventQueue` to the main thread.
+
+At the time of writing, the font flash is unused. The interface mapping still stands, for future-proofing.
 
 </details>
 
@@ -396,16 +398,15 @@ The script `tools/reset.sh` or the task "Reset Target" automates this spamming, 
 
 Optionally, append `-c "reset halt"` to the OpenOCD command. The chip then halts at the first instruction, which may be good for debugging.
 
-### Accessing the Font ROM
+### Accessing the Font ROM (Work in progress)
 
 The font rom is internally connected to the main CPU via SPI and implements a fairly standard flash command interface.
 
-Unfortunately, neither the NRF52832 nor the flash used support or use the *QSPI*interface, which would allow mapping the flash address range and accessing it via the *MMU*. This would enable remote reading and writing of the flash via the *SWD* connection.
+Unfortunately, neither the NRF52832 nor the flash used support or use the *QSPI* interface, which would allow mapping the flash address range and accessing it via the *MMU*. This would enable remote reading and writing of the flash via the *SWD* connection.
 
-It is possible to write a **RamCode** (https://wiki.segger.com/Programming_External_SPI_Flashes) using the SEGGER **Open Flashloader** framework (https://wiki.segger.com/Open_Flashloader). Then, a tool like **J-Flash** would eb able to access the external flash via the RamCode on the CPU. This is however quite a bit of work, unfinished tests can be found in the branch `flash-test`.
+It is possible to write a **RamCode** (https://wiki.segger.com/Programming_External_SPI_Flashes) using the SEGGER **Open Flashloader** framework (https://wiki.segger.com/Open_Flashloader). Then, a tool like **J-Flash** would be able to access the external flash via the RamCode on the CPU. This is however quite a bit of work, unfinished tests can be found in the branch `flash-test`.
 
-Instead some python scripts are used to communicate with the chip using the RTT interface. ?
-
+Instead some python scripts are used to communicate with the chip using the RTT interface. However, a proper SPI flash driver is still missing and yet to be fully implemented.
 ## Connecting to a phone
 
 A fork of the Android app **Gadgetbridge** (https://gadgetbridge.org/) with support for this firmware is available at *Codeberg*: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch .

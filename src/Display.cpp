@@ -11,7 +11,7 @@
 
 
 DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService& current_time_service,
-        events::EventQueue &event_queue, GT24L24A2Y& flash):
+        events::EventQueue &event_queue):
     _sensor_service(sensor_service),
     _current_time_service(current_time_service),
     _event_queue(event_queue),
@@ -19,8 +19,7 @@ DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService
     _vibration_trigger(1),
     _lcd_bl(PIN_LCD_BL),
     _lcd_pwr(PIN_LCD_PWR),
-    _vibration_thread(osPriorityNormal, THREAD_SIZE),
-    screen(flash)
+    _vibration_thread(osPriorityNormal, THREAD_SIZE)
 {
     _vibration_thread.start(callback(this, &DisplayService::threadVibration));
     setPower(true);

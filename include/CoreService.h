@@ -76,7 +76,6 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
         BLE& _ble; //!< Reference to the BLE instance
         uint8_t _adv_buffer[ble::LEGACY_ADVERTISING_MAX_SIZE]; //!< BLE GAP advertising buffer
         ble::AdvertisingDataBuilder _adv_data_builder; //!< BLE GAP factory
-        GT24L24A2Y _flash; //!< Flash chip interface
 
         HeartRateService _ble_hr_service; //!< BLE heartrate service
         BatteryService _ble_bat_service; //!< BLE battery service

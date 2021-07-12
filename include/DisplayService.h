@@ -16,7 +16,7 @@
 #include <rtos.h>
 
 #include "Adafruit_ST7735_Mini.h"
-#include "GT24L24A2Y.h"
+// #include "GT24L24A2Y.h"
 
 #include "HardwareConfiguration.h"
 #include "CurrentTimeService.h"
@@ -66,10 +66,9 @@ class Screen
 
         /**
          * @brief Construct a new Screen Model object
-         * 
-         * @param flash Flash interface 
+         *  
          */
-        Screen(GT24L24A2Y& flash);
+        Screen();
 
         /**
          * @brief Renders the model to a LCD
@@ -94,7 +93,7 @@ class Screen
     protected:
         Adafruit_ST7735_Mini _lcd; //!< LCD output
         char _lcd_bitmap_buffer[LCD_BUFFER_SIZE]; //!< Buffer for fast bitmap drawing
-        GT24L24A2Y& _flash; //!< Flash font interface
+        // GT24L24A2Y _flash; //!< Flash font interface
 
         enum ScreenState _state = ScreenState::STATE_CLOCK; //!< Stores screen state
         enum ScreenState _prev_state = ScreenState::STATE_LOOP; //!< Previous screen state
@@ -158,7 +157,7 @@ class DisplayService
          * @brief Construct a new Display Service object
          */
         DisplayService(SensorService& sensor_service, CurrentTimeService& current_time_service, 
-            events::EventQueue& event_queue, GT24L24A2Y& flash);
+            events::EventQueue& event_queue);
 
         /**
          * @brief Vibrates the motor

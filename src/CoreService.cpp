@@ -21,8 +21,7 @@ CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
         RSCFF::INSTANTANEOUS_STRIDE_LENGTH_MEASUREMENT_SUPPORTED | 
         RSCFF::TOTAL_DISTANCE_MEASUREMENT_SUPPORTED)),
     _ble_settings_service(ble),
-    _flash(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_ACC_CS),
-    _display_service(_sensor_service, _ble_time_service, event_queue, _flash),
+    _display_service(_sensor_service, _ble_time_service, event_queue),
     _sensor_service(_display_service)
 { 
     _display_service.setBLEStatusPtr(&_connected);

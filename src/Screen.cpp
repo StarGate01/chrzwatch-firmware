@@ -16,11 +16,11 @@
 #include "roboto_bold_36_minimal.h"
 
 
-Screen::Screen(GT24L24A2Y& flash):
+Screen::Screen():
     _lcd(PIN_LCD_MOSI, NC, PIN_LCD_CLK, PIN_LCD_CS, 
         PIN_LCD_DC, PIN_LCD_RESET, LCD_SPI_FREQ),
-    _display_guard(1),
-    _flash(flash)
+    _display_guard(1)
+    // _flash(PIN_FONT_MOSI, PIN_FONT_MISO, PIN_FONT_CLK, PIN_ACC_CS)
 {
     _display_guard.acquire();
 
@@ -137,21 +137,7 @@ void Screen::render()
         }
         case ScreenState::STATE_HEART:
         {
-            if(_prev_state != _state) 
-            {
-                _lcd.fillFastScreen(LCD_COLOR_RED, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
-
-                printf("BEGIN DUMP");
-                _flash.dump(CoreService::kickWatchdog);
-                printf("END DUMP");
-
-                // char buffer[90];
-                // _flash.read_raw(0x198dde, 90, buffer);
-
-                // printf("read: ");
-                // for (int i = 0; i < 90; i++) printf("%02X ", buffer[i]);
-                // printf("\n");
-            }
+            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_RED, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
             break;
         }
         case ScreenState::STATE_CADENCE:
