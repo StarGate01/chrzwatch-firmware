@@ -6,20 +6,24 @@
  * @date 2020-05-21
  */
 
-#include <mbed.h>
+#ifdef TARGET_VARIANT_I6HRC
 
-#include "JLink_RTT.h"
+    #include <mbed.h>
+
+    #include "JLink_RTT.h"
 
 
-static JLink_RTT rtt; //!< Stream which exposes the RTT interface
+    static JLink_RTT rtt; //!< Stream which exposes the RTT interface
 
-/**
- * @brief Override the default console used for printf etc.
- * 
- * @param fd A file id (unused)
- * @return FileHandle* A stream to perform IO on
- */
-FileHandle* mbed::mbed_override_console(int fd)
-{
-    return &rtt;
-}
+    /**
+     * @brief Override the default console used for printf etc.
+     * 
+     * @param fd A file id (unused)
+     * @return FileHandle* A stream to perform IO on
+     */
+    FileHandle* mbed::mbed_override_console(int fd)
+    {
+        return &rtt;
+    }
+
+#endif

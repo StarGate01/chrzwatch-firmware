@@ -76,30 +76,25 @@ bool SensorService::getBatteryCharging()
 
 void SensorService::reevaluateStepsCadence()
 {
-    uint64_t now = get_ms_count();
-    if(now - _motion_count_age > 60000) // 1 minute
-    {
-        rsc_measurement.instantaneous_cadence = _motion_count;
-        // Convert cm/min to 1/256*m/s
-        rsc_measurement.instantaneous_speed = (uint16_t)round(((float)(_motion_count * user_settings.sensor.step_length) / 6000.f) * 256.f);
-        // Convert cm to dm
-        rsc_measurement.total_distance = (rsc_measurement.total_steps * user_settings.sensor.step_length) / 10;
-        // Clear running flag and set it if needed
-        #define RSCF RunningSpeedAndCadenceService::RSCMeasurementFlags
-        rsc_measurement.flags = (RSCF)(
-            RSCF::INSTANTANEOUS_STRIDE_LENGTH_PRESENT | 
-            RSCF::TOTAL_DISTANCE_PRESENT |
-            ((_motion_count >= user_settings.sensor.cadence_running_thresh)? RSCF::RUNNING_NOT_WALKING : 0));
-        _motion_count = 0;
-        _motion_count_age = now;
+    rsc_measurement.instantaneous_cadence = _motion_count;
+    // Convert cm/min to 1/256*m/s
+    rsc_measurement.instantaneous_speed = (uint16_t)round(((float)(_motion_count * user_settings.sensor.step_length) / 6000.f) * 256.f);
+    // Convert cm to dm
+    rsc_measurement.total_distance = (rsc_measurement.total_steps * user_settings.sensor.step_length) / 10;
+    // Clear running flag and set it if needed
+    #define RSCF RunningSpeedAndCadenceService::RSCMeasurementFlags
+    rsc_measurement.flags = (RSCF)(
+        RSCF::INSTANTANEOUS_STRIDE_LENGTH_PRESENT | 
+        RSCF::TOTAL_DISTANCE_PRESENT |
+        ((_motion_count >= user_settings.sensor.cadence_running_thresh)? RSCF::RUNNING_NOT_WALKING : 0));
+    _motion_count = 0;
 
-        // Refresh display if needed
-        if(_display_service.screen.getState() == Screen::ScreenState::STATE_STEPS ||
-            _display_service.screen.getState() == Screen::ScreenState::STATE_CADENCE ||
-            _display_service.screen.getState() == Screen::ScreenState::STATE_DISTANCE)
-        {
-            _display_service.render();
-        }
+    // Refresh display if needed
+    if(_display_service.screen.getState() == Screen::ScreenState::STATE_STEPS ||
+        _display_service.screen.getState() == Screen::ScreenState::STATE_CADENCE ||
+        _display_service.screen.getState() == Screen::ScreenState::STATE_DISTANCE)
+    {
+        _display_service.render();
     }
 }
 
@@ -172,7 +167,12 @@ void SensorService::handleButtonIRQ()
     }
 
     // Trigger display wakeup or state change
-    if(!_display_service.getPower()) _display_service.setPower(true);
+    if(!_display_service.getPower()) 
+    {
+        _display_service.screen.setState(Screen::ScreenState::STATE_CLOCK);
+        _display_service.setPower(true);
+        _display_service.render();
+    }
     else
     {
         // Advance to next screen state
@@ -180,7 +180,6 @@ void SensorService::handleButtonIRQ()
         (*(int*)&current_state)++;
         if(current_state == Screen::ScreenState::STATE_LOOP) current_state = Screen::ScreenState::STATE_CLOCK;
         _display_service.screen.setState(current_state);
-
         _display_service.render();
     }
 }
@@ -220,7 +219,7 @@ void SensorService::handleDisplayTimeout()
     if(!_cancel_timeout)
     {
         _display_service.screen.setState(Screen::ScreenState::STATE_CLOCK);
-        _display_service.setPower(false);
+        _display_service.render(true);
     }
     _cancel_timeout = false;
 }

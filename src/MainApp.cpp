@@ -17,7 +17,6 @@
     #include "HardwareConfiguration.h"
     #include "UserSettings.h"
 
-
     const PinMapI2C PinMap_I2C[] = 
     {
         { PIN_ACC_SDA, PIN_ACC_SCL, 0 },

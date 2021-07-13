@@ -42,7 +42,7 @@ typedef struct
 } BLE_DateTime;
 
 /**
- * @brief Provides a BLE service to track and set the current time and RTC.
+ * @brief Provides a BLE service to track and set the current time
  * 
  */
 class CurrentTimeService 
@@ -55,7 +55,7 @@ class CurrentTimeService
          * @param ble BLE instance
          * @param event_queue Event queue for dispatching calls from interrupt
          */
-        CurrentTimeService(BLE& ble, events::EventQueue &event_queue);
+        CurrentTimeService(BLE& ble, events::EventQueue &event_queue, int seconds_resolution = 1);
 
         /**
          * @brief Attach a attach Seconds Notify Handler
@@ -68,17 +68,15 @@ class CurrentTimeService
          * @brief Sets the internal time using a date-time-stamp
          * 
          * @param dateTime The date-time-stamp
-         * @param writeRtc Whether to update the RTC
          */
-        void writeDateTime(const BLE_DateTime& dateTime, const bool writeRtc = false);
+        void writeDateTime(const BLE_DateTime& dateTime);
 
         /**
          * @brief Sets the internal time using a UNIX timestamp
          * 
          * @param epochTime The UNIX timestamp
-         * @param writeRtc Whether to update the RTC
          */
-        void writeEpoch(const time_t& epochTime, const bool writeRtc = false);
+        void writeEpoch(const time_t& epochTime);
 
         /**
          * @brief Return the internal time as a date-time-stamp
@@ -100,18 +98,14 @@ class CurrentTimeService
         Callback<void(const time_t epoch)> _second_notify = nullptr; //!< Notify callback handler
         uint8_t _valueBytes[BLE_CURRENT_TIME_CHAR_VALUE_SIZE]; //!< Buffer for the internal time
         GattCharacteristic _currentTimeCharacteristic; //!< BLE characteristic definition
-#       if LOW_POWER == 1
-            LowPowerTicker _ticker; //!< Low power monotonic timer for ticking
-#       else
-            Ticker _ticker; //!< Precision monotonic timer for ticking
-#       endif
+        int _ticker_event = -1;
+        int _ticker_resolution = 1;
 
         /**
          * @brief Writes the contents of the internal buffer to the BLE GATT server
          * 
-         * @param writeRtc Whether to update the RTC
          */
-        void writeBuffer(const bool writeRtc = false);
+        void writeBuffer();
 
         /**
          * @brief Handles the ticking event of the monotonic timer
@@ -125,7 +119,7 @@ class CurrentTimeService
          * @param params The new timestamp to store
          */
         virtual void onDataWritten(const GattWriteCallbackParams* params);
-        
+
 };
  
 #endif

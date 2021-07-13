@@ -35,7 +35,7 @@
 #define PIN_FONT_MOSI        P0_8
 #define PIN_RX               P0_9
 #define PIN_TX               P0_10
-#define THREAD_SIZE          2048 //!< Child thread stack size in bytes
+#define THREAD_SIZE          1024 //!< Child thread stack size in bytes
 #define LCD_COLSHIFT         0 //!< LCD pixel column shift
 #define LCD_ROWSHIFT         0 //!< LCD pixel row shift
 #define LCD_SPI_FREQ         8000000 //!< LCD SPI speed, 8Mhz is CPU max

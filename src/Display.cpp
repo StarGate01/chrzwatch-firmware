@@ -10,18 +10,18 @@
 #include "SensorService.h"
 
 
-DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService& current_time_service,
-        events::EventQueue &event_queue):
+DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService& current_time_service):
     _sensor_service(sensor_service),
     _current_time_service(current_time_service),
-    _event_queue(event_queue),
     _vibration(PIN_VIBRATION),
     _vibration_trigger(1),
     _lcd_bl(PIN_LCD_BL),
     _lcd_pwr(PIN_LCD_PWR),
-    _vibration_thread(osPriorityNormal, THREAD_SIZE)
+    _vibration_thread(osPriorityNormal, THREAD_SIZE),
+    _render_thread(osPriorityNormal, THREAD_SIZE * 2)
 {
     _vibration_thread.start(callback(this, &DisplayService::threadVibration));
+    _render_thread.start(callback(&_event_queue, &EventQueue::dispatch_forever));
     setPower(true);
     render();
 }
@@ -78,16 +78,16 @@ bool DisplayService::getVibration()
     return _vibrating;
 }
 
-void DisplayService::render()
+void DisplayService::render(bool poweroff)
 {
     if(_is_on)
     {
         // Defer if called from IRQ context
-        _event_queue.call(callback(this, &DisplayService::unsafeRender));
+        _event_queue.call(callback(this, &DisplayService::unsafeRender), poweroff);
     }
 }
 
-void DisplayService::unsafeRender()
+void DisplayService::unsafeRender(bool poweroff)
 {
     // Update screen variables
     if(_ble_connected != nullptr) screen._bleStatus = *_ble_connected;
@@ -99,6 +99,9 @@ void DisplayService::unsafeRender()
     screen._heartrate = _sensor_service.getHRValue();
     screen._stepsCadence = _sensor_service.rsc_measurement.instantaneous_cadence;
     screen._stepsTotal = _sensor_service.rsc_measurement.total_steps;
+
+    // Power off if wanted
+    if(poweroff) setPower(false);
 
     // Render screen
     screen.render();

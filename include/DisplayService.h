@@ -160,8 +160,7 @@ class DisplayService
         /**
          * @brief Construct a new Display Service object
          */
-        DisplayService(SensorService& sensor_service, CurrentTimeService& current_time_service, 
-            events::EventQueue& event_queue);
+        DisplayService(SensorService& sensor_service, CurrentTimeService& current_time_service);
 
         /**
          * @brief Vibrates the motor
@@ -182,7 +181,7 @@ class DisplayService
          * @brief Render the internal state to the LCD display
          * 
          */
-        void render();
+        void render(bool poweroff = false);
 
         /**
          * @brief Turns the display on or off to save energy
@@ -225,11 +224,12 @@ class DisplayService
     protected:
         SensorService& _sensor_service; //!< Sensor service reference
         CurrentTimeService& _current_time_service; //! Current time service
-        events::EventQueue& _event_queue; //!< Event queue
+        events::EventQueue _event_queue; //!< Render event queue
         bool* _ble_connected = nullptr; //!< BLE status
         bool* _ble_encrypted = nullptr; //!< BLE enc status
         DigitalOut _vibration; //!< Vibration output
         Thread _vibration_thread; //!< Thread for vibration duration
+        Thread _render_thread; //!< Thread for rendering
         Semaphore _vibration_trigger; //!< Interlock to trigger vibration
         uint16_t _vibration_duration = 0; //!< Duration of the vibration in ms
         volatile bool _vibrating = false; //!< Indicates vibration state - read in IRQ
@@ -238,7 +238,7 @@ class DisplayService
         PwmOutLP _lcd_bl; //!< LCD backlight
         DigitalOut _lcd_pwr; //!< LCD power
 
-        bool _is_on = false; //!< Power state
+        volatile bool _is_on = false; //!< Power state
 
         /**
          * @brief Waits for the vibration interlock and then vibrates the motor
@@ -256,7 +256,7 @@ class DisplayService
          * @brief Render the internal state to the LCD display, but is not IRQ safe
          * 
          */
-        void unsafeRender();
+        void unsafeRender(bool poweroff = false);
 
 };
 

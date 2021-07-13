@@ -102,7 +102,6 @@ class SensorService
         bool _charging_value = false; //!< The internal charging state
         uint8_t _hr_value = 0; //!< The internal heartrate value
         uint8_t _motion_count = 0; //!< The internal count of motion events
-        uint64_t _motion_count_age = 0; //<! Age of the motion count buffer
 
         InterruptIn _button1; //!< Button 1 input
         InterruptIn _button2; //!< Button 2 input

@@ -15,13 +15,13 @@ CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _adv_data_builder(_adv_buffer),
     _ble_hr_service(ble, 0, HeartRateService::LOCATION_WRIST),
     _ble_bat_service(ble, 0),
-    _ble_time_service(ble, event_queue),
+    _ble_time_service(ble, event_queue, 60), // 1 minute clock
     _ble_alert_service(ble),
     _ble_rsc_service(ble, (RSCFF)(
         RSCFF::INSTANTANEOUS_STRIDE_LENGTH_MEASUREMENT_SUPPORTED | 
         RSCFF::TOTAL_DISTANCE_MEASUREMENT_SUPPORTED)),
     _ble_settings_service(ble),
-    _display_service(_sensor_service, _ble_time_service, event_queue),
+    _display_service(_sensor_service, _ble_time_service),
     _sensor_service(_display_service)
 { 
     _display_service.setBLEStatusPtr(&_connected);
