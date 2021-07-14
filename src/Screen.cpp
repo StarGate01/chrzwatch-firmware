@@ -189,12 +189,12 @@ void Screen::render()
     }
 
     // Draw battery bar
-    uint8_t bar_len = max((uint8_t)round(_batteryPercent * 0.8f), (uint8_t)80);
-    _lcd.fillFastRect(bar_len, 0, 80 - bar_len, 4, _batteryCharging? LCD_COLOR_BLUE : LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+    uint8_t bar_len = min((uint8_t)round(_batteryPercent * 0.8f), (uint8_t)80);
+    if(bar_len < 80) _lcd.fillFastRect(bar_len, 0, 80 - bar_len, 4, _batteryCharging? LCD_COLOR_BLUE : LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
     uint16_t bar_color = LCD_COLOR_FROG;
     if(_batteryPercent < 25.f) bar_color = LCD_COLOR_RED;
     else if(_batteryPercent < 50.f) bar_color = LCD_COLOR_GOLD;
-    _lcd.fillFastRect(0, 0, bar_len, 4, bar_color, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+    if(bar_len > 0) _lcd.fillFastRect(0, 0, bar_len, 4, bar_color, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
 
     // Update state
     _prev_state = _state;

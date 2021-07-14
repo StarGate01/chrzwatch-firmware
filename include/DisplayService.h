@@ -112,7 +112,6 @@ class Screen
         time_t _epochTime = 0; //!< Current time
         float _batteryPercent = 0; //!< Battery remaining in percent
         uint8_t _heartrate = 0; //!< Heartrate
-        float _batteryRaw = 0.f; //!< Battery remaining raw (volts)
         bool _batteryCharging = false; //!< Battery charging state
         bool _bleStatus = false; //!< Bluetooth status
         bool _bleEncStatus = false; //!< Bluetooth Enc status

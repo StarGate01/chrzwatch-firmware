@@ -94,7 +94,6 @@ void DisplayService::unsafeRender(bool poweroff)
     if(_ble_encrypted != nullptr) screen._bleEncStatus = *_ble_encrypted;
     _current_time_service.readEpoch(screen._epochTime);
     screen._batteryPercent = _sensor_service.getBatteryPercent();
-    screen._batteryRaw = _sensor_service.getBatteryRaw();
     screen._batteryCharging = _sensor_service.getBatteryCharging();
     screen._heartrate = _sensor_service.getHRValue();
     screen._stepsCadence = _sensor_service.rsc_measurement.instantaneous_cadence;

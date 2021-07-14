@@ -5,8 +5,12 @@
                 "CONFIG_GPIO_AS_PINRESET"
             ],
             "target.macros_add":[
+                "MBED_TICKLESS",
+                "DEVICE_LPTICKER",
+                "DEVICE_SLEEP",
                 "CONFIG_NFCT_PINS_AS_GPIOS",
-                "NRFX_GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS=8"
+                "NRFX_GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS=8",
+                "MBED_CONF_TARGET_TICKLESS_FROM_US_TICKER=0"
             ],
             "target.device_has_remove": [
                 "ITM",
@@ -14,6 +18,8 @@
                 "SERIAL_ASYNCH",
                 "SERIAL_FC"
             ],
+            "target.console-uart": false,
+            "target.console-uart-flow-control": null,
             "platform.cpu-stats-enabled": true,
             "target.lse_available": true,
             "events.use-lowpower-timer-ticker": true,

@@ -37,12 +37,13 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 <details>
 <summary>Power saving</summary>
 
-- [x] Deep sleep in idle thread
+- [ ] Deep sleep in idle thread
 - [x] Energy saving display
 - [x] Energy saving touch input
 - [ ] Energy saving heartrate sensor
 - [x] Energy saving acceleration sensor
 - [ ] Endurance tests & verification
+- [ ] Power saving BLE stack (Requires https://github.com/ARMmbed/mbed-os/issues/10669)
 
 </details>
 
