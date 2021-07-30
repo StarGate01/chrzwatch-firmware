@@ -6,20 +6,18 @@
             ],
             "target.macros_add":[
                 "CONFIG_NFCT_PINS_AS_GPIOS",
-                "NRFX_GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS=8"
+                "NRFX_GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS=8",
+                "MBED_SLEEP_TRACING_ENABLED"
             ],
             "target.device_has_remove": [
-                "ITM",
-                "SERIAL",
-                "SERIAL_ASYNCH",
-                "SERIAL_FC"
+                "ITM"
             ],
             "platform.cpu-stats-enabled": true,
-            "target.lse_available": true,
-            "events.use-lowpower-timer-ticker": true,
             "platform.fatal-error-auto-reboot-enabled": true,
             "platform.crash-capture-enabled": true,
-            "platform.error-reboot-max": 3
+            "platform.error-reboot-max": 3,
+             "rtos.idle-thread-stack-size": 4096,
+    		 "rtos.idle-thread-stack-size-debug-extra": 4096
         }
     }
 }
