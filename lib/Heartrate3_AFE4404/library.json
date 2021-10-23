@@ -1,8 +1,8 @@
 {
     "name": "Heartrate3_AFE4404",
-    "version": "0.1.4",
+    "version": "0.2.0",
     "keywords": "heartrate, afe4404, pps964",
-    "description": "AFE4404 driver and data processing algorithms by MikroElektronika. Modified to provide a wrapper for Mbed 5.",
+    "description": "AFE4404 driver and data processing algorithms by MikroElektronika. Modified to provide a wrapper for Mbed.",
     "authors":
     [
         {

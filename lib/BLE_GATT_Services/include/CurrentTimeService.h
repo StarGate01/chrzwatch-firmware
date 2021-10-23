@@ -45,7 +45,7 @@ typedef struct
  * @brief Provides a BLE service to track and set the current time
  * 
  */
-class CurrentTimeService 
+class CurrentTimeService : private GattServer::EventHandler
 {
     
     public:
@@ -118,7 +118,7 @@ class CurrentTimeService
          * 
          * @param params The new timestamp to store
          */
-        virtual void onDataWritten(const GattWriteCallbackParams* params);
+        void onDataWritten(const GattWriteCallbackParams& params) override;
 
 };
  

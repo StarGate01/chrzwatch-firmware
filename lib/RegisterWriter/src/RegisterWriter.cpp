@@ -36,12 +36,6 @@ RegisterWriter::RegisterWriter(UnsafeI2C& i2c_obj) : i2c_bus(i2c_obj)
     write_single = true;
 }
 
-RegisterWriter::RegisterWriter(PinName sda, PinName scl) : i2c_bus(sda, scl)
-{
-    self_created_i2c = true;
-    write_single = true;
-}
-
 RegisterWriter::~RegisterWriter()
 {
     if (self_created_i2c == true)

@@ -44,14 +44,6 @@ class RegisterWriter
         */
         RegisterWriter(UnsafeI2C& i2c_obj);
 
-        /**
-        * Create a i2c instance which is connected to specified I2C pins.
-        *
-        * @param sda SDA pin
-        * @param sdl SCL pin
-        */
-        RegisterWriter(PinName sda = NC, PinName scl = NC);
-
         ~RegisterWriter();
 
         /**

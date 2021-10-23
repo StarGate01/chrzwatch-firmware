@@ -230,7 +230,7 @@ void Adafruit_ST7735_Mini::commandList(uint8_t *addr)
             ms = *addr++; // Read post-command delay time (ms)
             if (ms == 255)
                 ms = 500; // If 255, delay for 500 ms
-            ThisThread::sleep_for(ms);
+            ThisThread::sleep_for(std::chrono::milliseconds(ms));
         }
     }
 }
@@ -250,11 +250,11 @@ void Adafruit_ST7735_Mini::commonInit(uint8_t *cmdList)
     // toggle RST low to reset; CS low so it'll listen to us
     _cs = 0;
     _rst = 1;
-    ThisThread::sleep_for(500);
+    ThisThread::sleep_for(std::chrono::milliseconds(500));
     _rst = 0;
-    ThisThread::sleep_for(500);
+    ThisThread::sleep_for(std::chrono::milliseconds(500));
     _rst = 1;
-    ThisThread::sleep_for(500);
+    ThisThread::sleep_for(std::chrono::milliseconds(500));
 
     if (cmdList)
         commandList(cmdList);
@@ -457,7 +457,7 @@ void Adafruit_ST7735_Mini::fillFastRect(int16_t x, int16_t y, int16_t w, int16_t
     if ((y + h - 1) >= _height) h = _height - y;
 
     // Prepare buffer
-    if (buffer_size < 2 * w) return;
+    if ((int)buffer_size < 2 * w) return;
     int buffer_height = min(h, (int16_t)(buffer_size / (w * 2)));
     buffer_size = buffer_height * w * 2;
     for (int i = 0; i < (int)buffer_size - 1; i += 2)
@@ -499,7 +499,7 @@ void Adafruit_ST7735_Mini::drawFastBitmap(int16_t x, int16_t y,
     if ((y + h - 1) >= _height) h = _height - y;
 
     // Prepare buffer
-    if (buffer_size < 2 * w) return;
+    if ((int)buffer_size < 2 * w) return;
     int buffer_height = min(h, (int16_t)(buffer_size / (w * 2)));
     buffer_size = buffer_height * w * 2;
 

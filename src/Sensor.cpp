@@ -42,8 +42,8 @@ SensorService::SensorService(DisplayService &display_service):
     setupAccelerationSensor();
 
     // Handle dispatching events
-    _event_queue.call_every(SENSOR_FREQUENCY, this, &SensorService::poll);
-    _event_queue.call_every(LCD_TIMEOUT, this, &SensorService::handleDisplayTimeout);
+    _event_queue.call_every(std::chrono::milliseconds(SENSOR_FREQUENCY), this, &SensorService::poll);
+    _event_queue.call_every(std::chrono::milliseconds(LCD_TIMEOUT), this, &SensorService::handleDisplayTimeout);
     _event_thread.start(callback(&_event_queue, &EventQueue::dispatch_forever));
 
     // Poll once at start
@@ -130,7 +130,7 @@ void SensorService::poll()
 
     // Begin HR measuring interval
     _hr.setPower(true);
-    _event_queue.call_in(HR_DURATION, callback(this, &SensorService::finishPoll));
+    _event_queue.call_in(std::chrono::milliseconds(HR_DURATION), callback(this, &SensorService::finishPoll));
 
     // Refresh display if needed
     if(_display_service.screen.getState() == Screen::ScreenState::STATE_SETTINGS)
@@ -177,7 +177,7 @@ void SensorService::handleButtonIRQ()
     {
         // Advance to next screen state
         Screen::ScreenState current_state = _display_service.screen.getState();
-        (*(int*)&current_state)++;
+        current_state = static_cast<Screen::ScreenState>(static_cast<int>(current_state) + 1);
         if(current_state == Screen::ScreenState::STATE_LOOP) current_state = Screen::ScreenState::STATE_CLOCK;
         _display_service.screen.setState(current_state);
         _display_service.render();

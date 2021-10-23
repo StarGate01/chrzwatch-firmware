@@ -27,7 +27,7 @@
  * 
  */
 template <typename T>
-class CustomSettingsService 
+class CustomSettingsService : private GattServer::EventHandler
 {
     
     public:
@@ -72,7 +72,7 @@ class CustomSettingsService
          * 
          * @param params The new settings to store
          */
-        virtual void onDataWritten(const GattWriteCallbackParams* params);
+        void onDataWritten(const GattWriteCallbackParams& params) override;
 
 };
 

@@ -114,13 +114,13 @@ void DisplayService::threadVibration()
         _vibration_trigger.acquire();
         _vibrating = true;
         // 10 ms grace buffer for other sensor
-        ThisThread::sleep_for(VIBRATION_GRACE_IN);
+        ThisThread::sleep_for(std::chrono::milliseconds(VIBRATION_GRACE_IN));
 #       if defined(PIN_VIBRATION_INVERT)
             _vibration = 0;
 #       else
             _vibration = 1;
 #       endif
-        ThisThread::sleep_for(_vibration_duration);
+        ThisThread::sleep_for(std::chrono::milliseconds(_vibration_duration));
 #       if defined(PIN_VIBRATION_INVERT)
             _vibration = 1;
 #       else
@@ -128,7 +128,7 @@ void DisplayService::threadVibration()
 #       endif
         // Wait for vibration to dampen, ensure 750 ms grace
         if(_clearVibrationToken > 0) _event_queue.cancel(_clearVibrationToken);
-        _event_queue.call_in(VIBRATION_GRACE_OUT, this, &DisplayService::clearVibration);
+        _event_queue.call_in(std::chrono::milliseconds(VIBRATION_GRACE_OUT), this, &DisplayService::clearVibration);
         
     }
 }

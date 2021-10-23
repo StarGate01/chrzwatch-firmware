@@ -23,7 +23,7 @@
  * @brief Provides a BLE service to set an immediate alert
  * 
  */
-class ImmediateAlertService 
+class ImmediateAlertService : private GattServer::EventHandler
 {
     
     public:
@@ -52,7 +52,7 @@ class ImmediateAlertService
          * 
          * @param params The new timestamp to store
          */
-        virtual void onDataWritten(const GattWriteCallbackParams* params);
+        void onDataWritten(const GattWriteCallbackParams& params) override;
         
 
 };

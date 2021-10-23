@@ -72,9 +72,6 @@ uint8_t hr3_set_led2_sample_start_end(uint16_t start, uint16_t end)
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
 
-    if (start > 65535 || end > 65535)
-        return -1;
-
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
 
@@ -94,9 +91,6 @@ uint8_t hr3_set_led1_start_end(uint16_t start, uint16_t end)
     uint8_t reg_end = LED1_END;
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
-
-    if (start > 65535 || end > 65535)
-        return -1;
 
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
@@ -118,9 +112,6 @@ uint8_t hr3_set_led3_sample_start_end(uint16_t start, uint16_t end)
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
 
-    if (start > 65535 || end > 65535)
-        return -1;
-
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
 
@@ -140,9 +131,6 @@ uint8_t hr3_set_led1_sample_start_end(uint16_t start, uint16_t end)
     uint8_t reg_end = SMPL_LED1_END;
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
-
-    if (start > 65535 || end > 65535)
-        return -1;
 
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
@@ -164,9 +152,6 @@ uint8_t hr3_set_led2_start_end(uint16_t start, uint16_t end)
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
 
-    if (start > 65535 || end > 65535)
-        return -1;
-
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
 
@@ -186,9 +171,6 @@ uint8_t hr3_set_amb1_sample_start_end(uint16_t start, uint16_t end)
     uint8_t reg_end = SMPL_AMB1_END;
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
-
-    if (start > 65535 || end > 65535)
-        return -1;
 
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
@@ -210,9 +192,6 @@ uint8_t hr3_set_led2_convert_start_end(uint16_t start, uint16_t end)
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
 
-    if (start > 65535 || end > 65535)
-        return -1;
-
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
 
@@ -232,9 +211,6 @@ uint8_t hr3_set_led3_convert_start_end(uint16_t start, uint16_t end)
     uint8_t reg_end = LED3_CONV_END;
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
-
-    if (start > 65535 || end > 65535)
-        return -1;
 
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
@@ -256,9 +232,6 @@ uint8_t hr3_set_led1_convert_start_end(uint16_t start, uint16_t end)
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
 
-    if (start > 65535 || end > 65535)
-        return -1;
-
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
 
@@ -278,9 +251,6 @@ uint8_t hr3_set_amb1_convert_start_end(uint16_t start, uint16_t end)
     uint8_t reg_end = AMB1_CONV_END;
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
-
-    if (start > 65535 || end > 65535)
-        return -1;
 
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
@@ -302,9 +272,6 @@ uint8_t hr3_set_adc_reset0_start_end(uint16_t start, uint16_t end)
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
 
-    if (start > 65535 || end > 65535)
-        return -1;
-
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
 
@@ -324,9 +291,6 @@ uint8_t hr3_set_adc_reset1_start_end(uint16_t start, uint16_t end)
     uint8_t reg_end = ADC_RST_P1_END;
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
-
-    if (start > 65535 || end > 65535)
-        return -1;
 
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
@@ -348,9 +312,6 @@ uint8_t hr3_set_adc_reset2_start_end(uint16_t start, uint16_t end)
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
 
-    if (start > 65535 || end > 65535)
-        return -1;
-
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
 
@@ -371,9 +332,6 @@ uint8_t hr3_set_adc_reset3_start_end(uint16_t start, uint16_t end)
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
 
-    if (start > 65535 || end > 65535)
-        return -1;
-
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
 
@@ -392,9 +350,6 @@ uint8_t hr3_set_prpct_count(uint16_t count)
     uint8_t reg = PRPCT;
     uint8_t temp[3] = {0};
 
-    if (count > 65535)
-        return -1;
-
     temp[1] = count >> 8;
     temp[2] = (uint8_t)count;
 
@@ -408,7 +363,7 @@ uint8_t hr3_set_timer_and_average_num(bool enable, uint8_t av_num)
     uint8_t reg = TIM_NUMAV;
     uint8_t temp[3] = {0};
 
-    if (av_num > 15 || av_num < 0)
+    if (av_num > 15)
         return -1;
 
     if (enable)
@@ -861,9 +816,6 @@ uint8_t hr3_set_pdn_cycle_start_end(uint16_t start, uint16_t end)
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
 
-    if (start > 65535 || end > 65535)
-        return -1;
-
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
 
@@ -884,9 +836,6 @@ uint8_t hr3_set_prgrmmbl_timing_start_end(uint16_t start, uint16_t end)
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
 
-    if (start > 65535 || end > 65535)
-        return -1;
-
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
 
@@ -906,9 +855,6 @@ uint8_t hr3_set_led3_start_stop(uint16_t start, uint16_t end)
     uint8_t reg_end = LED3LEDENDC;
     uint8_t temp_st[3] = {0};
     uint8_t temp_end[3] = {0};
-
-    if (start > 65535 || end > 65535)
-        return -1;
 
     temp_st[1] = start >> 8;
     temp_st[2] = (uint8_t)start;
@@ -1004,6 +950,7 @@ uint32_t hr3_calibrate(void)
 
     return retVal;
                 */
+    return 0;
 }
 
 uint8_t hr3_read_enable(void)
