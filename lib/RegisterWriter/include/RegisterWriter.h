@@ -42,7 +42,7 @@ class RegisterWriter
         *
         * @param i2c_obj pre-instantiated i2c object.
         */
-        RegisterWriter(UnsafeI2C &i2c_obj);
+        RegisterWriter(UnsafeI2C& i2c_obj);
 
         /**
         * Create a i2c instance which is connected to specified I2C pins.
@@ -122,7 +122,7 @@ class RegisterWriter
         bool change_bits(uint8_t sad, uint8_t reg, uint8_t mask, uint8_t bits);
 
     private:
-        UnsafeI2C i2c_bus;
+        UnsafeI2C& i2c_bus;
         bool self_created_i2c;
         bool write_single; //Single command write or two command write
 

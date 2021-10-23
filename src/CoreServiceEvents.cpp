@@ -17,10 +17,10 @@ void CoreService::onInitComplete(BLE::InitializationCompleteCallbackContext *par
     }
 
     // Read BLE MAC
-    BLEProtocol::AddressType_t addr_type;
-    BLEProtocol::AddressBytes_t addr;
-    _ble.getAddress(&addr_type, addr);
-    _display_service.setBLEAddress((const char*)addr);
+    ble::own_address_type_t addr_type;
+    ble::address_t addr;
+    _ble.gap().getAddress(addr_type, addr);
+    _display_service.setBLEAddress((const char*)addr.data());
 
     // Init security bonding module
     ble_error_t error = _ble.securityManager().init(true, false, SecurityManager::IO_CAPS_NONE, NULL, false, NULL);

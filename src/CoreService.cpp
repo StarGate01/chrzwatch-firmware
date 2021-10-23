@@ -72,8 +72,6 @@ void CoreService::startAdvertising()
     // Services are added at runtime, client is notified via Service Changed indicator
     // Setup advertising parameters
     _ble.gap().setAdvertisingParameters(ble::LEGACY_ADVERTISING_HANDLE, adv_parameters);
-    _ble.gap().setDeviceName((uint8_t*)DEVICE_NAME);
-    _ble.gap().setAppearance(GapAdvertisingData::Appearance::GENERIC_WATCH);
 
     // Setup advertising payload and start
     _ble.gap().setAdvertisingPayload(ble::LEGACY_ADVERTISING_HANDLE, _adv_data_builder.getAdvertisingData());
