@@ -45,19 +45,17 @@ void DisplayService::setBLEAddress(const char address[6])
 
 void DisplayService::setPower(bool on)
 {
-    _lcd_bl.setPower(on);
     if(on)
     {
         // Enable LCD power
-        _lcd_pwr.write(1);
-        _lcd_bl.write(1.0f);
+        _lcd_pwr = 1;
+        _lcd_bl = 1;
     }
     else
     {
-        // Prepare cache for next turn on
-        _lcd_bl.write(0.f);
         // Disable LCD power
-        _lcd_pwr.write(0);
+        _lcd_bl = 0;
+        _lcd_pwr = 0;
     }
     _is_on = on;
 }

@@ -123,32 +123,6 @@ class Screen
 };
 
 /**
- * @brief Provides a PWM interface with power saving option
- * 
- */
-class PwmOutLP: public PwmOut
-{
-
-    public:
-
-        /**
-         * @brief Construct a new Pwm Out L P object
-         * 
-         * @param pin Which pin to use
-         */
-        PwmOutLP(PinName pin) : PwmOut(pin) { }
-
-        /**
-         * @brief Powers the interface up and down
-         * 
-         * @param on True to turn on, false to turn off
-         */
-        void setPower(bool on);
-
-};
-
-
-/**
  * @brief Provides methods to interact with the LCD display and other actors
  * 
  */
@@ -234,7 +208,7 @@ class DisplayService
         volatile bool _vibrating = false; //!< Indicates vibration state - read in IRQ
         int _clearVibrationToken = -1; //!< Eventqueue token for indicator clearing timeout
 
-        PwmOutLP _lcd_bl; //!< LCD backlight
+        DigitalOut _lcd_bl; //!< LCD backlight
         DigitalOut _lcd_pwr; //!< LCD power
 
         volatile bool _is_on = false; //!< Power state
