@@ -89,7 +89,7 @@ The *I6HRC* smartwatch uses these components. You can also purchase then separat
 
 - General: https://www.nordicsemi.com/Products/Low-power-short-range-wireless/nRF52832/Getting-started
 - Datasheet: https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.0.pdf
-- RTOS: https://os.mbed.com/ (V5.14.1)
+- RTOS: https://os.mbed.com/ (V6.7, development version, custom fork)
 
 </details>
 
@@ -236,6 +236,18 @@ It is recommended to use Linux, however Windows should work as well, provided al
 
  - *(Required)* Install **Visual Studio Code** (https://code.visualstudio.com/) and the **PlatformIO** (https://platformio.org/) extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
 
+    **Important:** Since this project uses a fork of Mbed that is not yet supported by PlatformIO, you have to [initialize the builder environment](https://community.platformio.org/t/support-for-mbed-os-6-stable-and-mature-apis-cloud-services-support-enhancements-to-the-bare-metal-profile/15079/10) by opening up a "`PlatformIO Core CLI`" in VSCode and running
+
+    ```
+    $ pio system info
+    ```
+
+    to print some information about your platformIO installation. Copy the python executable path and then install the required python packages:
+
+    ```
+    $ <python path> -m pip install -r patch/requirements.txt
+    ```
+
  - *(Required)* Install the `patch` command line utility, this might ship with `git`, depending on your distribution.
 
  - *(Required)* Install **OpenOCD** (http://http://openocd.org/), this is probably available via your package manager
@@ -247,6 +259,7 @@ It is recommended to use Linux, however Windows should work as well, provided al
  - *(Optional)* Install or compile **Fontedit** (https://github.com/ayoy/fontedit) to edit the bitmap fonts (MSB first).
 
  - *(Optional)* Install the **SEGGER J-Link tools** (https://www.segger.com/downloads/jlink/) to connect to the RTT interface or to use a J-Link adapter.
+
 
 ### Modifying an I6HRC watch
 
@@ -561,7 +574,7 @@ All modified libraries have been or will be published to https://platformio.org 
 - URL: https://platformio.org/lib/show/3975/kionix-kx123-driver
 - Modifications: 
   - URL: https://platformio.org/lib/show/11101/kionix-kx123-driver
-  - Adapted to Mbed 5
+  - Adapted to Mbed
   - Added interrupt configuration functionality
   - Added motion detecting functionality
   - Fixed include paths
@@ -577,7 +590,7 @@ All modified libraries have been or will be published to https://platformio.org 
 - URL: https://platformio.org/lib/show/10695/RegisterWriter
 - Modifications:
   - URL: https://platformio.org/lib/show/11100/RegisterWriter
-  - Adapted to Mbed 5
+  - Adapted to Mbed
   - Fixed include paths
   - Fixed default pins
   - Added an explicit dependency to `UnsafeI2C`, see above
