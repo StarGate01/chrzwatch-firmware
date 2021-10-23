@@ -9,7 +9,7 @@
 #include "ImmediateAlertService.h"
 
 
-ImmediateAlertService::ImmediateAlertService(BLE &ble):
+ImmediateAlertService::ImmediateAlertService(BLE &ble, ChainableGattServerEventHandler& gatt_handler):
     _ble(ble),
     _immediateAlertCharacteristic(GattCharacteristic::UUID_ALERT_LEVEL_CHAR,
         _valueBytes, UUID_ALERT_LEVEL_CHAR_VALUE_SIZE, UUID_ALERT_LEVEL_CHAR_VALUE_SIZE,
@@ -24,7 +24,7 @@ ImmediateAlertService::ImmediateAlertService(BLE &ble):
 
     // Attach GATT server and timer events
     _ble.gattServer().addService(ImmediateAlertGATT);
-    _ble.gattServer().setEventHandler(this);
+    gatt_handler.addEventHandler(this);
 }
 
 void ImmediateAlertService::setCallback(const Callback<void(int)>& alert_callback)

@@ -15,12 +15,12 @@ CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _adv_data_builder(_adv_buffer),
     _ble_hr_service(ble, 0, HeartRateService::LOCATION_WRIST),
     _ble_bat_service(ble, 0),
-    _ble_time_service(ble, event_queue, 60), // 1 minute clock
-    _ble_alert_service(ble),
+    _ble_time_service(ble, _gatt_handler, event_queue, 60), // 1 minute clock
+    _ble_alert_service(ble, _gatt_handler),
     _ble_rsc_service(ble, (RSCFF)(
         RSCFF::INSTANTANEOUS_STRIDE_LENGTH_MEASUREMENT_SUPPORTED | 
         RSCFF::TOTAL_DISTANCE_MEASUREMENT_SUPPORTED)),
-    _ble_settings_service(ble),
+    _ble_settings_service(ble, _gatt_handler),
     _display_service(_sensor_service, _ble_time_service),
     _sensor_service(_display_service)
 { 
@@ -41,6 +41,7 @@ void CoreService::start()
 {
     // Init BLE and attach event handlers
     _ble.gap().setEventHandler(this);
+    _ble.gattServer().setEventHandler(&_gatt_handler);
     _ble.init(this, &CoreService::onInitComplete);
     initWatchdog();
 

@@ -15,6 +15,7 @@
 #include <mbed.h>
 #include <events/mbed_events.h>
 #include <ble/BLE.h>
+#include <ChainableGattServerEventHandler.h>
 
 #define UUID_ALERT_LEVEL_CHAR_VALUE_SIZE 1
 
@@ -31,8 +32,9 @@ class ImmediateAlertService : private GattServer::EventHandler
          * @brief Construct a new Current Time Service object
          * 
          * @param ble BLE instance
+         * @param event_queue Event queue for dispatching calls from interrupt
          */
-        ImmediateAlertService(BLE& ble);
+        ImmediateAlertService(BLE& ble, ChainableGattServerEventHandler& gatt_handler);
 
         /**
          * @brief Set the alert callback 

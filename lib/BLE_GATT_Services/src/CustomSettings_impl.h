@@ -13,6 +13,7 @@
 
 template <class T>
 CustomSettingsService<T>::CustomSettingsService(BLE& ble,
+        ChainableGattServerEventHandler& gatt_handler,
         const UUID& gatt_service_uuid, const UUID& gatt_characteristic_uuid):
     _ble(ble),
     _settingsCharacteristic(gatt_characteristic_uuid,
@@ -27,7 +28,7 @@ CustomSettingsService<T>::CustomSettingsService(BLE& ble,
 
     // Attach GATT server
     _ble.gattServer().addService(CustomSettingsGATT);
-    _ble.gattServer().setEventHandler(this);
+    gatt_handler.addEventHandler(this);
 }
 
 template <class T>

@@ -20,6 +20,7 @@
 #include <ble/services/HeartRateService.h>
 #include <ble/services/BatteryService.h>
 #include <ble/services/DeviceInformationService.h>
+#include <ChainableGattServerEventHandler.h>
 
 #include "CurrentTimeService.h"
 #include "ImmediateAlertService.h"
@@ -38,7 +39,7 @@ const static char DEVICE_NAME[] = TARGET_VARIANT_NAME;
  * @brief Handles BLE connections, GAP advertising and contains all sub-service objects
  * 
  */
-class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
+class CoreService : ble::Gap::EventHandler //, public SecurityManager::EventHandler
 {
 
     public:
@@ -76,6 +77,7 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
         BLE& _ble; //!< Reference to the BLE instance
         uint8_t _adv_buffer[ble::LEGACY_ADVERTISING_MAX_SIZE]; //!< BLE GAP advertising buffer
         ble::AdvertisingDataBuilder _adv_data_builder; //!< BLE GAP factory
+        ChainableGattServerEventHandler _gatt_handler; //!< GATT event handler chain
 
         HeartRateService _ble_hr_service; //!< BLE heartrate service
         BatteryService _ble_bat_service; //!< BLE battery service

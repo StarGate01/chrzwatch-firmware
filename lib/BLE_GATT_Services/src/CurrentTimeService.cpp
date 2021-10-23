@@ -10,7 +10,8 @@
 #include "CurrentTimeService.h"
 
 
-CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue, int seconds_resolution):
+CurrentTimeService::CurrentTimeService(BLE &ble, ChainableGattServerEventHandler& gatt_handler,
+        events::EventQueue &event_queue, int seconds_resolution):
     _ble(ble),
     _event_queue(event_queue),
     _ticker_resolution(seconds_resolution),
@@ -29,7 +30,7 @@ CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue
 
     // Attach GATT server and timer events
     _ble.gattServer().addService(currentTimeGATT);
-    _ble.gattServer().setEventHandler(this);
+    gatt_handler.addEventHandler(this);
     _event_queue.call_every(std::chrono::milliseconds(_ticker_resolution * 1000), callback(this, &CurrentTimeService::onTickerCallback));
 }
 
