@@ -10,7 +10,8 @@
 #include "CurrentTimeService.h"
 
 
-CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue, int seconds_resolution):
+CurrentTimeService::CurrentTimeService(BLE &ble, ChainableGattServerEventHandler& gatt_handler,
+        events::EventQueue &event_queue, int seconds_resolution):
     _ble(ble),
     _event_queue(event_queue),
     _ticker_resolution(seconds_resolution),
@@ -29,8 +30,8 @@ CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue
 
     // Attach GATT server and timer events
     _ble.gattServer().addService(currentTimeGATT);
-    _ble.gattServer().onDataWritten(this, &CurrentTimeService::onDataWritten);
-    _event_queue.call_every(_ticker_resolution * 1000, callback(this, &CurrentTimeService::onTickerCallback));
+    gatt_handler.addEventHandler(this);
+    _event_queue.call_every(std::chrono::milliseconds(_ticker_resolution * 1000), callback(this, &CurrentTimeService::onTickerCallback));
 }
 
 void CurrentTimeService::setMonotonicCallback(const Callback<void(const time_t epoch)>& second_notify)
@@ -121,11 +122,11 @@ void CurrentTimeService::onTickerCallback(void)
     if(_second_notify != nullptr) _event_queue.call(_second_notify, tmpEpochTime);
 }
 
-void CurrentTimeService::onDataWritten(const GattWriteCallbackParams* params)
+void CurrentTimeService::onDataWritten(const GattWriteCallbackParams& params)
 {
-    if (params->handle == _currentTimeCharacteristic.getValueHandle()) 
+    if (params.handle == _currentTimeCharacteristic.getValueHandle()) 
     {
         // Blit the received update into the buffer
-        memcpy((void*)&_valueBytes, params->data, min(params->len, (uint16_t)BLE_CURRENT_TIME_CHAR_VALUE_SIZE));
+        memcpy((void*)&_valueBytes, params.data, min(params.len, (uint16_t)BLE_CURRENT_TIME_CHAR_VALUE_SIZE));
     }
 }

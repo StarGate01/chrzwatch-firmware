@@ -25,7 +25,7 @@
 * @param sad slave address of sensor.
 * @param wai who_am_i value (i.e. sensor type/model)
 */
-KX123::KX123(RegisterWriter &i2c_obj, uint8_t sad, uint8_t wai) : i2c_rw(i2c_obj)
+KX123::KX123(RegisterWriter& i2c_obj, uint8_t sad, uint8_t wai) : i2c_rw(i2c_obj)
 {
     _sad = sad;
     _wai = wai;

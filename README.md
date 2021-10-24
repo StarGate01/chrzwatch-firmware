@@ -17,7 +17,7 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 - [ ] Text message GATT profile
 - [ ] Health activity / sleep monitor GATT profile
 - [x] User configuration GATT profile
-- [x] Proper bonding support
+- ~~[x] Proper bonding support~~
 
 </details>
 
@@ -37,13 +37,14 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 <details>
 <summary>Power saving</summary>
 
-- [ ] Deep sleep in idle thread
+- [x] Deep sleep in idle thread
 - [x] Energy saving display
 - [x] Energy saving touch input
 - [ ] Energy saving heartrate sensor
 - [x] Energy saving acceleration sensor
 - [ ] Endurance tests & verification
-- [ ] Power saving BLE stack (Requires https://github.com/ARMmbed/mbed-os/issues/10669)
+- [x] Power saving BLE stack
+- [ ] Use even better BLE stack (Requires https://github.com/ARMmbed/mbed-os/issues/10669)
 
 </details>
 
@@ -89,7 +90,7 @@ The *I6HRC* smartwatch uses these components. You can also purchase then separat
 
 - General: https://www.nordicsemi.com/Products/Low-power-short-range-wireless/nRF52832/Getting-started
 - Datasheet: https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.0.pdf
-- RTOS: https://os.mbed.com/ (V5.14.1)
+- RTOS: https://os.mbed.com/ (V6.7, development version, custom fork at https://github.com/StarGate01/mbed-os, branch `feature-nrf52-low-power-ble` made compatible with PlatformIO )
 
 </details>
 
@@ -168,13 +169,6 @@ The *I6HRC* smartwatch uses these components. You can also purchase then separat
 This project configures the `NRF52832` IC and the Mbed OS as follows.
 
 <details>
-<summary>Low-power PWM</summary>
-
-The Mbed `PwmOut` implementation locks the system out from deep sleep once a **PWM** peripheral is activated, even if its duty cycle is `0%`. It only unlocks the deep sleep when the whole interface object is deconstructed. To use PWM while also allowing deep sleep when it shall be temporarily disabled, the `PwmOutLP` implementation is used. This implementation provides a function to lock / unlock deep sleep, and to simultaneously enable / disable the underlying *PWM* peripheral via the `NRF_PWM0->ENABLE` register. `PWM0` is hardcoded, but as only one instance is used this renders the code not portable, yet functional.
-
-</details>
-
-<details>
 <summary>SPI and I2C interfaces</summary>
 
 The `NRF52832` IC has 2 **I2C** and 3 **SPI** instances, which partly overlap. To avoid contention, the interfaces are assigned as follows:
@@ -200,22 +194,22 @@ At the time of writing, the font flash is unused. The interface mapping still st
 
 The `NRF52832` IC has a few special functions which can be assigned to specific pins, eg. *NFC* and *Reset*. To use these pins as standard GPIO pins, the following macros are configured in `mbed_app.json`, in order to configure how Mbed is built: `CONFIG_GPIO_AS_PINRESET` is removed (enables `p0.21` as GPIO)  and `CONFIG_NFCT_PINS_AS_GPIOS` is added (enables `p0.9` and `p0.10` as GPIO). Also, the `ITM` debug trace module, which uses the `SWO` pin, is removed (enables `p0.18` as GPIO). The `ITM` module is already removed in the board configuration this project inherits from (`NRF52_DK`).
 
-To support more than one interrupt event on the GPIO pins (using the `GPIOTE` peripheral), more memory is allocated to the peripheral by defining `NRFX_GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS=8`. This supports a maximum of 8 separate interrupt pins.
+To support more than one interrupt event on the GPIO pins (using the `GPIOTE` peripheral), more memory is allocated to the peripheral by defining `NRFX_GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS=8`. This supports a maximum of 8 separate interrupt events.
 
-To conserve space, the `SERIAL`, `SERIAL_ASYNC` and `SERIAL_FC` devices are removed, as the serial connection is unavailable anyway (for more info, see below).
+To conserve space, the `ITM`, `SERIAL`, `SERIAL_ASYNC` and `SERIAL_FC` devices are removed, as the serial connection is unavailable anyway (for more info, see below).
 
 </details>
 
 <details>
 <summary>Mbed configuration</summary>
 
-No proprietary softdevice by Nordic is used. Instead, Mbed supplies APIs like Bluetooth (https://os.mbed.com/docs/mbed-cordio/19.02/introduction/index.html), and also compiles the code to be able to run on bare-metal.
+No proprietary softdevice by Nordic is used. Instead, Mbed supplies APIs like Bluetooth CORDIO (https://os.mbed.com/docs/mbed-cordio/19.02/introduction/index.html). This enables the usage of all software interrupts, by removing the `SWI_DISABLE0` macro in `mbed_app.json`.
 
-The Bluetooth API is modified by a patch (`patch/mbed/ble_sleep.patch`), which removes the `sleep_manager_lock_deep_sleep` calls in `idle_hook` of the BLE implementation. This enables the chip to enter deep sleep mode when Bluetooth is used, but not doing anything. This modification might lead to some problems, but none have occurred so far.
+The Bluetooth API is modified in the custom Mbed OS fork, to enable deep sleep and reduce power usage. This modification might lead to some problems, but none have occurred so far.
 
 Mbed also provides various RTOS features, e.g. Threads. (Enabled by defining `PIO_FRAMEWORK_MBED_RTOS_PRESENT` in `platformio.ini`)
 
-Tho conserve energy, low-power timers are used. These are enabled by setting `"target.lse_available": true` and `"events.use-lowpower-timer-ticker": true` in `mbed_app.json`. 
+Tho conserve energy, low-power timers are used. These are enabled by setting `"events.use-lowpower-timer-ticker": true` in `mbed_app.json`. The clock source for the low power clock is defined to be the external crystal oscillator by setting `"target.lf_clock_src": "NRF_LF_SRC_XTAL"`.
 
 </details>
 
@@ -226,7 +220,7 @@ The system is configured to automatically reboot when a hard fault occurs (`"pla
 
 The crash dump retention feature of Mbed is enabled, and on the next boot after a crash the stored error information is printed out (in `mbed_error_reboot_callback`). The storage of this crash information requires a seperate memory region (`.crash_data_ram`), which is configured in the custom linker script `patch/mbed/linker.ld`.
 
-If you have a RTT reader attached, you can receive the message printed at reboot.
+If you have a RTT reader attached and compiled with RTT support, you can receive the message printed at reboot.
 
 </details>
 
@@ -234,11 +228,21 @@ If you have a RTT reader attached, you can receive the message printed at reboot
 
 It is recommended to use Linux, however Windows should work as well, provided all the command line tools, compilers and interface drivers are installed.
 
- - *(Required)* Install **Visual Studio Code** (https://code.visualstudio.com/) and the **PlatformIO** (https://platformio.org/) extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
+ - *(Required)* Install **Visual Studio Code** (https://code.visualstudio.com/) and the **PlatformIO** (https://platformio.org/) extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or eg. the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
 
- - *(Required)* Install the `patch` command line utility, this might ship with `git`, depending on your distribution.
+    **Important:** Since this project uses a fork of Mbed that is not yet supported by PlatformIO, you have to [initialize the builder environment](https://community.platformio.org/t/support-for-mbed-os-6-stable-and-mature-apis-cloud-services-support-enhancements-to-the-bare-metal-profile/15079/10) by opening up a "`PlatformIO Core CLI`" in VSCode and running
 
- - *(Required)* Install **OpenOCD** (http://http://openocd.org/), this is probably available via your package manager
+    ```
+    $ pio system info
+    ```
+
+    to print some information about your platformIO installation. Copy the python executable path and then install the required python packages:
+
+    ```
+    $ <python path> -m pip install -r patch/requirements.txt
+    ```
+
+ - *(Optional)* Install **OpenOCD** (http://http://openocd.org/), this is probably available via your package manager
 
  - *(Optional)* Install the **nRF command line tools** (https://www.nordicsemi.com/Products/Development-tools/nrf-command-line-tools) for J-Link support
 
@@ -247,6 +251,7 @@ It is recommended to use Linux, however Windows should work as well, provided al
  - *(Optional)* Install or compile **Fontedit** (https://github.com/ayoy/fontedit) to edit the bitmap fonts (MSB first).
 
  - *(Optional)* Install the **SEGGER J-Link tools** (https://www.segger.com/downloads/jlink/) to connect to the RTT interface or to use a J-Link adapter.
+
 
 ### Modifying an I6HRC watch
 
@@ -385,7 +390,7 @@ $ JLinkExe -autoconnect 1 -device NRF52832_XXAA -if SWD -speed 4000 -RTTTelnetPo
 $ telnet localhost 19021
 ```
 
-The task "Start Monitor Server" automates this connection.
+Add the compiler definition `SEGGER_RTT` to enable this feature. The task "Start Monitor Server" automates the connection.
 
 #### Troubleshooting
 
@@ -462,8 +467,10 @@ Patches to Mbed can be found in `/patch`.
 <details>
 <summary>ARM Mbed RTOS and API</summary>
 
-- URL: https://os.mbed.com/
-- Hot-patch Nordic BLE driver to support deep sleep
+- Original author: ARM Mbed Team
+- URL: https://os.mbed.com/, Fork: https://github.com/StarGate01/mbed-os
+- Use branch `feature-nrf52-low-power-ble`
+- Add PlatformIO metadata
 - Replace NRF52 linker memory map to support crash dump retention
 - *License: Custom - see https://github.com/ARMmbed/mbed-os/blob/master/LICENSE.md*
 
@@ -561,7 +568,7 @@ All modified libraries have been or will be published to https://platformio.org 
 - URL: https://platformio.org/lib/show/3975/kionix-kx123-driver
 - Modifications: 
   - URL: https://platformio.org/lib/show/11101/kionix-kx123-driver
-  - Adapted to Mbed 5
+  - Adapted to Mbed
   - Added interrupt configuration functionality
   - Added motion detecting functionality
   - Fixed include paths
@@ -577,7 +584,7 @@ All modified libraries have been or will be published to https://platformio.org 
 - URL: https://platformio.org/lib/show/10695/RegisterWriter
 - Modifications:
   - URL: https://platformio.org/lib/show/11100/RegisterWriter
-  - Adapted to Mbed 5
+  - Adapted to Mbed
   - Fixed include paths
   - Fixed default pins
   - Added an explicit dependency to `UnsafeI2C`, see above

@@ -18,7 +18,7 @@ DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService
     _lcd_bl(PIN_LCD_BL),
     _lcd_pwr(PIN_LCD_PWR),
     _vibration_thread(osPriorityNormal, THREAD_SIZE),
-    _render_thread(osPriorityNormal, THREAD_SIZE * 2)
+    _render_thread(osPriorityNormal, THREAD_SIZE_RENDER)
 {
     _vibration_thread.start(callback(this, &DisplayService::threadVibration));
     _render_thread.start(callback(&_event_queue, &EventQueue::dispatch_forever));
@@ -45,19 +45,17 @@ void DisplayService::setBLEAddress(const char address[6])
 
 void DisplayService::setPower(bool on)
 {
-    _lcd_bl.setPower(on);
     if(on)
     {
         // Enable LCD power
-        _lcd_pwr.write(1);
-        _lcd_bl.write(1.0f);
+        _lcd_pwr = 1;
+        _lcd_bl = 1;
     }
     else
     {
-        // Prepare cache for next turn on
-        _lcd_bl.write(0.f);
         // Disable LCD power
-        _lcd_pwr.write(0);
+        _lcd_bl = 0;
+        _lcd_pwr = 0;
     }
     _is_on = on;
 }
@@ -114,13 +112,13 @@ void DisplayService::threadVibration()
         _vibration_trigger.acquire();
         _vibrating = true;
         // 10 ms grace buffer for other sensor
-        ThisThread::sleep_for(VIBRATION_GRACE_IN);
+        ThisThread::sleep_for(std::chrono::milliseconds(VIBRATION_GRACE_IN));
 #       if defined(PIN_VIBRATION_INVERT)
             _vibration = 0;
 #       else
             _vibration = 1;
 #       endif
-        ThisThread::sleep_for(_vibration_duration);
+        ThisThread::sleep_for(std::chrono::milliseconds(_vibration_duration));
 #       if defined(PIN_VIBRATION_INVERT)
             _vibration = 1;
 #       else
@@ -128,7 +126,7 @@ void DisplayService::threadVibration()
 #       endif
         // Wait for vibration to dampen, ensure 750 ms grace
         if(_clearVibrationToken > 0) _event_queue.cancel(_clearVibrationToken);
-        _event_queue.call_in(VIBRATION_GRACE_OUT, this, &DisplayService::clearVibration);
+        _event_queue.call_in(std::chrono::milliseconds(VIBRATION_GRACE_OUT), this, &DisplayService::clearVibration);
         
     }
 }

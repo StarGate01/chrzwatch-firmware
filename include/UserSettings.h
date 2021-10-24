@@ -25,7 +25,7 @@ struct __attribute__ ((packed)) user_sensor_settings_t
 };
 
 /**
- * @brief Stores various user settings19
+ * @brief Stores various user settings
  * 
  */
 struct __attribute__ ((packed)) user_settings_t

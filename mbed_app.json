@@ -2,7 +2,8 @@
     "target_overrides": {
         "*": {
             "target.macros_remove": [
-                "CONFIG_GPIO_AS_PINRESET"
+                "CONFIG_GPIO_AS_PINRESET",
+                "SWI_DISABLE0"
             ],
             "target.macros_add":[
                 "CONFIG_NFCT_PINS_AS_GPIOS",
@@ -15,7 +16,7 @@
                 "SERIAL_FC"
             ],
             "platform.cpu-stats-enabled": true,
-            "target.lse_available": true,
+            "target.lf_clock_src": "NRF_LF_SRC_XTAL",
             "events.use-lowpower-timer-ticker": true,
             "platform.fatal-error-auto-reboot-enabled": true,
             "platform.crash-capture-enabled": true,

@@ -15,12 +15,12 @@ CoreService::CoreService(BLE& ble, events::EventQueue& event_queue):
     _adv_data_builder(_adv_buffer),
     _ble_hr_service(ble, 0, HeartRateService::LOCATION_WRIST),
     _ble_bat_service(ble, 0),
-    _ble_time_service(ble, event_queue, 60), // 1 minute clock
-    _ble_alert_service(ble),
+    _ble_time_service(ble, _gatt_handler, event_queue, 60), // 1 minute clock
+    _ble_alert_service(ble, _gatt_handler),
     _ble_rsc_service(ble, (RSCFF)(
         RSCFF::INSTANTANEOUS_STRIDE_LENGTH_MEASUREMENT_SUPPORTED | 
         RSCFF::TOTAL_DISTANCE_MEASUREMENT_SUPPORTED)),
-    _ble_settings_service(ble),
+    _ble_settings_service(ble, _gatt_handler),
     _display_service(_sensor_service, _ble_time_service),
     _sensor_service(_display_service)
 { 
@@ -41,12 +41,13 @@ void CoreService::start()
 {
     // Init BLE and attach event handlers
     _ble.gap().setEventHandler(this);
+    _ble.gattServer().setEventHandler(&_gatt_handler);
     _ble.init(this, &CoreService::onInitComplete);
     initWatchdog();
 
     // Setup and start ble and watchdog queue
-    _event_queue.call_every(SENSOR_FREQUENCY, this, &CoreService::doUpdateGATT);
-    _event_queue.call_every(15000, CoreService::kickWatchdog); // 15 sec kick leaves 5 sec headroom
+    _event_queue.call_every(std::chrono::milliseconds(SENSOR_FREQUENCY), this, &CoreService::doUpdateGATT);
+    _event_queue.call_every(std::chrono::milliseconds(15000), CoreService::kickWatchdog); // 15 sec kick leaves 5 sec headroom
 
     // Sensor service measures once in constructor, so update gatt at start
     doUpdateGATT();
@@ -72,8 +73,6 @@ void CoreService::startAdvertising()
     // Services are added at runtime, client is notified via Service Changed indicator
     // Setup advertising parameters
     _ble.gap().setAdvertisingParameters(ble::LEGACY_ADVERTISING_HANDLE, adv_parameters);
-    _ble.gap().setDeviceName((uint8_t*)DEVICE_NAME);
-    _ble.gap().setAppearance(GapAdvertisingData::Appearance::GENERIC_WATCH);
 
     // Setup advertising payload and start
     _ble.gap().setAdvertisingPayload(ble::LEGACY_ADVERTISING_HANDLE, _adv_data_builder.getAdvertisingData());

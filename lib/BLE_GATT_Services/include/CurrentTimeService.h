@@ -19,6 +19,7 @@
 #include <events/mbed_events.h>
 #include <time.h>
 #include <ble/BLE.h>
+#include <ChainableGattServerEventHandler.h>
 
 #define BLE_CURRENT_TIME_CHAR_VALUE_SIZE 10
 
@@ -45,7 +46,7 @@ typedef struct
  * @brief Provides a BLE service to track and set the current time
  * 
  */
-class CurrentTimeService 
+class CurrentTimeService : private GattServer::EventHandler
 {
     
     public:
@@ -53,9 +54,12 @@ class CurrentTimeService
          * @brief Construct a new Current Time Service object
          * 
          * @param ble BLE instance
+         * @param gatt_handler GATT event chain to add handler to
          * @param event_queue Event queue for dispatching calls from interrupt
+         * @param seconds_resolution Time resolution in seconds
          */
-        CurrentTimeService(BLE& ble, events::EventQueue &event_queue, int seconds_resolution = 1);
+        CurrentTimeService(BLE& ble, ChainableGattServerEventHandler& gatt_handler, 
+            events::EventQueue &event_queue, int seconds_resolution = 1);
 
         /**
          * @brief Attach a attach Seconds Notify Handler
@@ -118,7 +122,7 @@ class CurrentTimeService
          * 
          * @param params The new timestamp to store
          */
-        virtual void onDataWritten(const GattWriteCallbackParams* params);
+        void onDataWritten(const GattWriteCallbackParams& params) override;
 
 };
  

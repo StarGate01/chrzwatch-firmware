@@ -55,5 +55,5 @@ void hr3_hal_read(uint8_t *command, uint8_t *buffer, uint16_t count)
 
 void hr3_hal_delay(uint32_t ms)
 {
-    ThisThread::sleep_for(ms);
+    ThisThread::sleep_for(std::chrono::milliseconds(ms));
 }

@@ -17,21 +17,21 @@ void CoreService::onInitComplete(BLE::InitializationCompleteCallbackContext *par
     }
 
     // Read BLE MAC
-    BLEProtocol::AddressType_t addr_type;
-    BLEProtocol::AddressBytes_t addr;
-    _ble.getAddress(&addr_type, addr);
-    _display_service.setBLEAddress((const char*)addr);
+    ble::own_address_type_t addr_type;
+    ble::address_t addr;
+    _ble.gap().getAddress(addr_type, addr);
+    _display_service.setBLEAddress((const char*)addr.data());
 
-    // Init security bonding module
-    ble_error_t error = _ble.securityManager().init(true, false, SecurityManager::IO_CAPS_NONE, NULL, false, NULL);
-    if(error != BLE_ERROR_NONE) 
-    {
-        system_reset();
-        return;
-    }
-    _ble.securityManager().allowLegacyPairing(true);
-    _ble.securityManager().setSecurityManagerEventHandler(this);
-    _ble.securityManager().setPairingRequestAuthorisation(false);
+    // // Init security bonding module
+    // ble_error_t error = _ble.securityManager().init(true, false, SecurityManager::IO_CAPS_NONE, NULL, false, NULL);
+    // if(error != BLE_ERROR_NONE) 
+    // {
+    //     system_reset();
+    //     return;
+    // }
+    // _ble.securityManager().allowLegacyPairing(true);
+    // _ble.securityManager().setSecurityManagerEventHandler(this);
+    // _ble.securityManager().setPairingRequestAuthorisation(false);
 
     startAdvertising();
 }
@@ -48,10 +48,10 @@ void CoreService::onConnectionComplete(const ble::ConnectionCompleteEvent &event
     if(event.getStatus() == BLE_ERROR_NONE) _connected = true;
 }
 
-void CoreService::linkEncryptionResult(ble::connection_handle_t connectionHandle, ble::link_encryption_t result)
-{
-    _encrypted = (result != ble::link_encryption_t::NOT_ENCRYPTED);
-}
+// void CoreService::linkEncryptionResult(ble::connection_handle_t connectionHandle, ble::link_encryption_t result)
+// {
+//     _encrypted = (result != ble::link_encryption_t::NOT_ENCRYPTED);
+// }
 
 void CoreService::onAlert(int level)
 {

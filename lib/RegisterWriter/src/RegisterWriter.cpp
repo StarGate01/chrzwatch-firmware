@@ -30,15 +30,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define I2C_READ 1
 #define MAX_DATA_LENGTH 6
 
-RegisterWriter::RegisterWriter(UnsafeI2C &i2c_obj) : i2c_bus(i2c_obj)
+RegisterWriter::RegisterWriter(UnsafeI2C& i2c_obj) : i2c_bus(i2c_obj)
 {
     self_created_i2c = false;
-    write_single = true;
-}
-
-RegisterWriter::RegisterWriter(PinName sda, PinName scl) : i2c_bus(sda, scl)
-{
-    self_created_i2c = true;
     write_single = true;
 }
 

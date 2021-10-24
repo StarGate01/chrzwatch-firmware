@@ -15,6 +15,7 @@
 #include <mbed.h>
 #include <events/mbed_events.h>
 #include <ble/BLE.h>
+#include <ChainableGattServerEventHandler.h>
 
 #define UUID_CUSTOM_SETTINGS_SERVICE 0x1901 // Spec goes up to 0x184D
 #define UUID_CUSTOM_SETTINGS_CHAR    0x2C01 // Spec goes up to 0x2BC3
@@ -27,7 +28,7 @@
  * 
  */
 template <typename T>
-class CustomSettingsService 
+class CustomSettingsService : private GattServer::EventHandler
 {
     
     public:
@@ -35,8 +36,11 @@ class CustomSettingsService
          * @brief Construct a new Running Speed And Cadence Service object
          * 
          * @param ble BLE instance
+         * @param gatt_handler GATT event chain to add handler to
+         * @param gatt_service_uuid Optional service UUID
+         * @param gatt_characteristic_uuid Optional characteristic UUID
          */
-        CustomSettingsService(BLE& ble,
+        CustomSettingsService(BLE& ble, ChainableGattServerEventHandler& gatt_handler,
             const UUID& gatt_service_uuid = UUID(UUID_CUSTOM_SETTINGS_SERVICE), 
             const UUID& gatt_characteristic_uuid = UUID(UUID_CUSTOM_SETTINGS_CHAR));
 
@@ -72,7 +76,7 @@ class CustomSettingsService
          * 
          * @param params The new settings to store
          */
-        virtual void onDataWritten(const GattWriteCallbackParams* params);
+        void onDataWritten(const GattWriteCallbackParams& params) override;
 
 };
 

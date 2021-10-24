@@ -31,7 +31,7 @@ class KX123
 {
 
     public:
-        KX123(RegisterWriter &i2c_obj, uint8_t sad = KX123_DEFAULT_SLAVE_ADDRESS, uint8_t wai = KX123_WHO_AM_I_WAI_ID);
+        KX123(RegisterWriter& i2c_obj, uint8_t sad = KX123_DEFAULT_SLAVE_ADDRESS, uint8_t wai = KX123_WHO_AM_I_WAI_ID);
         ~KX123();
 
         bool start_setup_mode(void);
@@ -76,7 +76,7 @@ class KX123
 
     private:
         bool setup_mode_on;
-        RegisterWriter i2c_rw;
+        RegisterWriter& i2c_rw;
         uint16_t resolution_divider;
         uint8_t _sad;
         uint8_t _wai;

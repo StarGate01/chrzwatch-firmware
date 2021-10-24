@@ -13,6 +13,7 @@
 
 template <class T>
 CustomSettingsService<T>::CustomSettingsService(BLE& ble,
+        ChainableGattServerEventHandler& gatt_handler,
         const UUID& gatt_service_uuid, const UUID& gatt_characteristic_uuid):
     _ble(ble),
     _settingsCharacteristic(gatt_characteristic_uuid,
@@ -27,7 +28,7 @@ CustomSettingsService<T>::CustomSettingsService(BLE& ble,
 
     // Attach GATT server
     _ble.gattServer().addService(CustomSettingsGATT);
-    _ble.gattServer().onDataWritten(this, &CustomSettingsService<T>::onDataWritten);
+    gatt_handler.addEventHandler(this);
 }
 
 template <class T>
@@ -50,12 +51,12 @@ void CustomSettingsService<T>::readSettings(T& settings)
 }
 
 template <class T>
-void CustomSettingsService<T>::onDataWritten(const GattWriteCallbackParams* params)
+void CustomSettingsService<T>::onDataWritten(const GattWriteCallbackParams& params)
 {
-    if (params->handle == _settingsCharacteristic.getValueHandle()) 
+    if (params.handle == _settingsCharacteristic.getValueHandle()) 
     {
         // Callback with update value
-        memcpy(&_settings_value, params->data, min(params->len, (uint16_t)(sizeof(T))));
+        memcpy(&_settings_value, params.data, min(params.len, (uint16_t)(sizeof(T))));
         if(_update_callback != nullptr) _update_callback(_settings_value);
     }
 }
