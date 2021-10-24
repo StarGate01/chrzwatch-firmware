@@ -18,7 +18,7 @@ DisplayService::DisplayService(SensorService &sensor_service, CurrentTimeService
     _lcd_bl(PIN_LCD_BL),
     _lcd_pwr(PIN_LCD_PWR),
     _vibration_thread(osPriorityNormal, THREAD_SIZE),
-    _render_thread(osPriorityNormal, THREAD_SIZE * 2)
+    _render_thread(osPriorityNormal, THREAD_SIZE_RENDER)
 {
     _vibration_thread.start(callback(this, &DisplayService::threadVibration));
     _render_thread.start(callback(&_event_queue, &EventQueue::dispatch_forever));

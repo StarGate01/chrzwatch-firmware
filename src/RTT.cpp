@@ -6,7 +6,7 @@
  * @date 2020-05-21
  */
 
-#ifdef TARGET_VARIANT_I6HRC
+#ifdef SEGGER_RTT
 
     #include <mbed.h>
 
