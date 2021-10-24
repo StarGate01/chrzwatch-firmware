@@ -261,7 +261,7 @@ Disassemble the watch and solder the `SWCLK` and `SWDIO` testpoints to the unuse
 
 You might want to fabricate a custom SWD via USB to ISP adapter, link shown in the schematic below (KiCAD schematic is available in `doc/schematics/swd-usb-adapter`). You can still charge the watch using any USB A compliant charger or port.
 
-<img src="https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/docs/schematics/swd-usb-adapter/swd-usb-adapter_schematic2.jpg" height="400">
+<img src="https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/schematics/swd-usb-adapter/swd-usb-adapter_schematic2.jpg" height="400">
 
 ### Dumping the stock firmware
 
