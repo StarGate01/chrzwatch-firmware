@@ -1,14 +1,14 @@
 /**
  * @file ScreenModel.cpp
  * @author Christoph Honal
- * @brief Implements some functions defined in DisplayService.h
+ * @brief Implements some functions defined in Screen.h
  * @version 0.1
  * @date 2020-08-19
  */
 
 #include <mbed_stats.h>
 
-#include "DisplayService.h"
+#include "Screen.h"
 #include "UserSettings.h"
 #include "CoreService.h"
 
