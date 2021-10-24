@@ -17,7 +17,7 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 - [ ] Text message GATT profile
 - [ ] Health activity / sleep monitor GATT profile
 - [x] User configuration GATT profile
-- [x] Proper bonding support
+- ~~[x] Proper bonding support~~
 
 </details>
 
