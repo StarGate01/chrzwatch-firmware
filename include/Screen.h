@@ -19,6 +19,8 @@
 // #include "GT24L24A2Y.h"
 
 #include "HardwareConfiguration.h"
+#include "fonts.h"
+#include "icons.h"
 
 
 #define LCD_BUFFER_SIZE     400  //!< LCD buffer in bytes
@@ -31,7 +33,7 @@
 #define LCD_COLOR_YELLOW    0x7E1F
 #define LCD_COLOR_GOLD      0x2BDB
 #define LCD_COLOR_FROG      0x5E8B
-
+#define LCD_COLOR_SKY       0xF8E7
 
 // Forward decalarations
 class DisplayService;
@@ -103,8 +105,12 @@ class Screen
         const uint8_t _clock_indicator_pos[2][2] = { 
             {6, 115}, {44, 115} }; //!< Pixel positions of the clock AM/PM indicator
         const uint8_t _clock_24_y_offset = 17; //!< How many pixels to move digits down in 24h mode
+        const uint8_t _icon_pos[2] = { 20, 12 }; //!< Icon position
+        const uint8_t _icon_value_height = 57; //!< Value below icon y offset
+        const uint8_t _icon_value_margin[3] = { 30, 20, 9 }; //!< Space from left edge
+        const uint8_t _icon_value_squish = 3; //!< Squish letters together
+        
         mbed_stats_cpu_t _cpu_stats; //!< Buffer for cpu stats
-      
         time_t _epochTime = 0; //!< Current time
         float _batteryPercent = 0; //!< Battery remaining in percent
         uint8_t _heartrate = 0; //!< Heartrate
@@ -114,6 +120,25 @@ class Screen
         char _bleAddress[19]; //< BLE address string
         uint8_t _stepsCadence = 0; //!< Steps cadence
         uint32_t _stepsTotal = 0; //!< Steps total
+
+        /**
+         * @brief Renders a row of text with 24pt font
+         * 
+         * @param row Row 0 - 2
+         * @param indices The font glyphs to render
+         * @param count How many glyphs to draw
+         */
+        void renderGlyphs(uint8_t row, const uint8_t indices[], uint8_t count);
+
+        /**
+         * @brief Converts a number to glyph values
+         * 
+         * @param value The number to convert
+         * @param indices The glyphs
+         * @param count The glyph count
+         * @param leading_zeros Add leading zeros
+         */
+        void valueToGlyphs(uint16_t value, uint8_t indices[3], uint8_t& count, bool leading_zeros = false);
 
         friend class DisplayService; // Display may access internal screen variables
 };

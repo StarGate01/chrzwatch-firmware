@@ -17,6 +17,7 @@ SensorService::SensorService(DisplayService &display_service):
     _charging(PIN_CHARGE),
     _button1(PIN_BUTTON1),
     _button2(PIN_BUTTON2),
+    _button_lock(1),
     _hr(PIN_HR_SDA, PIN_HR_SCL, PIN_HR_ADCREADY, PIN_HR_RESET),
     _hr_pwr(PIN_HR_PWR),
     _event_thread(osPriorityNormal, THREAD_SIZE),
@@ -74,7 +75,7 @@ bool SensorService::getBatteryCharging()
     return _charging_value;
 }
 
-void SensorService::reevaluateStepsCadence()
+void SensorService::reevaluateStepsCadence(const time_t epoch)
 {
     rsc_measurement.instantaneous_cadence = _motion_count;
     // Convert cm/min to 1/256*m/s
@@ -88,6 +89,16 @@ void SensorService::reevaluateStepsCadence()
         RSCF::TOTAL_DISTANCE_PRESENT |
         ((_motion_count >= user_settings.sensor.cadence_running_thresh)? RSCF::RUNNING_NOT_WALKING : 0));
     _motion_count = 0;
+
+    // Reset step counter on midnight
+    struct tm then, now;
+    localtime_r(&_last_reeval, &then);
+    localtime_r(&epoch, &now);
+    if(then.tm_hour == 23 && now.tm_hour == 0)
+    {
+        rsc_measurement.total_steps = 0;
+    }
+    _last_reeval = epoch;
 
     // Refresh display if needed
     if(_display_service.screen.getState() == Screen::ScreenState::STATE_STEPS ||
@@ -116,7 +127,7 @@ void SensorService::setupAccelerationSensor()
     _acc_kx123.set_config(KX122_ODCNTL_OSA_50, KX122_CNTL1_GSEL_2G, true, false, true); // 50Hz data rate default output, 2g range, enable motion and tilt engine
     _acc_kx123.set_cntl3_odrs(KX122_CNTL3_OTP_12P5, 0xff, KX122_CNTL3_OWUF_50); // 12.5Hz for tilt engine, 50Hz data rate for motion engine
     _acc_kx123.set_motion_detect_config(KX123_AXIS_MASK, user_settings.sensor.motion_duration, user_settings.sensor.motion_threshold); // All axes, user tresholds
-    _acc_kx123.set_tilt_detect_config(KX123_AXIS_MASK, 1); // X+, 0.64 s treshold
+    _acc_kx123.set_tilt_detect_config(KX123_AXIS_MASK, 100); // X+, 0.64 s treshold
     _acc_kx123.int1_setup(0, true, false, false, false, false); // Latch interrupt 1, active low
     _acc_kx123.set_int1_interrupt_reason(KX122_MOTION_INTERRUPT | KX122_TILT_CHANGED); // Route interrupt source
     _acc_kx123.start_measurement_mode();
@@ -154,33 +165,43 @@ void SensorService::finishPoll()
 
 void SensorService::handleButtonIRQ()
 {
-    // Ensure last button press is a fixed time ago, for debouncing
-    uint64_t now = get_ms_count();
-    if(now - _last_button < BUTTON_DEBOUNCE) return;
-    _last_button = now;
-    _cancel_timeout = true;
+    // Collapse button presses, might happen when both sensors are touched
+    if(_button_lock.try_acquire()) 
+    {
+        // Ensure last button press is a fixed time ago, for debouncing
+        uint64_t now = get_ms_count();
+        if(now - _last_button < BUTTON_DEBOUNCE) 
+        {
+            _button_lock.release();
+            return;
+        }
+        _last_button = now;
+        _cancel_timeout = true;
 
-    // Trigger vibration
-    if(user_settings.button_feedback == 1) 
-    {
-        _display_service.vibrate(BUTTON_VIBRATION_LENGTH);
-    }
+        // Trigger vibration
+        if(user_settings.button_feedback == 1) 
+        {
+            _display_service.vibrate(BUTTON_VIBRATION_LENGTH);
+        }
 
-    // Trigger display wakeup or state change
-    if(!_display_service.getPower()) 
-    {
-        _display_service.screen.setState(Screen::ScreenState::STATE_CLOCK);
-        _display_service.setPower(true);
-        _display_service.render();
-    }
-    else
-    {
-        // Advance to next screen state
-        Screen::ScreenState current_state = _display_service.screen.getState();
-        current_state = static_cast<Screen::ScreenState>(static_cast<int>(current_state) + 1);
-        if(current_state == Screen::ScreenState::STATE_LOOP) current_state = Screen::ScreenState::STATE_CLOCK;
-        _display_service.screen.setState(current_state);
-        _display_service.render();
+        // Trigger display wakeup or state change
+        if(!_display_service.getPower()) 
+        {
+            _display_service.screen.setState(Screen::ScreenState::STATE_CLOCK);
+            _display_service.setPower(true);
+            _display_service.render();
+        }
+        else
+        {
+            // Advance to next screen state
+            Screen::ScreenState current_state = _display_service.screen.getState();
+            current_state = static_cast<Screen::ScreenState>(static_cast<int>(current_state) + 1);
+            if(current_state == Screen::ScreenState::STATE_LOOP) current_state = Screen::ScreenState::STATE_CLOCK;
+            _display_service.screen.setState(current_state);
+            _display_service.render();
+        }
+
+        _button_lock.release();
     }
 }
 
@@ -198,7 +219,10 @@ void SensorService::handleAccIRQ()
             rsc_measurement.total_steps++;
 
             // Refresh display if needed
-            if(_display_service.screen.getState() == Screen::ScreenState::STATE_HEART)
+            Screen::ScreenState current_state = _display_service.screen.getState();
+            if(current_state == Screen::ScreenState::STATE_CADENCE ||
+                current_state == Screen::ScreenState::STATE_STEPS ||
+                current_state == Screen::ScreenState::STATE_DISTANCE )
             {
                 _display_service.render();
             }
@@ -206,8 +230,13 @@ void SensorService::handleAccIRQ()
     }
     else if(reason == e_interrupt_reason::KX122_TILT_CHANGED)
     {
-        // Trigger display wakeup
-        if(!_display_service.getPower()) _display_service.setPower(true);
+        // Trigger display wakeup on wrist turn
+        if(!_display_service.getPower()) 
+        {
+            _display_service.screen.setState(Screen::ScreenState::STATE_CLOCK);
+            _display_service.setPower(true);
+            _display_service.render();
+        }
     }
 
     // Clear the interrupt latch register

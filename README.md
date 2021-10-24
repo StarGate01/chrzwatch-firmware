@@ -58,10 +58,10 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 - [x] User configurable settings
 - [x] High-speed LCD drawing
 - [ ] Sleep / rest detection algorithm
-- [x] Basic UI
-- [ ] Fancy UI
-- [x] SEGGER J-Link RTT serial interface
-- [ ] Expose flash for external interfacing
+- ~~[x] Basic UI~~
+- [x] Fancy UI
+- [x] *Optional* SEGGER J-Link RTT serial interface
+- ~~[ ] Expose flash for external interfacing~~
 
 </details>
 
@@ -249,6 +249,8 @@ It is recommended to use Linux, however Windows should work as well, provided al
  - *(Optional)* Install **Doxygen** (https://www.doxygen.nl/index.html, also via package manager) and use the "Build Documentation" task to generate documentation.
 
  - *(Optional)* Install or compile **Fontedit** (https://github.com/ayoy/fontedit) to edit the bitmap fonts (MSB first).
+
+ - *(Optional)* Install **GIMP** (https://www.gimp.org/) to export the icons as XBM code files.
 
  - *(Optional)* Install the **SEGGER J-Link tools** (https://www.segger.com/downloads/jlink/) to connect to the RTT interface or to use a J-Link adapter.
 
@@ -451,11 +453,51 @@ Fonts can be found in `/res/fonts`.
 </details>
 
 <details>
-<summary>Roboto Mono Bold [24pt, 36pt,48pt]</summary>
+<summary>Roboto Mono Bold [24pt, 36pt, 48pt]</summary>
 
 - Author: Google
 - URL: https://fonts.google.com/specimen/Roboto
 - Selected subset of glyphs
+- *License: Apache 2.0*
+
+</details>
+
+### Images
+
+Images can be found in `/res/img`.
+
+<details>
+<summary>MDI heart-pulse [36px]</summary>
+
+- Author: Google
+- URL: https://materialdesignicons.com/
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>MDI map-marker-distance [36px]</summary>
+
+- Author: Michael Richins
+- URL: https://materialdesignicons.com/
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>MDI shoe-print [36px]</summary>
+
+- Author: Michael Irigoyen
+- URL: https://materialdesignicons.com/
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>MDI speedometer [36px]</summary>
+
+- Author: Austin Andrews
+- URL: https://materialdesignicons.com/
 - *License: Apache 2.0*
 
 </details>

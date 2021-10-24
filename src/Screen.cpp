@@ -12,9 +12,6 @@
 #include "UserSettings.h"
 #include "CoreService.h"
 
-#include "roboto_bold_48_minimal.h"
-#include "roboto_bold_36_minimal.h"
-
 
 Screen::Screen():
     _lcd(PIN_LCD_MOSI, NC, PIN_LCD_CLK, PIN_LCD_CS, 
@@ -126,30 +123,124 @@ void Screen::render()
 
             break;
         }
+        // Smart caching is only implemented for the watch face since other pages
+        // are not redrawn on wakeup anyway
         case ScreenState::STATE_HEART:
         {
-            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_RED, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            // Draw heart icon
+            _lcd.fillFastScreen(LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            _lcd.drawFastBitmap(_icon_pos[0], _icon_pos[1], icon_heart_pulse, icons_w, icons_h, 
+                LCD_COLOR_RED, LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE, false);
+
+            uint8_t glyphs[3];
+            uint8_t glyph_count = 0;
+            valueToGlyphs(_heartrate, glyphs, glyph_count);
+            renderGlyphs(1, glyphs, glyph_count);
+            const uint8_t unit[] = { roboto_bold_24_minimal_off_b, roboto_bold_24_minimal_off_p, roboto_bold_24_minimal_off_m };
+            renderGlyphs(3, unit, 3);
+
             break;
         }
         case ScreenState::STATE_CADENCE:
         {
-            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_GOLD, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            // Draw speed icon
+            _lcd.fillFastScreen(LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            _lcd.drawFastBitmap(_icon_pos[0], _icon_pos[1], icon_speedometer, icons_w, icons_h, 
+                LCD_COLOR_FROG, LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE, false);
+
+            uint8_t glyphs[3];
+            uint8_t glyph_count = 0;
+            valueToGlyphs(_stepsCadence, glyphs, glyph_count);
+            renderGlyphs(1, glyphs, glyph_count);
+            const uint8_t unit[] = { roboto_bold_24_minimal_off_s, roboto_bold_24_minimal_off_p, roboto_bold_24_minimal_off_m };
+            renderGlyphs(3, unit, 3);
+
             break;
         }
         case ScreenState::STATE_STEPS:
         {
-            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_FROG, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            // Draw steps icon
+            _lcd.fillFastScreen(LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            _lcd.drawFastBitmap(_icon_pos[0], _icon_pos[1], icon_shoe_print, icons_w, icons_h, 
+                LCD_COLOR_YELLOW, LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE, false);
+
+            uint8_t glyphs[3];
+            uint8_t glyph_count = 0;
+            if (_stepsTotal < 1000) 
+            {
+                valueToGlyphs(_stepsTotal, glyphs, glyph_count);
+                renderGlyphs(2, glyphs, glyph_count);
+            } 
+            else
+            {
+                uint16_t value = _stepsTotal / 1000;
+                valueToGlyphs(value, glyphs, glyph_count);
+                renderGlyphs(1, glyphs, glyph_count);
+                value = _stepsTotal % 1000;
+                valueToGlyphs(value, glyphs, glyph_count, true);
+                renderGlyphs(3, glyphs, glyph_count);
+            }
+
             break;
         }
         case ScreenState::STATE_DISTANCE:
         {
-            if(_prev_state != _state) _lcd.fillFastScreen(LCD_COLOR_BLUE, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            // Draw distance icon
+            _lcd.fillFastScreen(LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+            _lcd.drawFastBitmap(_icon_pos[0], _icon_pos[1], icon_map_marker_distance, icons_w, icons_h, 
+                LCD_COLOR_SKY, LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE, false);
+
+            uint16_t distance = (_stepsTotal * user_settings.sensor.step_length) / 100;
+
+            uint8_t glyphs[3];
+            uint8_t glyph_count = 0;
+            if (distance < 1000) 
+            {
+                valueToGlyphs(distance, glyphs, glyph_count);
+                renderGlyphs(1, glyphs, glyph_count);
+                const uint8_t unit[] = { roboto_bold_24_minimal_off_m };
+                renderGlyphs(3, unit, 1);
+            }
+            else
+            {
+                // Either display in km if < 100000 using dot or in meters
+                uint16_t value = distance / 1000;
+                valueToGlyphs(value, glyphs, glyph_count);
+                bool in_meters = false;
+                if (glyph_count == 1)
+                {
+                    glyphs[1] = roboto_bold_24_minimal_off_dot;
+                    glyph_count += 1;
+                } 
+                else if (glyph_count == 2)
+                {
+                    glyphs[2] = roboto_bold_24_minimal_off_dot;
+                    glyph_count += 1;
+                }
+                else in_meters = true;
+                renderGlyphs(0, glyphs, glyph_count);
+                value = distance % 1000;
+                valueToGlyphs(value, glyphs, glyph_count, true);
+                renderGlyphs(2, glyphs, glyph_count);
+                if (!in_meters)
+                {
+                    const uint8_t unit[] = { roboto_bold_24_minimal_off_k, roboto_bold_24_minimal_off_m };
+                    renderGlyphs(4, unit, 2);
+                }
+                else
+                {
+                    const uint8_t unit[] = { roboto_bold_24_minimal_off_m };
+                    renderGlyphs(4, unit, 1);
+                }
+            }
+
             break;
         }
         case ScreenState::STATE_SETTINGS:
         {
             // Display settings
             _lcd.fillFastScreen(LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+
             _lcd.setCursor(0, 8);
             _lcd.setTextColor(LCD_COLOR_YELLOW);
             _lcd.printf("Settings\n\n");
@@ -171,6 +262,7 @@ void Screen::render()
 
             // Display info
             _lcd.fillFastScreen(LCD_COLOR_BLACK, _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+
             _lcd.setCursor(0, 8);
             _lcd.setTextColor(LCD_COLOR_YELLOW);
             _lcd.printf("System Info\n\n");
@@ -178,10 +270,10 @@ void Screen::render()
             _lcd.printf("[Bluetooth]\n");
             _lcd.printf("Address\n %s\n", _bleAddress);
             _lcd.printf("Connected\n %s\n", _bleStatus? "Yes":"No");
-            _lcd.printf("Bonded\n %s\n", _bleEncStatus? "Yes":"No");
+            // _lcd.printf("Bonded\n %s\n", _bleEncStatus? "Yes":"No");
             _lcd.printf("\n[CPU]\n");
             _lcd.printf("Uptime\n %llu s\n", _cpu_stats.uptime / 1000000);
-            _lcd.printf("Sleep\n %llu s\n", _cpu_stats.sleep_time / 1000000);
+            // _lcd.printf("Sleep\n %llu s\n", _cpu_stats.sleep_time / 1000000);
             _lcd.printf("Deep sleep\n %llu s", _cpu_stats.deep_sleep_time / 1000000);
             break;
         }    
@@ -200,4 +292,41 @@ void Screen::render()
     _prev_state = _state;
 
     _display_guard.release();
+}
+
+void Screen::renderGlyphs(uint8_t row, const uint8_t indices[], uint8_t count)
+{
+    for (uint8_t i = 0; i < count; i++)
+    {
+        _lcd.drawFastBitmap(
+            (i * (roboto_bold_24_minimal_w - _icon_value_squish)) + _icon_value_margin[count - 1], 
+            (row * (roboto_bold_24_minimal_h / 2)) + _icon_value_height,
+            roboto_bold_24_minimal + (indices[i] * roboto_bold_24_minimal_bs), 
+            roboto_bold_24_minimal_w, roboto_bold_24_minimal_h, LCD_COLOR_WHITE, LCD_COLOR_BLACK, 
+            _lcd_bitmap_buffer, LCD_BUFFER_SIZE);
+    }
+}
+
+void Screen::valueToGlyphs(uint16_t value, uint8_t indices[3], uint8_t& count, bool leading_zeros)
+{
+    if (value < 10) count = 1;
+    else if (value < 100) count = 2;
+    else if (value < 1000) count = 3;
+    else return;
+
+    indices[0] = roboto_bold_24_minimal_off_num + (value / 100);
+    value = value % 100;
+    indices[1] = roboto_bold_24_minimal_off_num + (value / 10);
+    value = value % 10;
+    indices[2] = roboto_bold_24_minimal_off_num + value;
+
+    if (!leading_zeros)
+    {
+        if (count == 2)
+        {
+            indices[0] = indices[1];
+            indices[1] = indices[2];
+        }
+        else if (count == 1) indices[0] = indices[2];
+    } else count = 3;
 }

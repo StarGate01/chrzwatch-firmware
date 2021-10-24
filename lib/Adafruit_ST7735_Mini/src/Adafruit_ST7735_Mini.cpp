@@ -487,7 +487,7 @@ void Adafruit_ST7735_Mini::fillFastRect(int16_t x, int16_t y, int16_t w, int16_t
 
 // display a bitmap
 void Adafruit_ST7735_Mini::drawFastBitmap(int16_t x, int16_t y,
-    const uint8_t* bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size)
+    const uint8_t* bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size, bool msb)
 {
     // rudimentary clipping (drawChar w/big text requires this)
     if ((x >= _width) || (y >= _height)) return;
@@ -509,9 +509,20 @@ void Adafruit_ST7735_Mini::drawFastBitmap(int16_t x, int16_t y,
     {
         // Generate slice
         int buffer_index = 0;
-        for(int16_t j = s; j < s + buffer_height; j++) for(int16_t i = 0; i < og_w; i++) 
+        for (int16_t j = s; j < s + buffer_height; j++) for (int16_t i = 0; i < og_w; i++) 
         {
-            uint16_t current_color = (bitmap[(j * byte_width) + (i / 8)] & (1 << (7 - (i & 7))))? color : bg_color;
+            // Select correct byte from source bitmap
+            uint8_t source_byte = 0;
+            if (msb) 
+            {
+                source_byte = bitmap[(j * byte_width) + (i / 8)];
+            }
+            else 
+            {
+                source_byte = bitmap[((j + 1) * byte_width) - (i / 8) - 1];
+            }
+            // Select correct bit from source byte
+            uint16_t current_color = (source_byte & (1 << (7 - (i & 7))))? color : bg_color;
             if(i < w)
             {
                 buffer[buffer_index] = current_color >> 8;

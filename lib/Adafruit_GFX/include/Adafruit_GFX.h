@@ -76,7 +76,7 @@ public:
     virtual void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, 
         int16_t w, int16_t h, uint16_t color);
     virtual void drawFastBitmap(int16_t x, int16_t y, const uint8_t *bitmap, 
-        int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size);
+        int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size, bool msb = true);
     void drawChar(int16_t x, int16_t y, unsigned char c,
         uint16_t color, uint16_t bg, uint8_t size);
 

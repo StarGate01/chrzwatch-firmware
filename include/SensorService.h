@@ -25,7 +25,7 @@
 
 
 #define BUTTON_VIBRATION_LENGTH 75    //!< Button vibration feedback in ms
-#define BUTTON_DEBOUNCE         200   //!< Minimum time between button pressen in ms
+#define BUTTON_DEBOUNCE         300   //!< Minimum time between button pressen in ms
 #define ALERT_VIBRATION_LENGTH  200   //!< Alert vibration length in ms
 #define SENSOR_FREQUENCY        60000 //!< Sensor measuring / reporting interval in ms
 #define HR_DURATION             30000 //!< Heartrate measurement interval in ms
@@ -82,7 +82,7 @@ class SensorService
         /**
          * @brief Reevaluate steps cadence
          */
-        void reevaluateStepsCadence();
+        void reevaluateStepsCadence(const time_t epoch);
 
         /**
          * @brief Updates the sensor from user settings
@@ -102,11 +102,13 @@ class SensorService
         bool _charging_value = false; //!< The internal charging state
         uint8_t _hr_value = 0; //!< The internal heartrate value
         uint8_t _motion_count = 0; //!< The internal count of motion events
+        time_t _last_reeval = 0; //!< Last time the rcs was reevaluated
 
         InterruptIn _button1; //!< Button 1 input
         InterruptIn _button2; //!< Button 2 input
         uint64_t _last_button; //!< Time since button press for debouncing
         bool _cancel_timeout = false; //!< Whether a button timeout is already running
+        Semaphore _button_lock; //< Where a button press is currently being handled
 
         UnsafeI2C _acc_i2c; //!< I2C interface for the acceleration sensor
         RegisterWriter _acc_rw; //!< Register access to the acceleration sensor

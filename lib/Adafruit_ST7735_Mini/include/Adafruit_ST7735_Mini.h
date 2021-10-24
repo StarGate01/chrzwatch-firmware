@@ -245,10 +245,10 @@ public:
      * @param color Bitmap color
      * @param buffer Temp buffer
      * @param buffer_size Size of the buffer
-     * @param antialias Antialias the image
+     * @param msb Interpret bitmap in most significant byte first
      */
-    virtual void drawFastBitmap(int16_t x, int16_t y, const uint8_t *bitmap, 
-        int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size);
+    void drawFastBitmap(int16_t x, int16_t y, const uint8_t *bitmap, 
+        int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size, bool msb = true);
 
     /**
      * @brief Inverts the display

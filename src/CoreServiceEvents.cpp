@@ -63,7 +63,7 @@ void CoreService::onAlert(int level)
 
 void CoreService::onMonotonic(const time_t epoch)
 {
-    _sensor_service.reevaluateStepsCadence();
+    _sensor_service.reevaluateStepsCadence(epoch);
     if(_display_service.screen.getState() == Screen::ScreenState::STATE_CLOCK)
     {
         _display_service.render();
