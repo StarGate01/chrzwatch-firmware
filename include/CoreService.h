@@ -101,13 +101,13 @@ class CoreService : ble::Gap::EventHandler //, public SecurityManager::EventHand
          */
         void doUpdateGATT();
 
-        /**
-         * @brief Handles the resulting link encryption event
-         * 
-         * @param connectionHandle Handle to the BLE connection
-         * @param result The type of encryption
-         */
-        virtual void linkEncryptionResult(ble::connection_handle_t connectionHandle, ble::link_encryption_t result);
+        // /**
+        //  * @brief Handles the resulting link encryption event
+        //  * 
+        //  * @param connectionHandle Handle to the BLE connection
+        //  * @param result The type of encryption
+        //  */
+        // virtual void linkEncryptionResult(ble::connection_handle_t connectionHandle, ble::link_encryption_t result);
 
         /**
          * @brief Handles the BLE init completion event
