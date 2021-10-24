@@ -220,7 +220,7 @@ The system is configured to automatically reboot when a hard fault occurs (`"pla
 
 The crash dump retention feature of Mbed is enabled, and on the next boot after a crash the stored error information is printed out (in `mbed_error_reboot_callback`). The storage of this crash information requires a seperate memory region (`.crash_data_ram`), which is configured in the custom linker script `patch/mbed/linker.ld`.
 
-If you have a RTT reader attached, you can receive the message printed at reboot.
+If you have a RTT reader attached and compiled with RTT support, you can receive the message printed at reboot.
 
 </details>
 
@@ -228,7 +228,7 @@ If you have a RTT reader attached, you can receive the message printed at reboot
 
 It is recommended to use Linux, however Windows should work as well, provided all the command line tools, compilers and interface drivers are installed.
 
- - *(Required)* Install **Visual Studio Code** (https://code.visualstudio.com/) and the **PlatformIO** (https://platformio.org/) extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
+ - *(Required)* Install **Visual Studio Code** (https://code.visualstudio.com/) and the **PlatformIO** (https://platformio.org/) extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or eg. the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
 
     **Important:** Since this project uses a fork of Mbed that is not yet supported by PlatformIO, you have to [initialize the builder environment](https://community.platformio.org/t/support-for-mbed-os-6-stable-and-mature-apis-cloud-services-support-enhancements-to-the-bare-metal-profile/15079/10) by opening up a "`PlatformIO Core CLI`" in VSCode and running
 
@@ -242,9 +242,7 @@ It is recommended to use Linux, however Windows should work as well, provided al
     $ <python path> -m pip install -r patch/requirements.txt
     ```
 
- - *(Required)* Install the `patch` command line utility, this might ship with `git`, depending on your distribution.
-
- - *(Required)* Install **OpenOCD** (http://http://openocd.org/), this is probably available via your package manager
+ - *(Optional)* Install **OpenOCD** (http://http://openocd.org/), this is probably available via your package manager
 
  - *(Optional)* Install the **nRF command line tools** (https://www.nordicsemi.com/Products/Development-tools/nrf-command-line-tools) for J-Link support
 
