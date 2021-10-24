@@ -1,0 +1,34 @@
+{
+    "name": "JLink_RTT",
+    "version": "0.2.4",
+    "keywords": "segger, jlink, rtt, debug",
+    "description": "SEGGER JLink RTT interface implementation using Mbed Streams. Based on JLink_V630D/Samples/RTT/SEGGER_RTT_V630d.zip.",
+    "authors":
+    [
+        {
+            "name": "Christoph Honal",
+            "email": "christoph.honal@web.de",
+            "url": "https://chrz.de",
+            "maintainer": true
+        },
+        {
+            "name": "James Wang",
+            "url": "https://github.com/woodsking2/"
+        },
+        {
+            "name": "SEGGER Microcontroller GmbH",
+            "url": "https://www.segger.com"
+        }
+    ],
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/StarGate01/chrzwatch-firmware.git"
+    }, 
+    "export": {
+        "include": [
+            "lib/JLink_RTT"
+        ]
+    },
+    "frameworks": "mbed"
+}

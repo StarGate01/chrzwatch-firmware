@@ -1,0 +1,23 @@
+{
+    "target_overrides": {
+        "*": {
+            "target.macros_remove": [
+                "CONFIG_GPIO_AS_PINRESET"
+            ],
+            "target.macros_add":[
+                "CONFIG_NFCT_PINS_AS_GPIOS",
+                "NRFX_GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS=8",
+                "MBED_SLEEP_TRACING_ENABLED"
+            ],
+            "target.device_has_remove": [
+                "ITM"
+            ],
+            "platform.cpu-stats-enabled": true,
+            "platform.fatal-error-auto-reboot-enabled": true,
+            "platform.crash-capture-enabled": true,
+            "platform.error-reboot-max": 3,
+             "rtos.idle-thread-stack-size": 4096,
+    		 "rtos.idle-thread-stack-size-debug-extra": 4096
+        }
+    }
+}

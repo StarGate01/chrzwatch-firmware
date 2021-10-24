@@ -15,13 +15,10 @@
 #define PIN_LCD_CS           P0_11
 #define PIN_LCD_RESET        P0_12
 #define PIN_LCD_DC           P0_13
-#define PIN_LCD_SCL          P0_14
-#define PIN_LCD_SDA          P0_15
+#define PIN_LCD_CLK          P0_14
+#define PIN_LCD_MOSI         P0_15
 #define PIN_LCD_BL           P0_4
 #define PIN_LCD_PWR          P0_30
-#define LCD_COLSHIFT         0
-#define LCD_ROWSHIFT         0
-#define LCD_SPI_FREQ         8000000 //!< LCD SPI speed, 8Mhz is CPU max
 #define PIN_ACC_SDA          P0_3
 #define PIN_ACC_SCL          P0_2
 #define PIN_ACC_CS           P0_16
@@ -38,7 +35,13 @@
 #define PIN_FONT_MOSI        P0_8
 #define PIN_RX               P0_9
 #define PIN_TX               P0_10
-#define THREAD_SIZE          2048 //!< Child thread stack size in bytes
+#define THREAD_SIZE          768 //!< Child thread stack size in bytes
+#define THREAD_SIZE_RENDER   1536 //!< Render thread stack size in bytes
+#define LCD_COLSHIFT         0 //!< LCD pixel column shift
+#define LCD_ROWSHIFT         0 //!< LCD pixel row shift
+#define LCD_SPI_FREQ         8000000 //!< LCD SPI speed, 8Mhz is CPU max
+#define BATTERY_MAX          0.4f //!< 100% battery voltage / 10 V
+#define BATTERY_MIN          0.34f //!< 0% battery voltage / 10 V
 
 #if defined(TARGET_VARIANT_I6HRC)
 #   define TARGET_VARIANT_NAME  u8"CHRZwatch I6HRC\0"

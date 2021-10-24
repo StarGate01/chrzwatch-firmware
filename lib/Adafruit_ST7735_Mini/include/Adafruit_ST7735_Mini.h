@@ -29,8 +29,10 @@
 #ifndef _ADAFRUIT_ST7735H_MINI_
 #define _ADAFRUIT_ST7735H_MINI_
 
-#include "mbed.h"
+#include <mbed.h>
+
 #include "Adafruit_GFX.h"
+
 
 #define boolean bool
 
@@ -106,6 +108,7 @@
 #define ST7735_YELLOW 0xFFE0
 #define ST7735_WHITE 0xFFFF
 
+
 /**
  * @brief Provides an Adafruit_GFX object for the ST7735 (mini) display
  * 
@@ -169,6 +172,15 @@ public:
     void fillScreen(uint16_t color);
 
     /**
+     * @brief  Fills the whole screen with a color
+     * 
+     * @param color The color
+     * @param buffer Temp buffer
+     * @param buffer_size Size of the buffer
+     */
+    void fillFastScreen(uint16_t color, char* buffer, size_t buffer_size);
+
+    /**
      * @brief Fills one specific pixel with a color
      * 
      * @param x X pixel coordinate
@@ -207,6 +219,36 @@ public:
      * @param color The color
      */
     void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+
+    /**
+     * @brief Fills a rectangular region with a color
+     * 
+     * @param x X position
+     * @param y Y position
+     * @param w Width
+     * @param h Height
+     * @param color The color
+     * @param buffer Temp buffer
+     * @param buffer_size Size of the buffer
+     */
+    void fillFastRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color,
+        char* buffer, size_t buffer_size);
+
+    /**
+     * @brief Draws a bitmap
+     * 
+     * @param x Origin x
+     * @param y Origin y
+     * @param bitmap Bitmap data
+     * @param w Bitmap width
+     * @param h Bitmap height
+     * @param color Bitmap color
+     * @param buffer Temp buffer
+     * @param buffer_size Size of the buffer
+     * @param msb Interpret bitmap in most significant byte first
+     */
+    void drawFastBitmap(int16_t x, int16_t y, const uint8_t *bitmap, 
+        int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size, bool msb = true);
 
     /**
      * @brief Inverts the display
@@ -276,6 +318,21 @@ private:
      * @param cmdList Command list used for initialization
      */
     void commonInit(uint8_t *cmdList);
+
+    /**
+     * @brief Perform simple antialiasing of a pixel
+     * 
+     * @param x Pixel x position
+     * @param y Pixel y position
+     * @param bitmap Bitmap buffer
+     * @param w Bitmap width
+     * @param h Bitmap height
+     * @param color Pixel color
+     * @param bg_color Pixel background color
+     * @return uint16_t New pixel color
+     */
+    uint16_t sample_antialias(int16_t x, int16_t y, const uint8_t *bitmap, 
+        int16_t w, int16_t h, uint16_t color, uint16_t bg_color, uint16_t radius);
 };
 
 #endif

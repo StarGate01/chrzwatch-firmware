@@ -15,10 +15,11 @@
 #ifndef KX123_H
 #define KX123_H
 
-#include "rohm_hal2.h"
 #include "RegisterWriter.h"
+#include "rohm_hal2.h"
 
 #include "kx123_registers.h"
+
 
 /**
 * Kionix KX123 accelerometer i2c driver. For some extend can be used also with
@@ -30,7 +31,7 @@ class KX123
 {
 
     public:
-        KX123(RegisterWriter &i2c_obj, uint8_t sad = KX123_DEFAULT_SLAVE_ADDRESS, uint8_t wai = KX123_WHO_AM_I_WAI_ID);
+        KX123(RegisterWriter& i2c_obj, uint8_t sad = KX123_DEFAULT_SLAVE_ADDRESS, uint8_t wai = KX123_WHO_AM_I_WAI_ID);
         ~KX123();
 
         bool start_setup_mode(void);
@@ -46,7 +47,7 @@ class KX123
         bool get_tilt(enum e_axis *current_previous);
         bool get_tap_interrupt_axis(enum e_axis *axis);
         bool get_detected_motion_axis(enum e_axis *axis);
-        bool set_tilt_axis_mask(uint8_t cnltl2_tilt_mask);
+        bool set_tilt_detect_config(uint8_t xxyyzz, uint8_t tilt_timer);
 
         bool get_interrupt_reason(enum e_interrupt_reason *int_reason);
 
@@ -75,9 +76,7 @@ class KX123
 
     private:
         bool setup_mode_on;
-        void set_tilt_position_defaults();
-
-        RegisterWriter i2c_rw;
+        RegisterWriter& i2c_rw;
         uint16_t resolution_divider;
         uint8_t _sad;
         uint8_t _wai;

@@ -15,16 +15,17 @@
 
 #include <mbed.h>
 #include <events/mbed_events.h>
-#include "ble/BLE.h"
-#include "ble/gap/Gap.h"
-#include "ble/services/HeartRateService.h"
-#include "ble/services/BatteryService.h"
-#include "ble/services/DeviceInformationService.h"
+#include <ble/BLE.h>
+#include <ble/Gap.h>
+#include <ble/services/HeartRateService.h>
+#include <ble/services/BatteryService.h>
+#include <ble/services/DeviceInformationService.h>
+#include <ChainableGattServerEventHandler.h>
 
-#include <CurrentTimeService.h>
-#include <ImmediateAlertService.h>
-#include <RunningSpeedAndCadence.h>
-#include <CustomSettings.h>
+#include "CurrentTimeService.h"
+#include "ImmediateAlertService.h"
+#include "RunningSpeedAndCadence.h"
+#include "CustomSettings.h"
 
 #include "HardwareConfiguration.h"
 #include "UserSettings.h"
@@ -38,7 +39,7 @@ const static char DEVICE_NAME[] = TARGET_VARIANT_NAME;
  * @brief Handles BLE connections, GAP advertising and contains all sub-service objects
  * 
  */
-class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
+class CoreService : ble::Gap::EventHandler //, public SecurityManager::EventHandler
 {
 
     public:
@@ -63,12 +64,6 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
         void start();
 
         /**
-         * @brief Initialized the watchdog timer
-         * 
-         */
-        static void initWatchdog();
-
-        /**
          * @brief Restarts the deadlock watchdog
          * 
          */
@@ -77,12 +72,12 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
     protected:
         events::EventQueue& _event_queue; //!< Reference to the event queue for dispatching
 
-        bool _connected; //!< Connection state of the BLE system
-        bool _encrypted; //!< BLE link encryption state
+        bool _connected = false; //!< Connection state of the BLE system
+        bool _encrypted = false; //!< BLE link encryption state
         BLE& _ble; //!< Reference to the BLE instance
         uint8_t _adv_buffer[ble::LEGACY_ADVERTISING_MAX_SIZE]; //!< BLE GAP advertising buffer
         ble::AdvertisingDataBuilder _adv_data_builder; //!< BLE GAP factory
-        struct user_settings_t _settings; //!< User settings
+        ChainableGattServerEventHandler _gatt_handler; //!< GATT event handler chain
 
         HeartRateService _ble_hr_service; //!< BLE heartrate service
         BatteryService _ble_bat_service; //!< BLE battery service
@@ -106,13 +101,13 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
          */
         void doUpdateGATT();
 
-        /**
-         * @brief Handles the resulting link encryption event
-         * 
-         * @param connectionHandle Handle to the BLE connection
-         * @param result The type of encryption
-         */
-        virtual void linkEncryptionResult(ble::connection_handle_t connectionHandle, ble::link_encryption_t result);
+        // /**
+        //  * @brief Handles the resulting link encryption event
+        //  * 
+        //  * @param connectionHandle Handle to the BLE connection
+        //  * @param result The type of encryption
+        //  */
+        // virtual void linkEncryptionResult(ble::connection_handle_t connectionHandle, ble::link_encryption_t result);
 
         /**
          * @brief Handles the BLE init completion event
@@ -156,6 +151,12 @@ class CoreService : ble::Gap::EventHandler, public SecurityManager::EventHandler
          * @param settings New settings
          */
         void onUpdateSettings(const struct user_settings_t& settings);
+
+        /**
+         * @brief Initialized the watchdog timer
+         * 
+         */
+        void initWatchdog();
 
 };
 

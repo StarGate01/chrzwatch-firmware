@@ -26,8 +26,10 @@
   MIT license, all text above must be included in any redistribution
  ****************************************************/
 
-#include "mbed.h"
+#include <mbed.h>
+
 #include "Adafruit_ST7735_Mini.h"
+
 
 inline uint16_t swapcolor(uint16_t x)
 {
@@ -228,7 +230,7 @@ void Adafruit_ST7735_Mini::commandList(uint8_t *addr)
             ms = *addr++; // Read post-command delay time (ms)
             if (ms == 255)
                 ms = 500; // If 255, delay for 500 ms
-            ThisThread::sleep_for(ms);
+            ThisThread::sleep_for(std::chrono::milliseconds(ms));
         }
     }
 }
@@ -244,16 +246,15 @@ void Adafruit_ST7735_Mini::commonInit(uint8_t *cmdList)
 
     // use default SPI format
     lcdPort.format(8, 0);
-    lcdPort.frequency(4000000); // Lets try 4MHz
 
     // toggle RST low to reset; CS low so it'll listen to us
     _cs = 0;
     _rst = 1;
-    ThisThread::sleep_for(500);
+    ThisThread::sleep_for(std::chrono::milliseconds(500));
     _rst = 0;
-    ThisThread::sleep_for(500);
+    ThisThread::sleep_for(std::chrono::milliseconds(500));
     _rst = 1;
-    ThisThread::sleep_for(500);
+    ThisThread::sleep_for(std::chrono::milliseconds(500));
 
     if (cmdList)
         commandList(cmdList);
@@ -322,7 +323,6 @@ void Adafruit_ST7735_Mini::initR(uint8_t options, int8_t colshift, int8_t rowshi
 void Adafruit_ST7735_Mini::setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1,
                                          uint8_t y1)
 {
-
     writecommand(ST7735_CASET); // Column addr set
     writedata(0x00);
     writedata(x0 + colstart); // XSTART
@@ -414,11 +414,15 @@ void Adafruit_ST7735_Mini::fillScreen(uint16_t color)
     fillRect(0, 0, _width, _height, color);
 }
 
+void Adafruit_ST7735_Mini::fillFastScreen(uint16_t color, char* buffer, size_t buffer_size)
+{
+    fillFastRect(0, 0, _width, _height, color, buffer, buffer_size);
+}
+
 // fill a rectangle
 void Adafruit_ST7735_Mini::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
                                     uint16_t color)
 {
-
     // rudimentary clipping (drawChar w/big text requires this)
     if ((x >= _width) || (y >= _height))
         return;
@@ -441,6 +445,118 @@ void Adafruit_ST7735_Mini::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
         }
     }
 
+    _cs = 1;
+}
+
+void Adafruit_ST7735_Mini::fillFastRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, 
+    char* buffer, size_t buffer_size)
+{
+    // rudimentary clipping (drawChar w/big text requires this)
+    if ((x >= _width) || (y >= _height)) return;
+    if ((x + w - 1) >= _width) w = _width - x;
+    if ((y + h - 1) >= _height) h = _height - y;
+
+    // Prepare buffer
+    if ((int)buffer_size < 2 * w) return;
+    int buffer_height = min(h, (int16_t)(buffer_size / (w * 2)));
+    buffer_size = buffer_height * w * 2;
+    for (int i = 0; i < (int)buffer_size - 1; i += 2)
+    {
+        buffer[i] = color >> 8;
+        buffer[i + 1] = color;
+    }
+
+    // Write slices
+    int s = 0;
+    for (s = 0; s <= h - buffer_height; s += buffer_height)
+    {
+        setAddrWindow(x, y + s, x + w - 1, y + s + buffer_height - 1);
+        _rs = 1;
+        _cs = 0;
+        lcdPort.write(buffer, buffer_size, 0, 0);
+        _cs = 1;
+    }
+
+    // Write rest
+    setAddrWindow(x, y + s, x + w - 1, y + h - 1);
+    _rs = 1;
+    _cs = 0;
+    lcdPort.write(buffer, (h - s) * w * 2, 0, 0);
+    _cs = 1;
+}
+
+// display a bitmap
+void Adafruit_ST7735_Mini::drawFastBitmap(int16_t x, int16_t y,
+    const uint8_t* bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size, bool msb)
+{
+    // rudimentary clipping (drawChar w/big text requires this)
+    if ((x >= _width) || (y >= _height)) return;
+    // Keep original width for bitmap clipping
+    int16_t og_w = w;
+    int16_t byte_width = (og_w + 7) / 8; 
+    if ((x + w - 1) >= _width) w = _width - x;
+    // Bitmap scanline pad = whole byte
+    if ((y + h - 1) >= _height) h = _height - y;
+
+    // Prepare buffer
+    if ((int)buffer_size < 2 * w) return;
+    int buffer_height = min(h, (int16_t)(buffer_size / (w * 2)));
+    buffer_size = buffer_height * w * 2;
+
+    // Write slices
+    int s = 0;
+    for (s = 0; s <= h - buffer_height; s += buffer_height)
+    {
+        // Generate slice
+        int buffer_index = 0;
+        for (int16_t j = s; j < s + buffer_height; j++) for (int16_t i = 0; i < og_w; i++) 
+        {
+            // Select correct byte from source bitmap
+            uint8_t source_byte = 0;
+            if (msb) 
+            {
+                source_byte = bitmap[(j * byte_width) + (i / 8)];
+            }
+            else 
+            {
+                source_byte = bitmap[((j + 1) * byte_width) - (i / 8) - 1];
+            }
+            // Select correct bit from source byte
+            uint16_t current_color = (source_byte & (1 << (7 - (i & 7))))? color : bg_color;
+            if(i < w)
+            {
+                buffer[buffer_index] = current_color >> 8;
+                buffer[buffer_index + 1] = current_color;
+                buffer_index += 2;
+            }
+        }
+
+        // Output slice
+        setAddrWindow(x, y + s, x + w - 1, y + s + buffer_height - 1);
+        _rs = 1;
+        _cs = 0;
+        lcdPort.write(buffer, buffer_size, 0, 0);
+        _cs = 1;
+    }
+
+    // Generate rest
+    int buffer_index = 0;
+    for(int16_t j = s; j < h; j++) for(int16_t i = 0; i < og_w; i++) 
+    {
+        uint16_t current_color = (bitmap[(j * byte_width) + (i / 8)] & (1 << (7 - (i & 7))))? color : bg_color;
+        if(i < w)
+        {
+            buffer[buffer_index] = current_color >> 8;
+            buffer[buffer_index + 1] = current_color;
+            buffer_index += 2;
+        }
+    }
+
+    // Output rest
+    setAddrWindow(x, y + s, x + w - 1, y + h - 1);
+    _rs = 1;
+    _cs = 0;
+    lcdPort.write(buffer, (h - s) * w * 2, 0, 0);
     _cs = 1;
 }
 

@@ -9,7 +9,7 @@
 #include "ImmediateAlertService.h"
 
 
-ImmediateAlertService::ImmediateAlertService(BLE &ble):
+ImmediateAlertService::ImmediateAlertService(BLE &ble, ChainableGattServerEventHandler& gatt_handler):
     _ble(ble),
     _immediateAlertCharacteristic(GattCharacteristic::UUID_ALERT_LEVEL_CHAR,
         _valueBytes, UUID_ALERT_LEVEL_CHAR_VALUE_SIZE, UUID_ALERT_LEVEL_CHAR_VALUE_SIZE,
@@ -24,7 +24,7 @@ ImmediateAlertService::ImmediateAlertService(BLE &ble):
 
     // Attach GATT server and timer events
     _ble.gattServer().addService(ImmediateAlertGATT);
-    _ble.gattServer().onDataWritten(this, &ImmediateAlertService::onDataWritten);
+    gatt_handler.addEventHandler(this);
 }
 
 void ImmediateAlertService::setCallback(const Callback<void(int)>& alert_callback)
@@ -32,12 +32,12 @@ void ImmediateAlertService::setCallback(const Callback<void(int)>& alert_callbac
     _alert_callback = alert_callback;
 }
 
-void ImmediateAlertService::onDataWritten(const GattWriteCallbackParams* params)
+void ImmediateAlertService::onDataWritten(const GattWriteCallbackParams& params)
 {
-    if (params->handle == _immediateAlertCharacteristic.getValueHandle()) 
+    if (params.handle == _immediateAlertCharacteristic.getValueHandle()) 
     {
         // Callback with alert value
-        memcpy((void*)&_valueBytes, params->data, min(params->len, (uint16_t)UUID_ALERT_LEVEL_CHAR_VALUE_SIZE));
+        memcpy((void*)&_valueBytes, params.data, min(params.len, (uint16_t)UUID_ALERT_LEVEL_CHAR_VALUE_SIZE));
         if(_alert_callback != nullptr) _alert_callback((int)(_valueBytes[0]));
     }
 }

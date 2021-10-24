@@ -28,8 +28,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 /* This file is meant for making same code work on many platforms easier. */
 #ifdef __MBED__
     /* Mbed Classic */
-    #include "mbed.h"               //types
-    #include "I2C.h"                //I2C
+    #include <mbed.h>               //types
+    #include <I2C.h>                //I2C
 
     #define USE_MBED_HARDWARE_I2C
 #ifdef _DEBUG

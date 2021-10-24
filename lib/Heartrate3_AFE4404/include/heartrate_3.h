@@ -79,7 +79,7 @@ typedef struct
  * @retval LED Values
  *
  */
-led_values_t *hr3_get_values(void);
+void hr3_get_values(led_values_t& values);
 
 /**
  * @brief <h3> Get HeartRate </h3>

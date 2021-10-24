@@ -11,6 +11,7 @@
 
 #include <mbed.h>
 
+
 /**
  * @brief Stores various sensor settings
  * 
@@ -24,12 +25,16 @@ struct __attribute__ ((packed)) user_sensor_settings_t
 };
 
 /**
- * @brief Stores various user settings19
+ * @brief Stores various user settings
  * 
  */
 struct __attribute__ ((packed)) user_settings_t
 {
+    uint8_t time_format     = 0; //!< 0 = 24h, 1 = 12h
+    uint8_t button_feedback = 1; //!< 0 = No vibration on touch, 1 = yes
     user_sensor_settings_t sensor; //!< Sensor settings
 };
+
+extern struct user_settings_t user_settings;
 
 #endif

@@ -31,9 +31,11 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "mbed.h"
+#include <mbed.h>
+
 #include "Adafruit_GFX.h"
 #include "glcdfont.h"
+
 
 Adafruit_GFX::Adafruit_GFX(int16_t w, int16_t h): WIDTH(w), HEIGHT(h) {
  
@@ -231,9 +233,21 @@ void Adafruit_GFX::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
   }
 }
 
+void Adafruit_GFX::fillFastRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, 
+        char* buffer, size_t buffer_size)
+{
+  // stupidest version - update in subclasses if desired!
+  fillRect(x, y, w, h, color);
+}
 
 void Adafruit_GFX::fillScreen(uint16_t color) {
   fillRect(0, 0, _width, _height, color);
+}
+
+void Adafruit_GFX::fillFastScreen(uint16_t color, char* buffer, size_t buffer_size)
+{
+  // stupidest version - update in subclasses if desired!
+    fillFastRect(0, 0, _width, _height, color, buffer, buffer_size);
 }
 
 // draw a rounded rectangle!
@@ -349,31 +363,26 @@ void Adafruit_GFX::fillTriangle ( int16_t x0, int16_t y0,
   }
 }
 
-void Adafruit_GFX::drawBitmap(int16_t x, int16_t y, 
-                  const uint8_t *bitmap, int16_t w, int16_t h,
-                  uint16_t color, bool vertical_byte, uint32_t offset) {
-  //  if(pgm_read_byte(bitmap + j * byteWidth + i / 8) & (128 >> (i & 7))) {
-  if(!vertical_byte) {
-    int16_t i, j, byteWidth = (w + 7) / 8;
+void Adafruit_GFX::drawBitmap(int16_t x, int16_t y,
+  const uint8_t* bitmap, int16_t w, int16_t h, uint16_t color) {
+    // stupidest version - update in subclasses if desired!
 
-    for(j=0; j<h; j++) {
-      for(i=0; i<w; i++ ) {
-        if(bitmap[offset + (j * byteWidth + i / 8)] & (128 >> (i & 7))) {
-          drawPixel(x+i, y+j, color);
-        }
-      }
-    }
-  } else {
-    int16_t i, j, byteHeight = (h + 7) / 8;
+    int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
+    uint8_t byte = 0;
 
-    for(j=0; j<w; j++) {
-      for(i=0; i<h; i++ ) {
-        if(bitmap[offset + (j * byteHeight + i / 8)] & (128 >> (i & 7))) {
-          drawPixel(x+j, y+i, color);
+    for(int16_t j=0; j<h; j++, y++) {
+        for(int16_t i=0; i<w; i++) {
+            if(i & 7) byte <<= 1;
+            else      byte   = bitmap[(j * byteWidth) + (i / 8)];
+            if(byte & 0x80) drawPixel(x+i, y, color);
         }
-      }
     }
-  }
+}
+
+void Adafruit_GFX::drawFastBitmap(int16_t x, int16_t y,
+  const uint8_t* bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg_color, char* buffer, size_t buffer_size, bool msb) {
+    // stupidest version - update in subclasses if desired!
+    drawBitmap(x, y, bitmap, w, h, color);
 }
 
 int  Adafruit_GFX::_putc(int c) {

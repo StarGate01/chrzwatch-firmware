@@ -17,7 +17,7 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 - [ ] Text message GATT profile
 - [ ] Health activity / sleep monitor GATT profile
 - [x] User configuration GATT profile
-- [x] Proper bonding support
+- [ ] ~~Proper bonding support~~
 
 </details>
 
@@ -43,6 +43,8 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 - [ ] Energy saving heartrate sensor
 - [x] Energy saving acceleration sensor
 - [ ] Endurance tests & verification
+- [x] Power saving BLE stack
+- [ ] Use even better BLE stack (Requires https://github.com/ARMmbed/mbed-os/issues/10669)
 
 </details>
 
@@ -54,9 +56,12 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 - [x] Step detection algorithm
 - [x] Heartrate detection algorithm
 - [x] User configurable settings
+- [x] High-speed LCD drawing
 - [ ] Sleep / rest detection algorithm
-- [x] Basic UI
-- [ ] Fancy UI
+- [x] ~~Basic UI~~
+- [x] Fancy UI
+- [x] *Optional* SEGGER J-Link RTT serial interface
+- [ ] ~~Expose flash for external interfacing~~
 
 </details>
 
@@ -76,19 +81,21 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 
 </details>
 
-## Hardware overview
+## Hardware
+
+The *I6HRC* smartwatch uses these components. You can also purchase then separately (on breakout boards) and connect them to a *NRF52-DK*.
 
 <details>
-<summary>CPU: NRF52832 with 512K ROM, 64K RAM</summary>
+<summary>CPU: NRF52832 with 512K ROM, 64K RAM, supports deep sleep</summary>
 
 - General: https://www.nordicsemi.com/Products/Low-power-short-range-wireless/nRF52832/Getting-started
 - Datasheet: https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.0.pdf
-- RTOS: https://os.mbed.com/ (V5.14.1)
+- RTOS: https://os.mbed.com/ (V6.7, development version, custom fork at https://github.com/StarGate01/mbed-os, branch `feature-nrf52-low-power-ble` made compatible with PlatformIO )
 
 </details>
 
 <details>
-<summary>Display: 0.96 inch LCD with ST7735 driver IC</summary>
+<summary>Display: 0.96 inch, 80x160 pixel LCD with ST7735 driver IC</summary>
 
 - Datasheet: https://www.displayfuture.com/Display/datasheet/controller/ST7735.pdf
 - Driver: https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini via Mbed SPI
@@ -115,12 +122,12 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 </details>
 
 <details>
-<summary>Font ROM: GT24L24A2Y</summary>
+<summary>Font Flash: GT24L24A2Y, 2MB storage, top 4KB user writeable</summary>
 
 - General: https://lcsc.com/product-detail/_Gotop-GT24L24A2Y_C124690.html
 - Datasheet: https://datasheet.lcsc.com/szlcsc/1912111436_Gotop-GT24L24A2Y_C124690.pdf
 - Map: https://github.com/RichardBsolut/GT24L24A2Y
-- Driver: Mbed SPI and Mbed GPIO (But currently unused)
+- Driver: TBA via Mbed SPI and Mbed GPIO (Currently unused)
 
 </details>
 
@@ -132,7 +139,7 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 </details>
 
 <details>
-<summary>Battery voltage sensor: Down-scaled battery voltage (0.3V - 0.4V)</summary>
+<summary>Battery voltage sensor: Down-scaled battery voltage (ca. 0.34V - 0.4V)</summary>
 
 - Driver: Mbed ADC
 
@@ -159,46 +166,149 @@ Source code: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch
 
 </details>
 
+This project configures the `NRF52832` IC and the Mbed OS as follows.
 
-See `doc/pinout.png` for the pin mapping by *Aaron Christophel*. Please note that pins `P0_23` and `P0_24` are swapped.
+<details>
+<summary>SPI and I2C interfaces</summary>
+
+The `NRF52832` IC has 2 **I2C** and 3 **SPI** instances, which partly overlap. To avoid contention, the interfaces are assigned as follows:
+
+
+| Peripheral / Instance | Pin Mapping  | Instance 0 | Instance 1 | Instance 2 |
+| --------------------- | ------------ | ---------- | ---------- | ---------- |
+| LC Display            | `15, NC, 14` |            |            | `SPI2`     |
+| Acceleration Sensor   | `3, 2`       | `TWI0`     |            |            |
+| Heartrate Sensor      | `20, 21`     |            | `TWI1`     |            |
+| Font Flash            | `8, 5, 7`    |            |            | `SPI2`     |
+
+The reason for this particular configuration is a follows: Both the acceleration and heartrate sensor need to be able to access the I2C bus upon receiving an interrupt signal (to read a motion event upon occurrence and to read the ADC when it signals readiness, respectively). This means `UnsafeI2C`,  - an *I2C* implementation without bus access locking - has to be used, because the mutex used for locking cant be used in an interrupt context.
+
+Because these *I2C* access events may occur at any moment, a dedicated instance is allocated to each of them. The remaining instance does only support *SPI* anyways. To ensure no contention occurs between the LCD and the flash, the standard bus locking SPI functions are used. Due to this locking, parallel access to the LCD and font flash is impossible, but also not needed by the app logic. Locking also means that all functions using these devices cant be called from an interrupt context. Specifically, this concerns the `Screen::render` function. This function is intended to never be called directly, instead `DisplayService::render` has to be called, which defers the rendering call via the main `EventQueue` to the main thread.
+
+At the time of writing, the font flash is unused. The interface mapping still stands, for future-proofing.
+
+</details>
+
+<details>
+<summary>GPIO pins and interrupt memory</summary>
+
+The `NRF52832` IC has a few special functions which can be assigned to specific pins, eg. *NFC* and *Reset*. To use these pins as standard GPIO pins, the following macros are configured in `mbed_app.json`, in order to configure how Mbed is built: `CONFIG_GPIO_AS_PINRESET` is removed (enables `p0.21` as GPIO)  and `CONFIG_NFCT_PINS_AS_GPIOS` is added (enables `p0.9` and `p0.10` as GPIO). Also, the `ITM` debug trace module, which uses the `SWO` pin, is removed (enables `p0.18` as GPIO). The `ITM` module is already removed in the board configuration this project inherits from (`NRF52_DK`).
+
+To support more than one interrupt event on the GPIO pins (using the `GPIOTE` peripheral), more memory is allocated to the peripheral by defining `NRFX_GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS=8`. This supports a maximum of 8 separate interrupt events.
+
+To conserve space, the `ITM`, `SERIAL`, `SERIAL_ASYNC` and `SERIAL_FC` devices are removed, as the serial connection is unavailable anyway (for more info, see below).
+
+</details>
+
+<details>
+<summary>Mbed configuration</summary>
+
+No proprietary softdevice by Nordic is used. Instead, Mbed supplies APIs like Bluetooth CORDIO (https://os.mbed.com/docs/mbed-cordio/19.02/introduction/index.html). This enables the usage of all software interrupts, by removing the `SWI_DISABLE0` macro in `mbed_app.json`.
+
+The Bluetooth API is modified in the custom Mbed OS fork, to enable deep sleep and reduce power usage. This modification might lead to some problems, but none have occurred so far.
+
+Mbed also provides various RTOS features, e.g. Threads. (Enabled by defining `PIO_FRAMEWORK_MBED_RTOS_PRESENT` in `platformio.ini`)
+
+Tho conserve energy, low-power timers are used. These are enabled by setting `"events.use-lowpower-timer-ticker": true` in `mbed_app.json`. The clock source for the low power clock is defined to be the external crystal oscillator by setting `"target.lf_clock_src": "NRF_LF_SRC_XTAL"`.
+
+</details>
+
+<details>
+<summary>Crash behavior</summary>
+
+The system is configured to automatically reboot when a hard fault occurs (`"platform.fatal-error-auto-reboot-enabled": true,`). Although the number of these subsequent reboots is configured to be 3 (`"platform.error-reboot-max": 3`), this counter is set to 0 on each boot (`mbed_reset_reboot_count()`). This leads to an unlimited amount of reboots.
+
+The crash dump retention feature of Mbed is enabled, and on the next boot after a crash the stored error information is printed out (in `mbed_error_reboot_callback`). The storage of this crash information requires a seperate memory region (`.crash_data_ram`), which is configured in the custom linker script `patch/mbed/linker.ld`.
+
+If you have a RTT reader attached and compiled with RTT support, you can receive the message printed at reboot.
+
+</details>
 
 ## Development setup
 
 It is recommended to use Linux, however Windows should work as well, provided all the command line tools, compilers and interface drivers are installed.
 
-Install **Visual Studio Code** and the **PlatformIO** extension. Then use the `i6hrc` env for deployment, or the `nrf52_dk` env for debugging on a NRF52-DK board.
+ - *(Required)* Install **Visual Studio Code** (https://code.visualstudio.com/) and the **PlatformIO** (https://platformio.org/) extension. Then use the `i6hrc` / `i6hrc_debug` env for deployment, or eg. the `nrf52_dk_debug` env for debugging on a NRF52-DK board.
 
-Install the `patch` command line utility, this might ship with `git`, depending on your distribution.
+    **Important:** Since this project uses a fork of Mbed that is not yet supported by PlatformIO, you have to [initialize the builder environment](https://community.platformio.org/t/support-for-mbed-os-6-stable-and-mature-apis-cloud-services-support-enhancements-to-the-bare-metal-profile/15079/10) by opening up a "`PlatformIO Core CLI`" in VSCode and running
 
-Install and use `doxygen` or the "Build Documentation" task to generate documentation.
+    ```
+    $ pio system info
+    ```
+
+    to print some information about your platformIO installation. Copy the python executable path and then install the required python packages:
+
+    ```
+    $ <python path> -m pip install -r patch/requirements.txt
+    ```
+
+ - *(Optional)* Install **OpenOCD** (http://http://openocd.org/), this is probably available via your package manager
+
+ - *(Optional)* Install the **nRF command line tools** (https://www.nordicsemi.com/Products/Development-tools/nrf-command-line-tools) for J-Link support
+
+ - *(Optional)* Install **Doxygen** (https://www.doxygen.nl/index.html, also via package manager) and use the "Build Documentation" task to generate documentation.
+
+ - *(Optional)* Install or compile **Fontedit** (https://github.com/ayoy/fontedit) to edit the bitmap fonts (MSB first).
+
+ - *(Optional)* Install **GIMP** (https://www.gimp.org/) to export the icons as XBM code files.
+
+ - *(Optional)* Install the **SEGGER J-Link tools** (https://www.segger.com/downloads/jlink/) to connect to the RTT interface or to use a J-Link adapter.
+
 
 ### Modifying an I6HRC watch
 
 Disassemble the watch and solder the `SWCLK` and `SWDIO` testpoints to the unused inner two USB data lines like shown in this video: https://www.youtube.com/watch?v=0Fu-VSuKHEg . Verify that the PCB actually contains a `NRF52832` IC, and not an off-brand `HS6620D` IC.
 
-You might want to fabricate a custom SWD via USB to ISP adapter, link shown in the schematic below (KiCAD schematic is available in `schematics/swd-usb-adapter`). You can still charge the watch using any USB A compliant charger or port.
+You might want to fabricate a custom SWD via USB to ISP adapter, link shown in the schematic below (KiCAD schematic is available in `doc/schematics/swd-usb-adapter`). You can still charge the watch using any USB A compliant charger or port.
 
-<img src="https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/schematics/swd-usb-adapter/swd-usb-adapter_schematic2.jpg" height="400">
+<img src="https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/docs/schematics/swd-usb-adapter/swd-usb-adapter_schematic2.jpg" height="400">
 
 ### Dumping the stock firmware
 
-The watch does not use read-back-protection. To dump the stock ROM and RAM, you need to use a genuine J-Link programmer and the official Nordic dev tools (`nrfjprog`). Then, disassemble the watch to expose the internal testpoints. Connect the `VDD`, `SWDIO` and `SWCLK` testpoints and also the ground terminal. Then, dump the data like this:
-
-```
-$ nrfjprog -f nrf52 --readcode i6hrc_code.bin
-$ nrfjprog -f nrf52 --readram i6hrc_ram.bin
-```
-
-These files can also be found at `doc/dump` (armv7le) for decompiling (e.g. using **Ghidra**: https://ghidra-sre.org/) or restoring the watch (untested).
-
-### Unlocking the flash memory
-
-First of all, the flash memory has to be reset in oder for the chip to accept new firmware and debug instructions. This requires *lower level* SWD access (`SWD`), and thus cant be performed by the cheap ST-Link V2 clones because these only provide *high level* access (`SWD_HLA`).
+The watch does not use read-back-protection. If it ever does, you might be able to use dirty hacks like https://github.com/StarGate01/nRF51822-siphon (untested, also probably incompatible).
 
 <details>
 <summary>Using a J-Link</summary>
 
-Buy any genuine **J-Link** adapter, and connect it like in the paragraph above. This is annoying, since the internal `VDD` testpoint has to be tapped, requiring the watch to be disassembled. Hence, one of the other methods is recommended.
+To dump the stock ROM and RAM,  use any **J-Link** adapter and the official Nordic dev tools (`nrfjprog`). Then, disassemble the watch to expose the internal testpoints. Connect the `VDD`, `SWDIO` and `SWCLK` testpoints and also the ground terminal. Then, dump the data like this:
+
+```
+$ nrfjprog -f nrf52 --readcode i6hrc_code.bin
+```
+
+You can also dump the contents of the RAM:
+
+```
+$ nrfjprog -f nrf52 --readram i6hrc_ram.bin
+```
+
+</details>
+
+<details>
+<summary>Using a CMSIS-DAP</summary>
+
+For more info on the *CMSIS-DAP*, see below.
+
+**OpenOCD** is able to to read the flash data as well, e.g. using a **CMSIS-DAP** adapter:
+
+```
+$ openocd -f interface/cmsis-dap.cfg -c "transport select swd" -f target/nrf52.cfg -c "init; reset halt; flash read_bank 0 i6hrc_code.bin; reset; exit"
+```
+
+</details>
+
+Using other adapters should work as well, but is untested.
+
+The original firmware dumps can also be found at `doc/dump` (armv7le) for decompiling (e.g. using **Ghidra**: https://ghidra-sre.org/) or restoring the watch (untested).
+
+### Unlocking the flash memory
+
+The flash memory has to be reset in oder for the chip to accept new firmware and debug instructions. This requires *lower level* SWD access (`SWD`), and thus cant be performed by the cheap ST-Link V2 clones because these only provide *high level* access (`SWD_HLA`).
+
+<details>
+<summary>Using a J-Link</summary>
+
+Buy a **J-Link** adapter and connect it like in the paragraph above. This is annoying, since the internal `VDD` testpoint has to be tapped, requiring the watch to be disassembled. Hence, one of the other methods is recommended.
 
 ```
 $ nrfjprog -f nrf52 --eraseall
@@ -238,102 +348,317 @@ $ arm-none-eabi-gdb
 
 Flashing the unlocked chip should then work with any basic SWD capable programmer, like the **ST-Link V2** (the cheap clones work too). The **CMSIS-DAP** or the **Black Magic Probe** can be used as well.
 
-You can use **OpenOCD** (http://openocd.org/) to connect to the chip and manage its flash memory (... means subsequent commands or arguments):
+You can use **OpenOCD** to connect to the chip and manage its flash memory ("..." denote subsequent commands or arguments):
 
-High level SWD access using a *ST-Link V2* clone:
-
-```
-$ openocd -d2 -f interface/stlink-v2.cfg -c "transport select hla_swd; ..." -f target/nrf52.cfg
-```
-
-Lower level SWD access using a *CMSIS-DAP* (recommended):
+<details>
+<summary>High level SWD access using a ST-Link V2 clone</summary>
 
 ```
-$ openocd -f interface/cmsis-dap.cfg -c "transport select swd; ..." -f target/nrf52.cfg
+$ openocd -f interface/stlink-v2.cfg -c "transport select hla_swd" -f target/nrf52.cfg -c "init; reset halt; ...; reset; exit"
 ```
 
-Lower level SWD access using a *J-Link* (not recommended):
+</details>
+
+<details>
+<summary>Lower level SWD access using a CMSIS-DAP (recommended)</summary>
+
+```
+$ openocd -f interface/cmsis-dap.cfg -c "transport select swd" -f target/nrf52.cfg -c "init; reset halt; ...; reset; exit"
+```
+
+</details>
+
+<details>
+<summary>Lower level SWD access using a J-Link (not recommended)</summary>
 
 ```
 $ nrfjprog -f nrf52 ...
 ```
 
-The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (default: CMSIS-DAP) to program the chip. This can be changed in the `platformio.ini` file.
+</details>
+
+The *J-Link tools* are able to communicate with the *CMIS-DAP* interface as well.
+
+The **PlatformIO IDE** is set up to use OpenOCD via some hardware adapter (default: CMSIS-DAP) to program the chip. This can be changed in the `platformio.ini` file. For the watch, use the `i6hrc` configuration.
+
+#### Debugging
+
+The PlatformIO IDE is able to use either a *CMSIS-DAP* or *J-Link* adapter for interactive debugging. The `i6hrc_debug` and `nrf52_dk_debug` configurations provide debugging support. Do note that the watchdog timer might kill your debugging session. The host may use the *J-Link* debugger software (which is able to connect to a *CMSIS-DAP* as well) or the *CMSIS_DAP* debugger software by PlatformIO (default).
+
+Since the `RX`, `TX` and `SWO` pins are used for other peripherals, *UART* and *SWO* communication is not possible. The firmware thus implements a **SEGGER J-Link RTT** interface (https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/), which communicates via the `SWD` debug interface. To access this interface, either the SEGGER RTT tools or J-Link tools are required. Use *JLinkRTTViewer* or the other tools to open a socket, then connect to it via a terminal at `socket://localhost:19021` (default port).
+
+```
+$ JLinkExe -autoconnect 1 -device NRF52832_XXAA -if SWD -speed 4000 -RTTTelnetPort 19021 &
+$ telnet localhost 19021
+```
+
+Add the compiler definition `SEGGER_RTT` to enable this feature. The task "Start Monitor Server" automates the connection.
 
 #### Troubleshooting
 
-Unfortunatly, the SWD `RESET` line is not easily accessible. However, shorting `SWDCLK` to `VCC` triggers a debug init halt as well.
+Unfortunately, the SWD `RESET` line is not easily accessible. However, shorting `SWDCLK` to `VCC` triggers a debug init halt as well.
 
-If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using OpenOCD while spamming the reset button on your adapter. This should not be needed during normal flashing and execution. Sometimes, this condition occurs randomly when the `SWDCLK` pin is left floating due to EMI. On a successful connection OpenOCD displays something like "`Info : nrf52.cpu: hardware has 6 breakpoints, 4 watchpoints`". This means the chip was reset, caught and is now in debug mode. 
+If the watch refuses to flash, hangs in low power mode or is stuck in a bootloop, try connecting to it using *OpenOCD* while spamming the reset button on your adapter - hoping the debugger attaches before the error state occures. This should not be needed during normal flashing and execution. Sometimes, this reset condition occurs randomly when the `SWDCLK` pin is left floating due to EMI and long wires. This is also the reason for the pulldown resistor in the schematic above.
+
+On a successful connection OpenOCD displays something like "`Info : nrf52.cpu: hardware has 6 breakpoints, 4 watchpoints`". This means the chip was reset, caught and is now in debug mode. 
 
 The script `tools/reset.sh` or the task "Reset Target" automates this spamming, waiting for you to press the reset button.
 
 Optionally, append `-c "reset halt"` to the OpenOCD command. The chip then halts at the first instruction, which may be good for debugging.
 
-### Dumping the Font ROM
+### Accessing the Font ROM (Work in progress)
 
-Disassemble your watch and connect the `TX` and `RX` testpoints to the corresponding pins of a Serial-to-USB converter. Connect power and ground of the USB plug to the `5V` and `GND` pins of the converter.
+The font rom is internally connected to the main CPU via SPI and implements a fairly standard flash command interface.
 
-Next, remove `"SERIAL", "SERIAL_ASYNCH", "SERIAL_FC"` from `mbed_app.json` and compile and upload the firmware using the `i6hrc_flashdump` environment. Then, launch the script `tools/flash.dump.py`. The content of the flash will be downloaded to `dump.bin`. However, on some models I noticed the flash memory to be empty.
+Unfortunately, neither the NRF52832 nor the flash used support or use the *QSPI* interface, which would allow mapping the flash address range and accessing it via the *MMU*. This would enable remote reading and writing of the flash via the *SWD* connection.
+
+It is possible to write a **RamCode** (https://wiki.segger.com/Programming_External_SPI_Flashes) using the SEGGER **Open Flashloader** framework (https://wiki.segger.com/Open_Flashloader). Then, a tool like **J-Flash** would be able to access the external flash via the RamCode on the CPU. This is however quite trick to do. Instead, the **OpenOCD** "on chip flash loader" protocol by *Pavel Chromy* (http://openocd.org/doc/html/Flash-Commands.html) could be implemented.
+
+Some python scripts are used to communicate with the chip using the RTT interface. However, a proper SPI flash driver is still missing and has yet to be fully implemented (#1).
+
 
 ## Connecting to a phone
 
 A fork of the Android app **Gadgetbridge** (https://gadgetbridge.org/) with support for this firmware is available at *Codeberg*: https://codeberg.org/StarGate01/Gadgetbridge/src/branch/chrzwatch .
 
-You can use the Android app "**nRF Connect**" (https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp&hl=en) to test the Bluetooth functions. Sometimes, connecting takes multiple tries.
+You can use the Android app "**nRF Connect**" (https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp) to test the Bluetooth functions. Sometimes, connecting takes multiple tries.
 
-Various other apps like e.g. **FitoTrack** (https://play.google.com/store/apps/details?id=de.tadris.fitness&hl=en&gl=US) are able to read the heartrate from this sensor. Update: The device has not to be bonded in the recent version.
+Various other apps like e.g. **FitoTrack** (https://play.google.com/store/apps/details?id=de.tadris.fitness) are able to read the heartrate from this sensor. Update: The device has not to be bonded in the recent version.
 
-## Thanks to
+## Thanks
 
 Thanks to *Aaron Christophel* for providing instructions on how to modify the hardware, mapping out the pins and providing some demo Arduino code.
 
  - https://github.com/atc1441
- - http://atcnetz.blogspot.com/2019/02/arduino-auf-dem-fitness-tracker-dank.html
+ - https://atcnetz.blogspot.com/2019/02/arduino-auf-dem-fitness-tracker-dank.html
  - https://www.mikrocontroller.net/topic/467136
  - https://www.youtube.com/watch?v=0Fu-VSuKHEg
 
-## Library credits, modifications and licensing
+## Licensing
 
-Hot-patches can be found in this repository under `/patch`.
 
-- ARM Mbed RTOS and API: https://os.mbed.com/
-   - Hot-patch Nordic BLE driver to support deep sleep
-   - Hot-patch NRF52 linker memory map to support crash dump retention
+Please note that while most code in this repository is licensed under the terms of the GPLv3 license, this explicitly does not apply to the libraries contained in `/lib`, fonts in `/res/fonts`, patches in `/patch` and the file `/doc/pinout.png`. All these documents have their own license attached.
 
-All modified libraries have been or will be published to https://platformio.org , their source code can be found in this repository under `/lib`.
+### Fonts
 
-Please note that while most code in this repository may be licensed under the term of the GPL3 license, this explicitly does not apply to the libraries contained in `/lib`. All these libraries have their own license attached.
+Fonts can be found in `/res/fonts`.
 
- - The `CurrentTimeService` module of the `BLE_GATT_Services` library (https://platformio.org/lib/show/7372/BLE_GATT_Services) is based on `BLE_CurrentTimeService` by *Takehisa Oneta*: https://os.mbed.com/users/ohneta/code/BLE_CurrentTimeService/
-   - Deferred calls in ISR context to EventQueue
-   - Added documentation
-   - Added LOW_POWER macro (default 1) to use a low-power ticker.
-   - Exposed monotonic timer callback
- - The `Adafruit_GFX` library (https://platformio.org/lib/show/12501/Adafruit_GFX) is based on the library of the same name by *Andrew Lindsay*: https://platformio.org/lib/show/2147/Adafruit_GFX, which in turn is a port of https://github.com/adafruit/Adafruit-GFX-Library
-   - Added convenience bitmap functions
-   - Move font to .text
- - The `Adafruit_ST7735_Mini` library (https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini) is based on the `Adafruit_ST7735` library by *Andrew Lindsay*: https://platformio.org/lib/show/2150/Adafruit_ST7735, which in turn is a port of a library by Adafruit: https://github.com/adafruit/Adafruit-ST7735-Library
-   - Added support for the `R_MINI160x80` display type
-   - Added documentation
-   - Added an explicit dependency to `Adafruit_GFX` port, see above
-   - Added SPI speed configuration
- - The `UnsafeI2C` library (https://platformio.org/lib/show/12500/UnsafeI2C) is a wrapper for the existing Mbed I2C library
-   - Removed threadsafe mutex
- - The `GT24L24A2Y` library (Unpublished, unfinished) is a driver for the font chip of the same name
-   - Initial implementation
- - The `Heartrate3_AFE4404` library (https://platformio.org/lib/show/11099/Heartrate3_AFE4404) is based on the library and example code of `Click_Heartrate3_AFE4404` by *MikroElektronika* / *Corey Lakey*: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
-   - Added Mbed integration
-   - Added interrupt handling
-   - Added power down/up functionality
-   - Added an explicit dependency to `UnsafeI2C`, see above
- - The `kionix-kx123-driver` library (https://platformio.org/lib/show/11101/kionix-kx123-driver) is based on the library of the same name by *Rohm*: https://platformio.org/lib/show/3975/kionix-kx123-driver
-   - Adapted to Mbed 5
-   - Added interrupt configuration functionality
-   - Added motion detecting functionality
-   - Fixed include paths
- - The `RegisterWriter` library (https://platformio.org/lib/show/11100/RegisterWriter) is based on the library of the same name by *Rohm* / *Mikko Koivunen*: https://platformio.org/lib/show/10695/RegisterWriter
-   - Adapted to Mbed 5
-   - Fixed include paths
-   - Fixed default pins
-   - Added an explicit dependency to `UnsafeI2C`, see above
+<details>
+<summary>Standard ascii 5x7</summary>
+
+- Author: Adafruit
+- URL: https://platformio.org/lib/show/12501/Adafruit_GFX
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>Roboto Mono Bold [24pt, 36pt, 48pt]</summary>
+
+- Author: Google
+- URL: https://fonts.google.com/specimen/Roboto
+- Selected subset of glyphs
+- *License: Apache 2.0*
+
+</details>
+
+### Images
+
+Images can be found in `/res/img`.
+
+<details>
+<summary>MDI heart-pulse [36px]</summary>
+
+- Author: Google
+- URL: https://materialdesignicons.com/
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>MDI map-marker-distance [36px]</summary>
+
+- Author: Michael Richins
+- URL: https://materialdesignicons.com/
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>MDI shoe-print [36px]</summary>
+
+- Author: Michael Irigoyen
+- URL: https://materialdesignicons.com/
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>MDI speedometer [36px]</summary>
+
+- Author: Austin Andrews
+- URL: https://materialdesignicons.com/
+- *License: Apache 2.0*
+
+</details>
+
+### Patches
+
+Patches to Mbed can be found in `/patch`.
+
+<details>
+<summary>ARM Mbed RTOS and API</summary>
+
+- Original author: ARM Mbed Team
+- URL: https://os.mbed.com/, Fork: https://github.com/StarGate01/mbed-os
+- Use branch `feature-nrf52-low-power-ble`
+- Add PlatformIO metadata
+- Replace NRF52 linker memory map to support crash dump retention
+- *License: Custom - see https://github.com/ARMmbed/mbed-os/blob/master/LICENSE.md*
+
+</details>
+
+### Libraries
+
+All modified libraries have been or will be published to https://platformio.org , their source code can be found in `/lib`.
+
+<details>
+<summary>CurrentTimeService</summary>
+
+- Original author: Takehisa Oneta
+- URL: https://os.mbed.com/users/ohneta/code/BLE_CurrentTimeService/
+- Modifications:
+  - URL: https://platformio.org/lib/show/7372/BLE_GATT_Services
+  - Deferred calls in ISR context to EventQueue
+  - Added documentation
+  - Added LOW_POWER macro (default 1) to use a low-power ticker.
+  - Exposed monotonic timer callback
+- *License: GPLv3*
+
+</details>
+
+<details>
+<summary>Adafruit_GFX</summary>
+
+- Original author: Adafruit
+- URL: https://github.com/adafruit/Adafruit-GFX-Library
+- Modifications:
+  - Original author: Andrew Lindsay
+  - URL: https://platformio.org/lib/show/2147/Adafruit_GFX
+  - Modifications:
+    - URL: https://platformio.org/lib/show/12501/Adafruit_GFX
+    - Added buffered high-speed drawing functions
+    - Move font to .text
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>Adafruit_ST7735_Mini</summary>
+
+- Original author: Adafruit
+- URL: https://github.com/adafruit/Adafruit-ST7735-Library
+- Modifications:
+  - Original author: Andrew Lindsay
+  - URL: https://platformio.org/lib/show/2150/Adafruit_ST7735
+  - Modifications:
+    - URL: https://platformio.org/lib/show/7412/Adafruit_ST7735_Mini
+    - Added support for the `R_MINI160x80` display type
+    - Added documentation
+    - Added an explicit dependency to `Adafruit_GFX` port, see above
+    - Added SPI speed configuration
+    - Added high-speed buffered drawing functions
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>UnsafeI2C</summary>
+
+- URL: https://platformio.org/lib/show/12500/UnsafeI2C
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>GT24L24A2Y</summary>
+
+- URL: (Unpublished, unfinished)
+- *License: GPLv3*
+
+</details>
+
+<details>
+<summary>Heartrate3_AFE4404</summary> 
+
+- Original author: MikroElektronika / Corey Lakey: 
+- URL: https://github.com/MikroElektronika/Click_Heartrate3_AFE4404
+- Modifications:
+  - URL: https://platformio.org/lib/show/11099/Heartrate3_AFE4404
+  - Added Mbed integration
+  - Added interrupt handling
+  - Added power down/up functionality
+  - Added an explicit dependency to `UnsafeI2C`, see above
+- *License: GPLv2*
+
+</details>
+
+<details>
+<summary>kionix-kx123-driver</summary> 
+
+- Original author: Rohm
+- URL: https://platformio.org/lib/show/3975/kionix-kx123-driver
+- Modifications: 
+  - URL: https://platformio.org/lib/show/11101/kionix-kx123-driver
+  - Adapted to Mbed
+  - Added interrupt configuration functionality
+  - Added motion detecting functionality
+  - Fixed include paths
+  - Add tilt detecting feature
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>RegisterWriter</summary>
+
+- Original author: Rohm / Mikko Koivunen
+- URL: https://platformio.org/lib/show/10695/RegisterWriter
+- Modifications:
+  - URL: https://platformio.org/lib/show/11100/RegisterWriter
+  - Adapted to Mbed
+  - Fixed include paths
+  - Fixed default pins
+  - Added an explicit dependency to `UnsafeI2C`, see above
+- *License: Apache 2.0*
+
+</details>
+
+<details>
+<summary>JLink_RTT</summary>
+
+- Original author: SEGGER
+- URL: https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/ (JLink_V630D/Samples/RTT/SEGGER_RTT_V630d.zip)
+- Modifications:
+  - Original author: James Wang
+  - URL: https://github.com/woodsking2/sabomo_jlink_rtt
+  - Modifications:
+    - URL: https://platformio.org/lib/show/12534/JLink_RTT
+    - Removed redundant printf implementation, use the one of Mbed
+    - Use Mutex instead of Thread_safe
+    - Add serial input
+    - Add example
+- *License: GPLv3 / Custom - see files*
+
+</details>
+
+### Other
+
+<details>
+<summary>File /doc/pinout.png</summary> 
+
+- Original author: Aaron Christophel
+- URL: https://atcnetz.blogspot.com/2019/02/arduino-auf-dem-fitness-tracker-dank.html
+- *License: All rights reserved, fair use*
+
+</details>

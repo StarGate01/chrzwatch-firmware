@@ -7,7 +7,6 @@
  */
 
 #include "Heartrate3_AFE4404.h"
-
 #include "heartrate_3_hal.h"
 
 
@@ -33,7 +32,7 @@ Heartrate3_AFE4404::Heartrate3_AFE4404(PinName sda, PinName scl, PinName intr, P
 void Heartrate3_AFE4404::init()
 {
     _reset.write(1);
-    ThisThread::sleep_for(10);
+    ThisThread::sleep_for(std::chrono::milliseconds(10));
     _init();
     _is_on = true;
 }

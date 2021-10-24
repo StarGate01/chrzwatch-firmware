@@ -10,20 +10,17 @@
 #include "CurrentTimeService.h"
 
 
-CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue):
+CurrentTimeService::CurrentTimeService(BLE &ble, ChainableGattServerEventHandler& gatt_handler,
+        events::EventQueue &event_queue, int seconds_resolution):
     _ble(ble),
     _event_queue(event_queue),
+    _ticker_resolution(seconds_resolution),
     _currentTimeCharacteristic(GattCharacteristic::UUID_CURRENT_TIME_CHAR,
         _valueBytes, BLE_CURRENT_TIME_CHAR_VALUE_SIZE, BLE_CURRENT_TIME_CHAR_VALUE_SIZE,
         GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_READ
             | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_NOTIFY
             | GattCharacteristic::BLE_GATT_CHAR_PROPERTIES_WRITE)
 {
-    // Read RTC
-    // rtc_init();
-    // time_t now = rtc_read();
-    // writeEpoch(now, false);
-
     // Setup buffers
     memset(_valueBytes, 0, BLE_CURRENT_TIME_CHAR_VALUE_SIZE);
 
@@ -33,8 +30,8 @@ CurrentTimeService::CurrentTimeService(BLE &ble, events::EventQueue &event_queue
 
     // Attach GATT server and timer events
     _ble.gattServer().addService(currentTimeGATT);
-    _ble.gattServer().onDataWritten(this, &CurrentTimeService::onDataWritten);
-    _ticker.attach(_event_queue.event(this, &CurrentTimeService::onTickerCallback), 1.0);
+    gatt_handler.addEventHandler(this);
+    _event_queue.call_every(std::chrono::milliseconds(_ticker_resolution * 1000), callback(this, &CurrentTimeService::onTickerCallback));
 }
 
 void CurrentTimeService::setMonotonicCallback(const Callback<void(const time_t epoch)>& second_notify)
@@ -42,7 +39,7 @@ void CurrentTimeService::setMonotonicCallback(const Callback<void(const time_t e
     _second_notify = second_notify;
 }
 
-void CurrentTimeService::writeDateTime(const BLE_DateTime& dateTime, const bool writeRtc)
+void CurrentTimeService::writeDateTime(const BLE_DateTime& dateTime)
 {
     // Populate buffer from date-time-stamp
     *(uint16_t*)&_valueBytes[0] = dateTime.year;
@@ -58,25 +55,26 @@ void CurrentTimeService::writeDateTime(const BLE_DateTime& dateTime, const bool 
     _valueBytes[9] = 0;   // Adjust Reason
 
     // Update systems
-    writeBuffer(writeRtc);
+    writeBuffer();
 }
 
-void CurrentTimeService::writeEpoch(const time_t& epochTime, const bool writeRtc)
+void CurrentTimeService::writeEpoch(const time_t& epochTime)
 {
     // Populate buffer from UNIX timestamp
-    struct tm *tmPtr = localtime(&epochTime);
-    *(uint16_t *)&_valueBytes[0] = tmPtr->tm_year + 1900;
-    _valueBytes[2] = tmPtr->tm_mon + 1;
-    _valueBytes[3] = tmPtr->tm_mday;
-    _valueBytes[4] = tmPtr->tm_hour;
-    _valueBytes[5] = tmPtr->tm_min;
-    _valueBytes[6] = tmPtr->tm_sec;
-    _valueBytes[7] = (tmPtr->tm_wday == 0)? 7:(tmPtr->tm_wday);
+    struct tm tmv;
+    localtime_r(&epochTime, &tmv);
+    *(uint16_t *)&_valueBytes[0] = tmv.tm_year + 1900;
+    _valueBytes[2] = tmv.tm_mon + 1;
+    _valueBytes[3] = tmv.tm_mday;
+    _valueBytes[4] = tmv.tm_hour;
+    _valueBytes[5] = tmv.tm_min;
+    _valueBytes[6] = tmv.tm_sec;
+    _valueBytes[7] = (tmv.tm_wday == 0)? 7:(tmv.tm_wday);
     _valueBytes[8] = 0;
     _valueBytes[9] = 0;
 
     // Update systems
-    writeBuffer(writeRtc);
+    writeBuffer();
 }
 
 void CurrentTimeService::readDateTime(BLE_DateTime& dateTime)
@@ -106,16 +104,8 @@ void CurrentTimeService::readEpoch(time_t& epochTime)
     epochTime = mktime(&timep);
 }
 
-void CurrentTimeService::writeBuffer(const bool writeRtc)
+void CurrentTimeService::writeBuffer()
 {
-    if(writeRtc)
-    {  
-        // Update RTC
-        // time_t tmpEpochTime;
-        // readEpoch(tmpEpochTime);
-        // rtc_write(tmpEpochTime);
-    }
-
     // Update GATT server
     _ble.gattServer().write(_currentTimeCharacteristic.getValueHandle(), _valueBytes, BLE_CURRENT_TIME_CHAR_VALUE_SIZE);
 }
@@ -125,19 +115,18 @@ void CurrentTimeService::onTickerCallback(void)
     // Add 1 second to the internal time
     time_t tmpEpochTime;
     readEpoch(tmpEpochTime);
-    tmpEpochTime++;
-    writeEpoch(tmpEpochTime, false);
+    tmpEpochTime += _ticker_resolution;
+    writeEpoch(tmpEpochTime);
 
     // Defer the second handler if existing
     if(_second_notify != nullptr) _event_queue.call(_second_notify, tmpEpochTime);
 }
 
-void CurrentTimeService::onDataWritten(const GattWriteCallbackParams* params)
+void CurrentTimeService::onDataWritten(const GattWriteCallbackParams& params)
 {
-    if (params->handle == _currentTimeCharacteristic.getValueHandle()) 
+    if (params.handle == _currentTimeCharacteristic.getValueHandle()) 
     {
         // Blit the received update into the buffer
-        memcpy((void*)&_valueBytes, params->data, min(params->len, (uint16_t)BLE_CURRENT_TIME_CHAR_VALUE_SIZE));
-        writeBuffer(true);
+        memcpy((void*)&_valueBytes, params.data, min(params.len, (uint16_t)BLE_CURRENT_TIME_CHAR_VALUE_SIZE));
     }
 }

@@ -1,6 +1,6 @@
 {
     "name": "UnsafeI2C",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "keywords": "i2c, thread, lock",
     "description": "Mbed I2C interface without locks, which makes it unsafe for parallel usage, but enables usage in interrupt handlers.",
     "authors":

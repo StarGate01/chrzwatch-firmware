@@ -6,10 +6,10 @@
  * @date 2020-08-30
  */
 
-#include "heartrate_3_hal.h"
-
 #include <mbed.h>
-#include <UnsafeI2C.h>
+
+#include "UnsafeI2C.h"
+#include "heartrate_3_hal.h"
 
 
 static UnsafeI2C* _hal_i2c = nullptr;
@@ -55,5 +55,5 @@ void hr3_hal_read(uint8_t *command, uint8_t *buffer, uint16_t count)
 
 void hr3_hal_delay(uint32_t ms)
 {
-    ThisThread::sleep_for(ms);
+    ThisThread::sleep_for(std::chrono::milliseconds(ms));
 }
