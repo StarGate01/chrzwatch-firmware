@@ -129,7 +129,7 @@ class CoreService : ble::Gap::EventHandler //, public SecurityManager::EventHand
          * 
          * @param event Event information
          */
-        virtual void onConnectionComplete(const ble::ConnectionCompleteEvent &event);
+        void onConnectionComplete(const ble::ConnectionCompleteEvent &event);
 
         /**
          * @brief Callback handler for the immediate alert service

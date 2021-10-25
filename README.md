@@ -54,6 +54,7 @@ Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Su
 - [x] Timekeeping
 - [x] Graceful reboot on error
 - [x] Step detection algorithm
+- [x] Wake-up on wrist turn
 - [x] Heartrate detection algorithm
 - [x] User configurable settings
 - [x] High-speed LCD drawing

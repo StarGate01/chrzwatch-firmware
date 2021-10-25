@@ -20,7 +20,7 @@
 #include "Screen.h"
 
 
-#define LCD_TIMEOUT         5000 //!< LCD timeout in ms
+#define LCD_TIMEOUT         4000 //!< LCD timeout in ms
 #define VIBRATION_GRACE_IN  10   //!< Sensor shutoff before vibration
 #define VIBRATION_GRACE_OUT 750  //!< Sensor restart grace after vibration
 

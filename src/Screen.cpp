@@ -1,7 +1,7 @@
 /**
- * @file ScreenModel.cpp
+ * @file Screen.cpp
  * @author Christoph Honal
- * @brief Implements some functions defined in Screen.h
+ * @brief Implements the functions defined in Screen.h
  * @version 0.1
  * @date 2020-08-19
  */
