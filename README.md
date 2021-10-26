@@ -2,6 +2,43 @@
 
 Custom firmware for the NRF52 based smartwatch I6HRC using the ARM Mbed RTOS. Supported by a custom version of the Gadgetbridge Android app.
 
+<details>
+<summary>Photos</summary>
+
+![Wrist](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/photos/wrist.jpeg)
+
+![Watch](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/photos/watch.jpeg)
+
+![Heartrate](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/photos/heartrate.jpeg)
+
+![Speed](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/photos/speed.jpeg)
+
+![Steps](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/photos/steps.jpeg)
+
+![Distance](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/photos/distance.jpeg)
+
+![Settings](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/photos/settings.jpeg)
+
+![System](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/photos/system.jpeg)
+
+
+</details>
+
+<details>
+<summary>Android Screenshots</summary>
+
+![General](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/screenshots/general.png)
+
+![Activity](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/screenshots/activity.png)
+
+![Activity2](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/screenshots/activity2.png)
+
+![Settings](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/screenshots/settings.png)
+
+![Sleep](https://raw.githubusercontent.com/StarGate01/chrzwatch-firmware/master/doc/screenshots/sleep.png)
+
+</details>
+
 ## State of the project
 
 
