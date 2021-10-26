@@ -27,8 +27,7 @@
 #define BUTTON_VIBRATION_LENGTH 75    //!< Button vibration feedback in ms
 #define BUTTON_DEBOUNCE         300   //!< Minimum time between button pressen in ms
 #define ALERT_VIBRATION_LENGTH  200   //!< Alert vibration length in ms
-#define SENSOR_FREQUENCY        60000 //!< Sensor measuring / reporting interval in ms
-#define HR_DURATION             30000 //!< Heartrate measurement interval in ms
+#define MIN_SENSOR_FREQUENCY    1     //!< Minimum (gatt broadcast) sensor measuring / reporting interval in min
 #define TILT_DURATION_THRESH    8     //!< Time treshold for tilt detection in 1/12.5 s
 
 // Forward decalarations
@@ -103,6 +102,7 @@ class SensorService
         uint8_t _hr_value = 0; //!< The internal heartrate value
         uint8_t _motion_count = 0; //!< The internal count of motion events
         time_t _last_reeval = 0; //!< Last time the rcs was reevaluated
+        int _hr_poll_token = 0; //!< Heartrate polling loop token
 
         InterruptIn _button1; //!< Button 1 input
         InterruptIn _button2; //!< Button 2 input
@@ -121,8 +121,9 @@ class SensorService
         DigitalOut _hr_pwr; //!< Power pin of the heartrate sensor
 
         void setupAccelerationSensor(); //!< Initializes the acceleration sensor
-        void poll(); //!< Begin to read all sensors
-        void finishPoll(); //!< Called after sensor reading is complete
+        void pollPower(); //!< Read power sensors
+        void pollHeartrate(); //!< Begin to read heartrate sensor
+        void finishPollHeartrate(); //!< Called after heartrate reading is complete
 
         void handleButtonIRQ(); //!< Handle press of buttons interrupt request
         void handleAccIRQ(); //!< Handle acceleration sensor interrupt request

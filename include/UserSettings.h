@@ -22,6 +22,9 @@ struct __attribute__ ((packed)) user_sensor_settings_t
     uint8_t motion_duration        = 25;  //!< Motion detection time window in 1/50 s
     uint8_t motion_threshold       = 8;   //!< Motion detection threshold in 1/16 g
     uint8_t cadence_running_thresh = 120; //!< Minimum step cadence for running
+    uint8_t hr_enable              = 1;   //!< Enable / disable heartrate sensor
+    uint8_t hr_frequency           = 1;   //!< Heartrate measurement frequency in minutes
+    uint8_t hr_duration            = 30;  //!< Heartrate measurement duration in seconds
 };
 
 /**

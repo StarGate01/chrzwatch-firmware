@@ -46,8 +46,8 @@ void CoreService::start()
     initWatchdog();
 
     // Setup and start ble and watchdog queue
-    _event_queue.call_every(std::chrono::milliseconds(SENSOR_FREQUENCY), this, &CoreService::doUpdateGATT);
-    _event_queue.call_every(std::chrono::milliseconds(15000), CoreService::kickWatchdog); // 15 sec kick leaves 5 sec headroom
+    _event_queue.call_every(std::chrono::minutes(MIN_SENSOR_FREQUENCY), this, &CoreService::doUpdateGATT);
+    _event_queue.call_every(std::chrono::seconds(15), CoreService::kickWatchdog); // 15 sec kick leaves 5 sec headroom
 
     // Sensor service measures once in constructor, so update gatt at start
     doUpdateGATT();

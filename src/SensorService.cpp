@@ -40,15 +40,15 @@ SensorService::SensorService(DisplayService &display_service):
     _acc_addr.write(1);
     _acc_cs.write(1);
     _acc_irq.fall(callback(this, &SensorService::handleAccIRQ)); // Attach interrupt handler
-    setupAccelerationSensor();
 
     // Handle dispatching events
-    _event_queue.call_every(std::chrono::milliseconds(SENSOR_FREQUENCY), this, &SensorService::poll);
+    updateUserSettings();
+    _event_queue.call_every(std::chrono::minutes(MIN_SENSOR_FREQUENCY), this, &SensorService::pollPower);
     _event_queue.call_every(std::chrono::milliseconds(LCD_TIMEOUT), this, &SensorService::handleDisplayTimeout);
     _event_thread.start(callback(&_event_queue, &EventQueue::dispatch_forever));
 
     // Poll once at start
-    poll();
+    pollPower();
 }
 
 uint8_t SensorService::getHRValue()
@@ -114,6 +114,27 @@ void SensorService::updateUserSettings()
     setupAccelerationSensor();
     rsc_measurement.instantaneous_stride_length = user_settings.sensor.step_length * 2;
 
+    // Refresh heartrate polling
+    if(_hr_poll_token != 0) _event_queue.cancel(_hr_poll_token);
+    if(user_settings.sensor.hr_enable)
+    {
+        _hr_poll_token = _event_queue.call_every(std::chrono::minutes(user_settings.sensor.hr_frequency), 
+            this, &SensorService::pollHeartrate);
+    }
+    else
+    {
+        finishPollHeartrate();
+        _hr_value = 0;
+        if(_display_service.screen.getState() == Screen::ScreenState::STATE_HEART)
+        {
+            Screen::ScreenState current_state = _display_service.screen.getState();
+            current_state = static_cast<Screen::ScreenState>(static_cast<int>(current_state) + 1);
+            if(current_state == Screen::ScreenState::STATE_LOOP) current_state = Screen::ScreenState::STATE_CLOCK;
+            _display_service.screen.setState(current_state);
+            _display_service.render();
+        }
+    }
+    
     // Refresh display if needed
     if(_display_service.screen.getState() == Screen::ScreenState::STATE_SETTINGS)
     {
@@ -133,24 +154,22 @@ void SensorService::setupAccelerationSensor()
     _acc_kx123.start_measurement_mode();
 }
 
-void SensorService::poll()
+void SensorService::pollPower()
 {
     // Update battery
     _battery_value = _battery.read();
     _charging_value = (_charging.read() == 0);
-
-    // Begin HR measuring interval
-    _hr.setPower(true);
-    _event_queue.call_in(std::chrono::milliseconds(HR_DURATION), callback(this, &SensorService::finishPoll));
-
-    // Refresh display if needed
-    if(_display_service.screen.getState() == Screen::ScreenState::STATE_SETTINGS)
-    {
-        _display_service.render();
-    }
 }
 
-void SensorService::finishPoll()
+void SensorService::pollHeartrate()
+{
+    // Begin HR measuring interval
+    _hr.setPower(true);
+    _event_queue.call_in(std::chrono::seconds(min((int)user_settings.sensor.hr_duration, user_settings.sensor.hr_frequency * 60)), 
+        callback(this, &SensorService::finishPollHeartrate));
+}
+
+void SensorService::finishPollHeartrate()
 {
     // End HR sensor interval
     _hr_value = _hr.getHeartrate();
@@ -196,6 +215,10 @@ void SensorService::handleButtonIRQ()
             // Advance to next screen state
             Screen::ScreenState current_state = _display_service.screen.getState();
             current_state = static_cast<Screen::ScreenState>(static_cast<int>(current_state) + 1);
+            if(current_state == Screen::ScreenState::STATE_HEART && user_settings.sensor.hr_enable == 0) 
+            {
+                current_state = static_cast<Screen::ScreenState>(static_cast<int>(current_state) + 1);
+            }
             if(current_state == Screen::ScreenState::STATE_LOOP) current_state = Screen::ScreenState::STATE_CLOCK;
             _display_service.screen.setState(current_state);
             _display_service.render();

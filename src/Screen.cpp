@@ -245,14 +245,15 @@ void Screen::render()
             _lcd.setTextColor(LCD_COLOR_YELLOW);
             _lcd.printf("Settings\n\n");
             _lcd.setTextColor(LCD_COLOR_WHITE);
-            _lcd.printf("[General]\n");
-            _lcd.printf("Time format\n %s\n", user_settings.time_format == 1? "12h":"24h");
-            _lcd.printf("Btn vibrate\n %s\n", user_settings.button_feedback? "Yes":"No");
-            _lcd.printf("\n[Sensor]\n");
-            _lcd.printf("Step length\n %u cm\n", user_settings.sensor.step_length);
-            _lcd.printf("Motion dur\n %u 1/50s\n", user_settings.sensor.motion_duration);
-            _lcd.printf("Motion thresh\n %u 1/16g\n", user_settings.sensor.motion_threshold);
-            _lcd.printf("Run cadence\n %u spm", user_settings.sensor.cadence_running_thresh);
+            _lcd.printf("Hrs: %s\n", user_settings.time_format == 1? "12h":"24h");
+            _lcd.printf("Bvb: %s\n", user_settings.button_feedback? "Yes":"No");
+            _lcd.printf("Sln: %u cm\n", user_settings.sensor.step_length);
+            _lcd.printf("Mdr: %u 1/50s\n", user_settings.sensor.motion_duration);
+            _lcd.printf("Mtr: %u 1/16g\n", user_settings.sensor.motion_threshold);
+            _lcd.printf("Rcd: %u spm\n", user_settings.sensor.cadence_running_thresh);
+            _lcd.printf("HRe: %s\n", user_settings.sensor.hr_enable == 1? "Yes":"No");
+            _lcd.printf("HRf: %u min\n", user_settings.sensor.hr_frequency);
+            _lcd.printf("HRd: %u sec\n", user_settings.sensor.hr_duration);
             break;
         }    
         case ScreenState::STATE_INFO:
@@ -273,7 +274,6 @@ void Screen::render()
             // _lcd.printf("Bonded\n %s\n", _bleEncStatus? "Yes":"No");
             _lcd.printf("\n[CPU]\n");
             _lcd.printf("Uptime\n %llu s\n", _cpu_stats.uptime / 1000000);
-            // _lcd.printf("Sleep\n %llu s\n", _cpu_stats.sleep_time / 1000000);
             _lcd.printf("Deep sleep\n %llu s", _cpu_stats.deep_sleep_time / 1000000);
             break;
         }    
