@@ -30,3 +30,4 @@ fp-info-cache
 # Docs binaries
 doc/html
 
+.direnv
